@@ -1,0 +1,78 @@
+.heroPortrait{
+  position: relative;
+  width: 100%;
+  height: 720px;
+  min-height: 520px;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.heroPortraitImg{
+  filter: contrast(1.02) saturate(1.02);
+}
+
+.heroDoctorMask {
+  position: relative;
+  /* Ajusta el tamaño del panel */
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  /* Fade 4 lados: combinando gradiente vertical + horizontal */
+  -webkit-mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      rgba(0,0,0,1) 12%,
+      rgba(0,0,0,1) 88%,
+      transparent 100%
+    ),
+    linear-gradient(to right,
+      transparent 0%,
+      rgba(0,0,0,1) 12%,
+      rgba(0,0,0,1) 88%,
+      transparent 100%
+    );
+  -webkit-mask-size: 100% 100%, 100% 100%;
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  -webkit-mask-position: center, center;
+  -webkit-mask-composite: source-in;
+
+  mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      rgba(0,0,0,1) 12%,
+      rgba(0,0,0,1) 88%,
+      transparent 100%
+    ),
+    linear-gradient(to right,
+      transparent 0%,
+      rgba(0,0,0,1) 12%,
+      rgba(0,0,0,1) 88%,
+      transparent 100%
+    );
+  mask-size: 100% 100%, 100% 100%;
+  mask-repeat: no-repeat, no-repeat;
+  mask-position: center, center;
+  mask-composite: intersect;
+}
+
+.heroPortrait::before{
+  content:"";
+  position:absolute;
+  inset:-8%;
+  z-index:-1;
+  background:
+    radial-gradient(45% 55% at 62% 38%, rgba(210,220,255,0.18) 0%, rgba(210,220,255,0) 70%),
+    radial-gradient(40% 50% at 55% 65%, rgba(120,140,255,0.10) 0%, rgba(120,140,255,0) 72%);
+  filter: blur(18px);
+  opacity: .9;
+  pointer-events:none;
+}
+
+/* Responsive: en pantallas pequeñas baja altura y centra */
+@media (max-width: 900px){
+  .heroPortrait{ height: 520px; min-height: 420px; }
+}
+@media (max-width: 520px){
+  .heroPortrait{ height: 420px; min-height: 320px; }
+}

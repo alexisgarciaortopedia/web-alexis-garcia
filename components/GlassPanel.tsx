@@ -9,9 +9,9 @@ export default function GlassPanel({ className = "", children }: GlassPanelProps
   return (
     <div
       className={[
-        "rounded-2xl border border-white/40",
-        "bg-[rgba(255,255,255,0.45)] backdrop-blur-[22px]",
-        "shadow-[0_20px_60px_rgba(15,23,42,0.12)]",
+        "rounded-[24px] border border-white/10",
+        "bg-[rgba(16,18,22,0.55)] backdrop-blur-[24px]",
+        "shadow-[0_35px_90px_rgba(2,6,12,0.55)]",
         className,
       ].join(" ")}
     >
