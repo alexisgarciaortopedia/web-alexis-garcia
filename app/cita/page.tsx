@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
@@ -34,7 +34,7 @@ function getUpcomingDates(days: number[], count = 14) {
   return result;
 }
 
-export default function CitaPage() {
+function CitaContent() {
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get("appointment_id") || "XXXX";
   const action = searchParams.get("action");
@@ -274,5 +274,13 @@ export default function CitaPage() {
 
       <WhatsAppFloating />
     </div>
+  );
+}
+
+export default function CitaPage() {
+  return (
+    <Suspense fallback={null}>
+      <CitaContent />
+    </Suspense>
   );
 }

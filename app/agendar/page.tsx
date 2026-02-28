@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GlassPanel from "@/components/GlassPanel";
@@ -8,6 +8,8 @@ import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { SCHEDULES, Sede } from "@/lib/appointmentsSchedule";
 type Tipo = "programada" | "prioritaria";
+
+export const dynamic = "force-dynamic";
 
 const SEDE_LABELS: Record<Sede, string> = {
   tula: "Tula — Presencial",
@@ -69,7 +71,7 @@ function EmbeddedCardPayment({ onConfirm }: { onConfirm: () => void }) {
   );
 }
 
-export default function AgendarPage() {
+function AgendarContent() {
   const searchParams = useSearchParams();
   const initialSede = (searchParams.get("sede") || "") as Sede;
   const initialMotivo = searchParams.get("motivo") || "";
@@ -599,5 +601,13 @@ export default function AgendarPage() {
 
       <WhatsAppFloating />
     </div>
+  );
+}
+
+export default function AgendarPage() {
+  return (
+    <Suspense fallback={null}>
+      <AgendarContent />
+    </Suspense>
   );
 }

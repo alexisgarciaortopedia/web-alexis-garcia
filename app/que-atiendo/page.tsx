@@ -275,7 +275,7 @@ const CATEGORIES: Category[] = [
 export default function QueAtiendoPage() {
   const [openCategory, setOpenCategory] = useState<string>(CATEGORIES[0].id);
   const [openCondition, setOpenCondition] = useState<string>("");
-  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const hashMap = useMemo(() => {
     return CATEGORIES.reduce<Record<string, string>>((acc, category) => {
