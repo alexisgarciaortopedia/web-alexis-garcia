@@ -84,7 +84,9 @@ function AgendarContent() {
   const initialTipo =
     VISIT_TYPE_PARAM_MAP[initialTipoParam.toLowerCase()] ?? "";
 
-  const [sede, setSede] = useState<Sede | "">(initialSede);
+  const [sede, setSede] = useState<"" | "tula" | "pachuca" | "telemedicina">(
+    initialSede
+  );
   const [tipo, setTipo] = useState<Tipo | "">(initialTipo);
   const [pago, setPago] = useState<"anticipo" | "total">("total");
   const [fecha, setFecha] = useState<string>("");
@@ -212,7 +214,7 @@ function AgendarContent() {
         nombre,
         telefono,
         motivo,
-        pago_tipo: sede === "telemedicina" ? "total" : pago,
+        pago_tipo: pago,
         pago_monto: totalToPay,
         ref_source: "WEB-2026",
       }),
