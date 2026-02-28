@@ -46,6 +46,7 @@ function CitaContent() {
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
+  const [showAllSlots, setShowAllSlots] = useState(false);
 
   useEffect(() => {
     if (!appointmentId || appointmentId === "XXXX") return;
@@ -95,6 +96,11 @@ function CitaContent() {
     if (!appointment?.sede) return [];
     return SCHEDULES[appointment.sede].slots;
   }, [appointment?.sede]);
+
+  const visibleHours = useMemo(() => {
+    if (showAllSlots) return availableHours;
+    return availableHours.slice(0, 3);
+  }, [availableHours, showAllSlots]);
 
   const handleReschedule = async () => {
     if (!appointment || !fecha || !hora) return;
@@ -216,7 +222,7 @@ function CitaContent() {
                         })}
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {availableHours.map((slot) => {
+                        {visibleHours.map((slot) => {
                           const isOccupied =
                             occupiedSlots.includes(slot) &&
                             !(fecha === appointment.fecha && slot === appointment.hora_inicio);
@@ -237,6 +243,15 @@ function CitaContent() {
                           );
                         })}
                       </div>
+                      {availableHours.length > 3 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllSlots((prev) => !prev)}
+                          className="text-left text-xs text-[#B9C0CC] transition-colors hover:text-white"
+                        >
+                          {showAllSlots ? "Ver menos" : "Ver más horarios"}
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={handleReschedule}

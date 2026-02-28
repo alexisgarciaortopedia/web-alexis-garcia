@@ -36,7 +36,7 @@ export default function UbicacionesPage() {
 
             <div className="flex flex-col gap-2 text-sm text-[#B9C0CC]">
               <p>
-                <span className="text-white">Atención:</span> Viernes y sábado
+                <span className="text-white">Atención:</span> Jueves y sábado
               </p>
               <p>
                 <span className="text-white">Horario:</span> 14:00 – 18:00 h

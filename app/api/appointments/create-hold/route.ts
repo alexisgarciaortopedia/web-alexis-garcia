@@ -30,10 +30,13 @@ export async function POST(request: Request) {
   const now = new Date();
   const expires = new Date(now.getTime() + 15 * 60 * 1000).toISOString();
   const id = crypto.randomUUID();
+  const startAt = `${fecha}T${hora_inicio}:00`;
 
   createHold({
     id,
     expires_at: expires,
+    original_start_at: startAt,
+    current_start_at: startAt,
     sede,
     tipo,
     fecha,

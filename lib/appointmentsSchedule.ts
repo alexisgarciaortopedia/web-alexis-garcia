@@ -2,7 +2,7 @@ export type Sede = "tula" | "pachuca" | "telemedicina";
 
 export const SCHEDULES: Record<Sede, { days: number[]; slots: string[] }> = {
   tula: {
-    days: [5, 6],
+    days: [4, 6],
     slots: [
       "14:00",
       "14:30",

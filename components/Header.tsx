@@ -8,13 +8,13 @@ const INSTAGRAM_URL =
 
 export default function Header() {
   return (
-    <div className="relative z-20 flex w-full justify-center px-4 pt-6">
-      <GlassPanel className="w-full max-w-6xl px-6 py-3">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div className="relative z-20 flex w-full justify-center px-3 pt-6 sm:px-4 lg:px-4">
+      <GlassPanel className="w-full max-w-6xl px-4 py-3 sm:px-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between max-[900px]:flex-wrap max-[900px]:items-start max-[900px]:gap-2">
           <Link href="/" className="text-sm font-semibold text-white">
             Dr. Alexis Eduardo García
           </Link>
-          <nav className="hidden items-center gap-6 text-sm text-[#B9C0CC] md:flex">
+          <nav className="flex w-full flex-wrap items-center gap-4 text-sm text-[#B9C0CC] md:w-auto md:flex-nowrap md:justify-center">
             <Link href="/sobre-mi" className="transition-colors hover:text-white">
               Sobre mí
             </Link>
@@ -25,11 +25,11 @@ export default function Header() {
               ¿Qué atiendo?
             </Link>
           </nav>
-          <div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
-            <div className="flex items-center gap-3 text-sm text-white/70">
+          <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-3 md:w-auto md:justify-end max-[900px]:w-full max-[900px]:flex-wrap max-[900px]:justify-between">
+            <div className="flex min-w-0 items-center gap-3 text-sm text-white/70">
               <a
                 href="tel:+527713344634"
-                className="flex items-center gap-2 transition-colors hover:text-white"
+                className="flex min-w-0 items-center gap-2 transition-colors hover:text-white max-[900px]:truncate"
               >
                 <PhoneIcon className="h-4 w-4 text-white/80" />
                 <span>{WHATSAPP_PHONE}</span>
@@ -46,7 +46,7 @@ export default function Header() {
             </div>
             <Link
               href="/agendar"
-              className="inline-flex min-h-[46px] items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
+              className="inline-flex w-full min-h-[46px] items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)] sm:w-auto max-[900px]:w-full max-[900px]:justify-center"
             >
               Agendar consulta
             </Link>

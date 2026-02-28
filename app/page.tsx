@@ -1,11 +1,33 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
+import { formatCurrency, PRICES, VisitType } from "@/lib/appointmentsPricing";
+import { Sede } from "@/lib/appointmentsSchedule";
 
 export default function Home() {
+  const router = useRouter();
+  const [location, setLocation] = useState<Sede>("tula");
+  const [visitType, setVisitType] = useState<VisitType>("programada");
+
+  const price = useMemo(() => PRICES[location][visitType], [location, visitType]);
+  const locationOptions: Sede[] = ["tula", "pachuca", "telemedicina"];
+  const locationLabels: Record<Sede, string> = {
+    tula: "Tula",
+    pachuca: "Pachuca",
+    telemedicina: "Telemedicina",
+  };
+  const visitTypeLabels: Record<VisitType, string> = {
+    programada: "Consulta programada",
+    prioritaria: "Atención prioritaria",
+  };
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
@@ -36,7 +58,6 @@ export default function Home() {
               <span>
                 Certificado por el Consejo Mexicano de Ortopedia y Traumatología
               </span>
-              <span>Cédula de especialidad: en trámite</span>
             </div>
           </div>
 
@@ -56,37 +77,75 @@ export default function Home() {
 
         <GlassPanel className="flex flex-col gap-8 px-6 py-8 lg:px-8">
           <div className="flex flex-wrap items-center gap-6 text-sm text-[#B9C0CC]">
-            <div className="flex items-center gap-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-white" />
-              <div>
-                <div className="font-medium text-white">Tula</div>
-                <div className="text-xs text-[#8C95A3]">Activa</div>
-              </div>
-            </div>
-            <div className="hidden h-6 w-px bg-white/10 sm:block" />
-            <div className="text-[#8C95A3]">
-              <div className="font-medium text-white/70">Pachuca</div>
-            </div>
+            {locationOptions.map((option, index) => {
+              const isActive = location === option;
+              return (
+                <div key={option} className="flex items-center gap-6">
+                  {index > 0 && (
+                    <div className="hidden h-6 w-px bg-white/10 sm:block" />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setLocation(option)}
+                    aria-pressed={isActive}
+                    className="flex items-center gap-3 text-left transition-colors"
+                  >
+                    {isActive && (
+                      <span className="h-2.5 w-2.5 rounded-full bg-white" />
+                    )}
+                    <div>
+                      <div className={`font-medium ${isActive ? "text-white" : "text-white/70"}`}>
+                        {locationLabels[option]}
+                      </div>
+                      {isActive && (
+                        <div className="text-xs text-[#8C95A3]">Activa</div>
+                      )}
+                    </div>
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           <div className="h-px w-full bg-white/10" />
 
           <div className="flex flex-wrap gap-3 text-sm">
-            <span className="rounded-full bg-white/10 px-4 py-2 text-white shadow-[0_10px_26px_rgba(0,0,0,0.35)]">
-              Consulta programada
-            </span>
-            <span className="rounded-full border border-white/15 px-4 py-2 text-[#B9C0CC]">
-              Atención prioritaria
-            </span>
+            {(Object.keys(visitTypeLabels) as VisitType[]).map((option) => {
+              const isActive = visitType === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setVisitType(option)}
+                  aria-pressed={isActive}
+                  className={
+                    isActive
+                      ? "rounded-full bg-white/10 px-4 py-2 text-white shadow-[0_10px_26px_rgba(0,0,0,0.35)]"
+                      : "rounded-full border border-white/15 px-4 py-2 text-[#B9C0CC]"
+                  }
+                >
+                  {visitTypeLabels[option]}
+                </button>
+              );
+            })}
           </div>
 
+          <p className="text-sm text-[#B9C0CC]">
+            <span className="text-white">Precio:</span> {formatCurrency(price)}
+          </p>
+
           <div className="w-full sm:w-auto">
-            <a
-              href="/agendar?sede=tula&tipo=programada"
+            <button
+              type="button"
+              onClick={() =>
+                router.push(
+                  `/agendar?location=${location}&visitType=${visitType}`
+                )
+              }
               className="inline-flex min-h-[56px] w-full items-center justify-center rounded-full bg-white px-8 text-sm font-semibold text-black shadow-[0_18px_46px_rgba(0,0,0,0.4)] transition-all hover:-translate-y-0.5 hover:opacity-90"
             >
               Agendar ahora
-            </a>
+            </button>
           </div>
         </GlassPanel>
 

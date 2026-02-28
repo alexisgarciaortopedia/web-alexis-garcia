@@ -7,7 +7,8 @@ import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { SCHEDULES, Sede } from "@/lib/appointmentsSchedule";
-type Tipo = "programada" | "prioritaria";
+import { formatCurrency, PRICES, VisitType } from "@/lib/appointmentsPricing";
+type Tipo = VisitType;
 
 export const dynamic = "force-dynamic";
 
@@ -28,16 +29,16 @@ const TIPO_DESCRIPTIONS: Record<Tipo, string> = {
     "Valoración en menor tiempo ante dolor incapacitante o traumatismo reciente.",
 };
 
-const PRICES: Record<Sede, Record<Tipo, number>> = {
-  tula: { programada: 900, prioritaria: 1800 },
-  pachuca: { programada: 1200, prioritaria: 1800 },
-  telemedicina: { programada: 800, prioritaria: 1500 },
+const LOCATION_PARAM_MAP: Record<string, Sede> = {
+  tula: "tula",
+  pachuca: "pachuca",
+  telemedicina: "telemedicina",
 };
 
-
-function formatCurrency(value: number) {
-  return `$${value.toLocaleString("es-MX")} MXN`;
-}
+const VISIT_TYPE_PARAM_MAP: Record<string, Tipo> = {
+  programada: "programada",
+  prioritaria: "prioritaria",
+};
 
 function getUpcomingDates(days: number[], count = 14) {
   const result: Date[] = [];
@@ -73,18 +74,18 @@ function EmbeddedCardPayment({ onConfirm }: { onConfirm: () => void }) {
 
 function AgendarContent() {
   const searchParams = useSearchParams();
-  const initialSede = (searchParams.get("sede") || "") as Sede;
+  const initialSedeParam =
+    searchParams.get("sede") || searchParams.get("location") || "";
+  const initialSede =
+    LOCATION_PARAM_MAP[initialSedeParam.toLowerCase()] ?? "";
   const initialMotivo = searchParams.get("motivo") || "";
-  const initialTipo = (searchParams.get("tipo") || "") as Tipo;
+  const initialTipoParam =
+    searchParams.get("tipo") || searchParams.get("visitType") || "";
+  const initialTipo =
+    VISIT_TYPE_PARAM_MAP[initialTipoParam.toLowerCase()] ?? "";
 
-  const [sede, setSede] = useState<Sede | "">(
-    ["tula", "pachuca", "telemedicina"].includes(initialSede)
-      ? initialSede
-      : ""
-  );
-  const [tipo, setTipo] = useState<Tipo | "">(
-    ["programada", "prioritaria"].includes(initialTipo) ? initialTipo : ""
-  );
+  const [sede, setSede] = useState<Sede | "">(initialSede);
+  const [tipo, setTipo] = useState<Tipo | "">(initialTipo);
   const [pago, setPago] = useState<"anticipo" | "total">("total");
   const [fecha, setFecha] = useState<string>("");
   const [hora, setHora] = useState<string>("");
@@ -93,8 +94,13 @@ function AgendarContent() {
   const [nombreTouched, setNombreTouched] = useState(false);
   const [telefonoTouched, setTelefonoTouched] = useState(false);
   const [motivo, setMotivo] = useState(initialMotivo);
+  const [telemedNombre, setTelemedNombre] = useState("");
+  const [telemedWhatsapp, setTelemedWhatsapp] = useState("");
+  const [telemedMotivo, setTelemedMotivo] = useState("");
+  const [telemedSubmitted, setTelemedSubmitted] = useState(false);
   const [telemedicinaAceptada, setTelemedicinaAceptada] = useState(false);
   const [pagoConfirmado, setPagoConfirmado] = useState(false);
+  const [showAllSlots, setShowAllSlots] = useState(false);
   const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
   const [weeklyAvailability, setWeeklyAvailability] = useState<{
     totalSlots: number;
@@ -143,6 +149,11 @@ function AgendarContent() {
     return SCHEDULES[sede].slots;
   }, [sede]);
 
+  const visibleHours = useMemo(() => {
+    if (showAllSlots) return availableHours;
+    return availableHours.slice(0, 3);
+  }, [availableHours, showAllSlots]);
+
   const total = sede && tipo ? PRICES[sede][tipo] : 0;
   const anticipo = total ? Math.round(total * 0.3) : 0;
   const totalToPay = sede === "telemedicina" ? total : pago === "total" ? total : anticipo;
@@ -160,7 +171,28 @@ function AgendarContent() {
     Boolean(sede && tipo && fecha && hora && nameIsValid && phoneIsValid) &&
     (sede !== "telemedicina" || telemedicinaAceptada);
 
+  const telemedFormValid =
+    Boolean(telemedNombre.trim()) &&
+    Boolean(telemedWhatsapp.trim()) &&
+    Boolean(telemedMotivo.trim());
+
+  const handleTelemedRequest = () => {
+    if (!telemedFormValid) return;
+    const ref = `WEB-TELEMED-${Date.now().toString(36)}`;
+    const message = [
+      "Solicitud de videoconsulta (WEB)",
+      `Nombre: ${telemedNombre.trim()}`,
+      `WhatsApp: ${telemedWhatsapp.trim()}`,
+      `Motivo: ${telemedMotivo.trim()}`,
+      `Ref: ${ref}`,
+    ].join("\n");
+    const url = `https://wa.me/527713344634?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+    setTelemedSubmitted(true);
+  };
+
   useEffect(() => {
+    if (sede === "telemedicina") return;
     if (!isStep5Enabled || appointmentId) return;
     const [h, m] = hora.split(":").map(Number);
     const endMinutes = h * 60 + m + 30;
@@ -451,63 +483,121 @@ function AgendarContent() {
           {scarcityMessage && (
             <p className="text-xs text-[#8C95A3]">{scarcityMessage}</p>
           )}
-          <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+          {sede === "telemedicina" ? (
             <GlassPanel className="px-6 py-6">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {availableDates.map((date) => {
-                  const label = date.toLocaleDateString("es-MX", {
-                    weekday: "short",
-                    day: "2-digit",
-                    month: "short",
-                  });
-                  const value = date.toISOString().slice(0, 10);
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setFecha(value)}
-                      className={`rounded-lg border px-3 py-2 text-left text-sm transition-all ${
-                        fecha === value
-                          ? "border-white bg-white/10 text-white"
-                          : "border-white/10 text-[#B9C0CC]"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col gap-4 text-sm text-[#B9C0CC]">
+                <p className="text-white">Solicitar videoconsulta</p>
+                <div className="flex flex-col gap-3">
+                  <input
+                    className="rounded-lg border border-white/10 bg-transparent px-3 py-2 text-white"
+                    placeholder="Nombre"
+                    value={telemedNombre}
+                    required
+                    onChange={(event) => setTelemedNombre(event.target.value)}
+                  />
+                  <input
+                    className="rounded-lg border border-white/10 bg-transparent px-3 py-2 text-white"
+                    placeholder="WhatsApp"
+                    value={telemedWhatsapp}
+                    required
+                    onChange={(event) => setTelemedWhatsapp(event.target.value)}
+                  />
+                  <input
+                    className="rounded-lg border border-white/10 bg-transparent px-3 py-2 text-white"
+                    placeholder="Motivo (corto)"
+                    value={telemedMotivo}
+                    required
+                    onChange={(event) => setTelemedMotivo(event.target.value)}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTelemedRequest}
+                  disabled={!telemedFormValid}
+                  className="inline-flex items-center justify-center rounded-lg bg-[#0A2540] px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Solicitar videoconsulta
+                </button>
+                <p className="text-xs text-[#8C95A3]">
+                  Confirmación en menos de 30 minutos.
+                </p>
+                {telemedSubmitted && (
+                  <p className="text-xs text-[#8C95A3]">
+                    Solicitud recibida. Confirmaremos disponibilidad en menos de
+                    30 minutos.
+                  </p>
+                )}
               </div>
             </GlassPanel>
-            <GlassPanel className="px-6 py-6">
-              <div className="grid gap-3">
-                {availableHours.map((slot) => {
-                  const isOccupied = occupiedSlots.includes(slot) && slot !== hora;
-                  return (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => setHora(slot)}
-                      disabled={isOccupied}
-                      className={`rounded-lg border px-3 py-2 text-left text-sm transition-all ${
-                        isOccupied
-                          ? "border-white/5 text-white/40"
-                          : hora === slot
+          ) : (
+            <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+              <GlassPanel className="px-6 py-6">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {availableDates.map((date) => {
+                    const label = date.toLocaleDateString("es-MX", {
+                      weekday: "short",
+                      day: "2-digit",
+                      month: "short",
+                    });
+                    const value = date.toISOString().slice(0, 10);
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setFecha(value)}
+                        className={`rounded-lg border px-3 py-2 text-left text-sm transition-all ${
+                          fecha === value
                             ? "border-white bg-white/10 text-white"
                             : "border-white/10 text-[#B9C0CC]"
-                      }`}
-                      aria-disabled={isOccupied}
-                      title={isOccupied ? "No disponible" : slot}
-                    >
-                      {slot}
-                    </button>
-                  );
-                })}
-              </div>
-            </GlassPanel>
-          </div>
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </GlassPanel>
+              <GlassPanel className="px-6 py-6">
+                <div className="grid gap-3">
+                  {visibleHours.map((slot) => {
+                    const isOccupied = occupiedSlots.includes(slot) && slot !== hora;
+                    return (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => setHora(slot)}
+                        disabled={isOccupied}
+                        className={`rounded-lg border px-3 py-2 text-left text-sm transition-all ${
+                          isOccupied
+                            ? "border-white/5 text-white/40"
+                            : hora === slot
+                              ? "border-white bg-white/10 text-white"
+                              : "border-white/10 text-[#B9C0CC]"
+                        }`}
+                        aria-disabled={isOccupied}
+                        title={isOccupied ? "No disponible" : slot}
+                      >
+                        {slot}
+                      </button>
+                    );
+                  })}
+                </div>
+                {availableHours.length > 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllSlots((prev) => !prev)}
+                    className="mt-4 text-left text-xs text-[#B9C0CC] transition-colors hover:text-white"
+                  >
+                    {showAllSlots ? "Ver menos" : "Ver más horarios"}
+                  </button>
+                )}
+              </GlassPanel>
+            </div>
+          )}
         </section>
 
-        <section className={`flex flex-col gap-6 ${isStep5Enabled ? "" : "opacity-40 pointer-events-none"}`}>
+        {sede !== "telemedicina" && (
+          <section className={`flex flex-col gap-6 ${isStep5Enabled ? "" : "opacity-40 pointer-events-none"}`}>
           <div className="flex items-center justify-between text-xs text-[#8C95A3]">
             <span>Paso 5</span>
             <span>Confirmación y pago</span>
@@ -570,7 +660,8 @@ function AgendarContent() {
               </div>
             )}
           </GlassPanel>
-        </section>
+          </section>
+        )}
 
         <section className="text-xs text-[#8C95A3]">
           <p>

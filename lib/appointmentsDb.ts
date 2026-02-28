@@ -207,9 +207,13 @@ export function getOccupiedSlots(sede: Sede, fecha: string) {
   );
   stmt.bind([sede, fecha, nowIso()]);
   const results: string[] = [];
+  const seen = new Set<string>();
   while (stmt.step()) {
     const row = stmt.getAsObject() as { hora_inicio: string };
-    results.push(row.hora_inicio);
+    if (!seen.has(row.hora_inicio)) {
+      seen.add(row.hora_inicio);
+      results.push(row.hora_inicio);
+    }
   }
   stmt.free();
   return results;
@@ -238,9 +242,14 @@ export function getWeeklyAvailability({
   );
   stmt.bind([sede, fromDate, toDate, nowIso()]);
   const results: { fecha: string; hora_inicio: string }[] = [];
+  const seen = new Set<string>();
   while (stmt.step()) {
     const row = stmt.getAsObject() as { fecha: string; hora_inicio: string };
-    results.push({ fecha: row.fecha, hora_inicio: row.hora_inicio });
+    const key = `${row.fecha}|${row.hora_inicio}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      results.push({ fecha: row.fecha, hora_inicio: row.hora_inicio });
+    }
   }
   stmt.free();
   return results;
