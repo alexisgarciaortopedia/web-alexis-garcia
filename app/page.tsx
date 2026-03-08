@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,9 +11,36 @@ import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { formatCurrency, PRICES, VisitType } from "@/lib/appointmentsPricing";
 import { Sede } from "@/lib/appointmentsSchedule";
 
+function SearchParamsHandler({
+  onModalidad,
+}: {
+  onModalidad: (modalidad: "tula" | "telemedicina") => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const directParam = searchParams.get("modalidad");
+    let hashParam = "";
+    if (!directParam && window.location.hash.includes("modalidad=")) {
+      const [, hashQuery = ""] = window.location.hash.split("?");
+      hashParam = new URLSearchParams(hashQuery).get("modalidad") ?? "";
+    }
+    const modalidad = (directParam || hashParam).toLowerCase();
+    if (modalidad === "tula" || modalidad === "telemedicina") {
+      onModalidad(modalidad as "tula" | "telemedicina");
+      const target = document.getElementById("agendar");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [onModalidad, searchParams]);
+
+  return null;
+}
+
 export default function Home() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [location, setLocation] = useState<Sede>("tula");
   const [visitType, setVisitType] = useState<VisitType>("programada");
 
@@ -29,26 +56,13 @@ export default function Home() {
     prioritaria: "Atención prioritaria",
   };
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const directParam = searchParams.get("modalidad");
-    let hashParam = "";
-    if (!directParam && window.location.hash.includes("modalidad=")) {
-      const [, hashQuery = ""] = window.location.hash.split("?");
-      hashParam = new URLSearchParams(hashQuery).get("modalidad") ?? "";
-    }
-    const modalidad = (directParam || hashParam).toLowerCase();
-    if (modalidad === "tula" || modalidad === "telemedicina") {
-      setLocation(modalidad as Sede);
-      const target = document.getElementById("agendar");
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
-  }, [searchParams]);
-
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
+      <Suspense fallback={null}>
+        <SearchParamsHandler
+          onModalidad={(modalidad) => setLocation(modalidad)}
+        />
+      </Suspense>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
       <div className="pointer-events-none absolute -right-28 top-16 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(148,156,170,0.18),transparent_70%)] blur-[90px]" />
       <div className="pointer-events-none absolute inset-0 noise-overlay opacity-20" />
