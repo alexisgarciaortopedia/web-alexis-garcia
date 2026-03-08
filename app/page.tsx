@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
@@ -13,6 +13,7 @@ import { Sede } from "@/lib/appointmentsSchedule";
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [location, setLocation] = useState<Sede>("tula");
   const [visitType, setVisitType] = useState<VisitType>("programada");
 
@@ -27,6 +28,24 @@ export default function Home() {
     programada: "Consulta programada",
     prioritaria: "Atención prioritaria",
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const directParam = searchParams.get("modalidad");
+    let hashParam = "";
+    if (!directParam && window.location.hash.includes("modalidad=")) {
+      const [, hashQuery = ""] = window.location.hash.split("?");
+      hashParam = new URLSearchParams(hashQuery).get("modalidad") ?? "";
+    }
+    const modalidad = (directParam || hashParam).toLowerCase();
+    if (modalidad === "tula" || modalidad === "telemedicina") {
+      setLocation(modalidad as Sede);
+      const target = document.getElementById("agendar");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [searchParams]);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
@@ -75,7 +94,8 @@ export default function Home() {
           </div>
         </section>
 
-        <GlassPanel className="flex flex-col gap-8 px-6 py-8 lg:px-8">
+        <section id="agendar">
+          <GlassPanel className="flex flex-col gap-8 px-6 py-8 lg:px-8">
           <div className="flex flex-wrap items-center gap-6 text-sm text-[#B9C0CC]">
             {locationOptions.map((option, index) => {
               const isActive = location === option;
@@ -147,7 +167,8 @@ export default function Home() {
               Agendar ahora
             </button>
           </div>
-        </GlassPanel>
+          </GlassPanel>
+        </section>
 
         <GlassPanel className="px-6 py-9 lg:px-10 lg:py-12">
           <div className="flex flex-col gap-2 text-center text-sm text-[#B9C0CC] md:text-left">

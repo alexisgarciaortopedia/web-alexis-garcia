@@ -25,6 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="rkruYMA5jVoDuZbRDX7ASEeJabhBbAaTctpdBKdRaDY"
+        />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} antialiased`}>
         {children}
       </body>
