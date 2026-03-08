@@ -17,7 +17,37 @@ type CardConfig = {
 };
 
 const cardBaseClasses =
-  "group relative flex w-full items-center gap-4 rounded-[22px] border border-white/15 bg-white/5 px-5 py-4 text-left text-white/90 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/40 hover:bg-white/8 hover:shadow-[0_0_30px_rgba(124,169,255,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
+  "group relative flex w-full items-center gap-4 overflow-hidden rounded-[22px] border border-white/15 bg-white/6 px-5 py-4 text-left text-white/90 backdrop-blur-[16px] shadow-[0_10px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
+
+const ICON_STYLES = {
+  whatsapp: {
+    color: "#25D366",
+    glow: "0 0 25px rgba(37,211,102,0.55)",
+    tint: "rgba(37,211,102,0.08)",
+  },
+  doctoralia: {
+    color: "#4A7DFF",
+    glow: "0 0 20px rgba(74,125,255,0.28)",
+    tint: "rgba(74,125,255,0.08)",
+  },
+  telemedicina: {
+    color: "#8A97B8",
+    glow: "0 0 18px rgba(138,151,184,0.16)",
+    tint: "rgba(138,151,184,0.08)",
+  },
+  map: {
+    color: "#90A0C8",
+    glow: "0 0 18px rgba(144,160,200,0.14)",
+    tint: "rgba(144,160,200,0.08)",
+  },
+} as const;
+
+function getIconStyle(key: string) {
+  if (key === "whatsapp") return ICON_STYLES.whatsapp;
+  if (key === "doctoralia") return ICON_STYLES.doctoralia;
+  if (key === "telemedicina") return ICON_STYLES.telemedicina;
+  return ICON_STYLES.map;
+}
 
 export default function AgendarClient() {
   const [toastMessage, setToastMessage] = useState("");
@@ -82,7 +112,7 @@ export default function AgendarClient() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#050608] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,#0B1430_0%,rgba(5,6,8,0.92)_55%,#050608_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(10,40,120,0.35),transparent_60%)]" />
       <div className="pointer-events-none absolute -left-32 top-12 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(120,160,255,0.18),transparent_70%)] blur-[90px]" />
       <div className="pointer-events-none absolute -right-40 bottom-[-120px] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(60,90,160,0.2),transparent_65%)] blur-[100px]" />
 
@@ -96,12 +126,21 @@ export default function AgendarClient() {
           </p>
         </section>
 
-        <section className="mt-12 w-full max-w-[560px] space-y-6">
+        <section className="mt-10 w-full max-w-[560px] space-y-6">
           {cards.map((card) => {
+            const iconStyle = getIconStyle(card.key);
             const content = (
               <div className="flex w-full items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
-                  {card.icon}
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 backdrop-blur-[10px]"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
+                    backgroundColor: iconStyle.tint,
+                    boxShadow: iconStyle.glow,
+                  }}
+                >
+                  <span style={{ color: iconStyle.color }}>{card.icon}</span>
                 </span>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-3">
@@ -122,6 +161,13 @@ export default function AgendarClient() {
               </div>
             );
 
+            const cardBody = (
+              <>
+                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,180,90,0.15),transparent_60%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="relative z-10 w-full">{content}</div>
+              </>
+            );
+
             if (card.externalHref) {
               return (
                 <a
@@ -131,7 +177,7 @@ export default function AgendarClient() {
                   rel="noopener noreferrer"
                   className={cardBaseClasses}
                 >
-                  {content}
+                  {cardBody}
                 </a>
               );
             }
@@ -139,7 +185,7 @@ export default function AgendarClient() {
             if (card.href) {
               return (
                 <Link key={card.key} href={card.href} className={cardBaseClasses}>
-                  {content}
+                  {cardBody}
                 </Link>
               );
             }
@@ -151,19 +197,19 @@ export default function AgendarClient() {
                 onClick={card.onClick}
                 className={cardBaseClasses}
               >
-                {content}
+                {cardBody}
               </button>
             );
           })}
         </section>
 
-        <section className="mt-16 flex flex-col items-center gap-4 text-center">
+        <section className="mt-[60px] flex flex-col items-center gap-4 pt-10 text-center">
           <Image
             src="/brand/ag-logo.png"
             alt="AG logo"
             width={120}
             height={120}
-            className="h-auto w-[110px] opacity-90"
+            className="h-auto w-[120px] opacity-90"
           />
           <div className="font-serif text-2xl text-white">Dr Alexis García</div>
           <div className="text-sm text-white/65">
@@ -173,13 +219,18 @@ export default function AgendarClient() {
         </section>
       </main>
 
-      <div className="pointer-events-none absolute bottom-0 right-0 z-0 w-[220px] sm:w-[300px] lg:w-[360px]">
+      <div className="pointer-events-none absolute bottom-0 right-0 z-0 w-[220px] sm:w-[300px] lg:w-[320px]">
         <Image
           src="/brand/dr-alexis.png"
           alt="Dr Alexis García"
           width={720}
           height={900}
-          className="h-auto w-full object-contain opacity-80"
+          className="h-auto w-full object-contain opacity-90"
+          style={{
+            maskImage: "linear-gradient(to top, black 60%, transparent)",
+            WebkitMaskImage: "linear-gradient(to top, black 60%, transparent)",
+            filter: "drop-shadow(0 0 30px rgba(255,255,255,0.08))",
+          }}
           priority
         />
       </div>
