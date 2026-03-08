@@ -45,7 +45,7 @@ export default function Header() {
               </a>
             </div>
             <Link
-              href="/agendar"
+              href="/#agendar"
               className="inline-flex w-full min-h-[46px] items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)] sm:w-auto max-[900px]:w-full max-[900px]:justify-center"
             >
               Agendar consulta

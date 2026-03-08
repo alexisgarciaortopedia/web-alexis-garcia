@@ -17,28 +17,32 @@ type CardConfig = {
 };
 
 const cardBaseClasses =
-  "group relative flex w-full items-center gap-4 overflow-hidden rounded-[22px] border border-white/15 bg-white/6 px-5 py-4 text-left text-white/90 backdrop-blur-[16px] shadow-[0_10px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
+  "group relative flex w-full items-center gap-4 overflow-hidden rounded-[22px] border border-white/20 bg-white/6 px-5 py-4 text-left text-white/90 backdrop-blur-[22px] shadow-[0_0_20px_rgba(255,255,255,0.06),0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
 
 const ICON_STYLES = {
   whatsapp: {
     color: "#25D366",
-    glow: "0 0 25px rgba(37,211,102,0.55)",
-    tint: "rgba(37,211,102,0.08)",
+    glow: "0 0 20px rgba(37,211,102,0.35)",
+    glowHover: "0 0 30px rgba(37,211,102,0.5)",
+    tint: "rgba(37,211,102,0.35)",
   },
   doctoralia: {
     color: "#4A7DFF",
-    glow: "0 0 20px rgba(74,125,255,0.28)",
-    tint: "rgba(74,125,255,0.08)",
+    glow: "0 0 20px rgba(74,125,255,0.35)",
+    glowHover: "0 0 28px rgba(74,125,255,0.42)",
+    tint: "rgba(74,125,255,0.30)",
   },
   telemedicina: {
-    color: "#8A97B8",
-    glow: "0 0 18px rgba(138,151,184,0.16)",
-    tint: "rgba(138,151,184,0.08)",
+    color: "#9BB3FF",
+    glow: "0 0 16px rgba(155,179,255,0.22)",
+    glowHover: "0 0 26px rgba(155,179,255,0.34)",
+    tint: "rgba(155,179,255,0.18)",
   },
   map: {
-    color: "#90A0C8",
-    glow: "0 0 18px rgba(144,160,200,0.14)",
-    tint: "rgba(144,160,200,0.08)",
+    color: "#A8B4D8",
+    glow: "0 0 16px rgba(168,180,216,0.22)",
+    glowHover: "0 0 24px rgba(168,180,216,0.32)",
+    tint: "rgba(168,180,216,0.18)",
   },
 } as const;
 
@@ -88,14 +92,14 @@ export default function AgendarClient() {
       subtitle:
         "Videoconsulta para orientación inicial y revisión de estudios.",
       icon: <Video className="h-6 w-6 text-white" />,
-      href: "/#agendar?modalidad=telemedicina",
+      href: "/?modalidad=telemedicina#agendar",
     },
     {
       key: "tula",
       title: "Consulta Presencial — Tula",
       subtitle: "Atención en consultorio.",
       icon: <MapPin className="h-6 w-6 text-white" />,
-      href: "/#agendar?modalidad=tula",
+      href: "/?modalidad=tula#agendar",
     },
     {
       key: "pachuca",
@@ -126,21 +130,38 @@ export default function AgendarClient() {
           </p>
         </section>
 
-        <section className="mt-10 w-full max-w-[560px] space-y-6">
+        <section className="relative mt-10 w-full max-w-[560px] space-y-6">
+          <span className="pointer-events-none absolute -top-14 left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.15),rgba(255,255,255,0.05),transparent_70%)] blur-[60px]" />
           {cards.map((card) => {
             const iconStyle = getIconStyle(card.key);
             const content = (
               <div className="flex w-full items-center gap-4">
                 <span
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 backdrop-blur-[10px]"
+                  className="relative flex h-12 w-12 items-center justify-center rounded-[18px] border border-white/10 backdrop-blur-[12px]"
                   style={{
                     backgroundImage:
-                      "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
+                      "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))",
                     backgroundColor: iconStyle.tint,
-                    boxShadow: iconStyle.glow,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
                   }}
                 >
-                  <span style={{ color: iconStyle.color }}>{card.icon}</span>
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-[18px] opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{ boxShadow: iconStyle.glow }}
+                  />
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-[18px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{ boxShadow: iconStyle.glowHover }}
+                  />
+                  <span
+                    className="relative transition-transform duration-300 group-hover:scale-[1.03]"
+                    style={{
+                      color: iconStyle.color,
+                      filter: `drop-shadow(${iconStyle.glow})`,
+                    }}
+                  >
+                    {card.icon}
+                  </span>
                 </span>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-3">
@@ -161,9 +182,10 @@ export default function AgendarClient() {
               </div>
             );
 
+            const isPrimary = card.key === "whatsapp";
             const cardBody = (
               <>
-                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,180,90,0.15),transparent_60%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,180,90,0.14),transparent_60%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <div className="relative z-10 w-full">{content}</div>
               </>
             );
@@ -175,7 +197,11 @@ export default function AgendarClient() {
                   href={card.externalHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cardBaseClasses}
+                  className={`${cardBaseClasses} ${
+                    isPrimary
+                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_0_24px_rgba(255,255,255,0.08),0_12px_40px_rgba(0,0,0,0.45)]"
+                      : ""
+                  }`}
                 >
                   {cardBody}
                 </a>
@@ -184,7 +210,15 @@ export default function AgendarClient() {
 
             if (card.href) {
               return (
-                <Link key={card.key} href={card.href} className={cardBaseClasses}>
+                <Link
+                  key={card.key}
+                  href={card.href}
+                  className={`${cardBaseClasses} ${
+                    isPrimary
+                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_0_24px_rgba(255,255,255,0.08),0_12px_40px_rgba(0,0,0,0.45)]"
+                      : ""
+                  }`}
+                >
                   {cardBody}
                 </Link>
               );
@@ -195,7 +229,11 @@ export default function AgendarClient() {
                 key={card.key}
                 type="button"
                 onClick={card.onClick}
-                className={cardBaseClasses}
+                className={`${cardBaseClasses} ${
+                  isPrimary
+                    ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_0_24px_rgba(255,255,255,0.08),0_12px_40px_rgba(0,0,0,0.45)]"
+                    : ""
+                }`}
               >
                 {cardBody}
               </button>
@@ -203,13 +241,17 @@ export default function AgendarClient() {
           })}
         </section>
 
-        <section className="mt-[60px] flex flex-col items-center gap-4 pt-10 text-center">
+        <section className="mt-[100px] flex flex-col items-center gap-3 pt-10 text-center">
           <Image
             src="/brand/ag-logo.png"
             alt="AG logo"
             width={120}
             height={120}
             className="h-auto w-[120px] opacity-90"
+            style={{
+              filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))",
+              mixBlendMode: "screen",
+            }}
           />
           <div className="font-serif text-2xl text-white">Dr Alexis García</div>
           <div className="text-sm text-white/65">
@@ -220,6 +262,7 @@ export default function AgendarClient() {
       </main>
 
       <div className="pointer-events-none absolute bottom-0 right-0 z-0 w-[220px] sm:w-[300px] lg:w-[320px]">
+        <span className="pointer-events-none absolute -bottom-10 right-[-30px] h-[380px] w-[380px] rounded-full bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.28),rgba(255,255,255,0.12),transparent_70%)] blur-[35px]" />
         <Image
           src="/brand/dr-alexis.png"
           alt="Dr Alexis García"
@@ -227,9 +270,13 @@ export default function AgendarClient() {
           height={900}
           className="h-auto w-full object-contain opacity-90"
           style={{
-            maskImage: "linear-gradient(to top, black 60%, transparent)",
-            WebkitMaskImage: "linear-gradient(to top, black 60%, transparent)",
-            filter: "drop-shadow(0 0 30px rgba(255,255,255,0.08))",
+            maskImage:
+              "linear-gradient(to top, black 58%, transparent), linear-gradient(to left, black 65%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to top, black 58%, transparent), linear-gradient(to left, black 65%, transparent)",
+            WebkitMaskComposite: "destination-in",
+            maskComposite: "intersect",
+            filter: "drop-shadow(0 0 24px rgba(255,255,255,0.08))",
           }}
           priority
         />
