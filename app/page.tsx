@@ -742,6 +742,13 @@ export default function Home() {
   const [showAgenda, setShowAgenda] = useState(false);
   const agendaRef = useRef<HTMLElement | null>(null);
 
+  const handleHeaderAgendar = () => {
+    if (window.location.hash !== "#agendar") {
+      window.history.pushState(null, "", "#agendar");
+    }
+    setShowAgenda(true);
+  };
+
   useEffect(() => {
     const revealAgenda = () => {
       if (window.location.hash !== "#agendar") return;
@@ -765,7 +772,7 @@ export default function Home() {
       <div className="pointer-events-none absolute -right-28 top-16 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(148,156,170,0.18),transparent_70%)] blur-[90px]" />
       <div className="pointer-events-none absolute inset-0 noise-overlay opacity-20" />
 
-      <Header />
+      <Header onAgendarClick={handleHeaderAgendar} />
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-20 px-8 pb-28 pt-10 sm:px-10 lg:pt-14">
         <section className="relative w-full min-h-[600px] flex flex-col items-center justify-center gap-12 lg:flex-row">

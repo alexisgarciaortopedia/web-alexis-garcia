@@ -52,7 +52,7 @@ export default function UbicacionesPage() {
                 Disponibilidad limitada
               </span>
               <Link
-                href="/agendar?sede=tula"
+                href="/?sede=tula#agendar"
                 className="inline-flex items-center justify-center rounded-lg bg-[#0A2540] px-5 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:brightness-105"
               >
                 Agendar cita en Tula
@@ -105,7 +105,7 @@ export default function UbicacionesPage() {
                 Disponibilidad limitada
               </span>
               <Link
-                href="/agendar?sede=pachuca"
+                href="/?sede=pachuca#agendar"
                 className="inline-flex items-center justify-center rounded-lg bg-[#0A2540] px-5 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:brightness-105"
               >
                 Agendar cita en Pachuca

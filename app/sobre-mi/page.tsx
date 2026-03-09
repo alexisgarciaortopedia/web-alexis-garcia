@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 
@@ -73,7 +74,7 @@ export default function SobreMiPage() {
 
             <div className="flex flex-col gap-3">
               <a
-                href="/agendar?sede=tula&tipo=programada"
+                href="/?sede=tula&tipo=programada#agendar"
                 className="inline-flex w-full items-center justify-center rounded-full bg-[#0A2540] px-6 py-2 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 sm:w-fit"
               >
                 Agendar evaluación
@@ -83,19 +84,14 @@ export default function SobreMiPage() {
           </div>
 
           <div className="w-full md:w-[40%]">
-            {/* TODO: reemplazar este bloque por la fotografía profesional */}
-            <div className="flex aspect-[4/5] w-full items-center justify-center rounded-[24px] border border-white/10 bg-[#0A2540] text-center text-white shadow-[0_30px_80px_rgba(2,6,12,0.55)]">
-              <div className="flex flex-col gap-2 px-6">
-                <span className="font-serif text-lg">
-                  Dr. Alexis Eduardo García
-                </span>
-                <span className="text-sm text-white/80">
-                  Traumatología y Ortopedia
-                </span>
-                <span className="text-xs text-white/60">
-                  Fotografía profesional próximamente
-                </span>
-              </div>
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] border border-white/10 bg-[#0A2540] shadow-[0_30px_80px_rgba(2,6,12,0.55)]">
+              <Image
+                src="/images/sobre-mi.jpg"
+                alt="Dr. Alexis Eduardo García"
+                fill
+                priority
+                className="object-cover object-[50%_20%]"
+              />
             </div>
           </div>
         </section>
