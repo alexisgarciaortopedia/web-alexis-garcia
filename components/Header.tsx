@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import GlassPanel from "./GlassPanel";
 import { InstagramIcon, PhoneIcon } from "./Icons";
