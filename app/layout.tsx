@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Dr. Alexis Eduardo García de los Santos",
   description:
     "Ortopedia moderna con enfoque en problemas ortopédicos y toma de decisiones basada en evidencia.",
+  icons: {
+    icon: "/favicon-ag-v2.png?v=2",
+  },
 };
 
 export default function RootLayout({
