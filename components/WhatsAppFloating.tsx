@@ -1,6 +1,6 @@
 const WHATSAPP_MESSAGE =
   "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.\nRef: WEB-2026";
-const WHATSAPP_URL = `https://wa.me/527713344634?text=${encodeURIComponent(
+const WHATSAPP_URL = `https://wa.me/527731754638?text=${encodeURIComponent(
   WHATSAPP_MESSAGE
 )}`;
 

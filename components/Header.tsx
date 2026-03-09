@@ -2,9 +2,8 @@ import Link from "next/link";
 import GlassPanel from "./GlassPanel";
 import { InstagramIcon, PhoneIcon } from "./Icons";
 
-const WHATSAPP_PHONE = "771 334 4634";
-const INSTAGRAM_URL =
-  "https://www.instagram.com/dr.bonesgs?igsh=cDI5ZW5sMGx5dmho&utm_source=qr";
+const WHATSAPP_PHONE = "773 175 4638";
+const INSTAGRAM_URL = "https://instagram.com/dralexisgarcia.ortopedia";
 
 export default function Header() {
   return (
@@ -28,7 +27,7 @@ export default function Header() {
           <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-3 md:w-auto md:justify-end max-[900px]:w-full max-[900px]:flex-wrap max-[900px]:justify-between">
             <div className="flex min-w-0 items-center gap-3 text-sm text-white/70">
               <a
-                href="tel:+527713344634"
+                href="tel:+527731754638"
                 className="flex min-w-0 items-center gap-2 transition-colors hover:text-white max-[900px]:truncate"
               >
                 <PhoneIcon className="h-4 w-4 text-white/80" />

@@ -201,7 +201,7 @@ function AgendarFlow() {
       `Motivo: ${telemedMotivo.trim()}`,
       `Ref: ${ref}`,
     ].join("\n");
-    const url = `https://wa.me/527713344634?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/527731754638?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank", "noopener,noreferrer");
     setTelemedSubmitted(true);
   };
@@ -670,7 +670,7 @@ function AgendarFlow() {
                   Cita confirmada
                 </p>
                 <Link
-                  href={`https://wa.me/527713344634?text=${whatsappMessage}`}
+                  href={`https://wa.me/527731754638?text=${whatsappMessage}`}
                   target="_blank"
                   className="inline-flex w-full items-center justify-center rounded-lg bg-[#0A2540] px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105 sm:w-fit"
                 >
