@@ -5,6 +5,13 @@ export const metadata: Metadata = {
   title: "Agendar consulta | Dr Alexis García",
   description:
     "Agenda tu consulta de Traumatología y Ortopedia por WhatsApp o conoce las opciones de atención presencial y en línea del Dr Alexis García.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://alexisgarciaortopedia.com/",
+  },
 };
 
 export default function AgendarPage() {
