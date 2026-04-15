@@ -82,9 +82,8 @@ export default function AgendarClient() {
       title: "Agendar en Doctoralia",
       subtitle: "Reserva inmediata con horarios disponibles.",
       icon: <CalendarCheck className="h-6 w-6 text-white" />,
-      badge: "Próximamente",
-      onClick: () =>
-        showToast("Doctoralia estará disponible próximamente."),
+      externalHref:
+        "https://www.doctoralia.com.mx/alexis-garcia-de-los-santos/traumatologo/doxey-2#address-id=634240&is-online-only=false&filters%5Bspecializations%5D%5B%5D=69",
     },
     {
       key: "telemedicina",
