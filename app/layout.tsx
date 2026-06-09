@@ -33,6 +33,10 @@ export default function RootLayout({
           name="google-site-verification"
           content="rkruYMA5jVoDuZbRDX7ASEeJabhBbAaTctpdBKdRaDY"
         />
+        <meta
+          name="facebook-domain-verification"
+          content="fjzniz8f2fcocaxcc6a9jwqb6sbo7c"
+        />
       </head>
       <body className={`${inter.variable} ${playfair.variable} antialiased`}>
         {children}
