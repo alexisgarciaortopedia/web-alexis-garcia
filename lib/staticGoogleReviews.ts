@@ -1,5 +1,5 @@
 export const FALLBACK_GOOGLE_MAPS_URI =
-  "https://www.google.com/search?q=dr+alexis+garcia+ortopedia";
+  "https://www.google.com/search?kgmid=%2Fg%2F11z1x56bs6&q=Dr.%20Alexis%20Garc%C3%ADa%20de%20los%20Santos%20%7C%20Traumatolog%C3%ADa%20y%20Ortopedia";
 
 export const FALLBACK_RATING = 5.0;
 

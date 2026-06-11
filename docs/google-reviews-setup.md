@@ -4,6 +4,27 @@ Esta guía describe cómo activar la integración con **Places API (New)** para 
 
 Hasta que las variables estén configuradas, el sitio muestra automáticamente las reseñas estáticas actuales como fallback, sin errores visibles para el visitante.
 
+## Ficha profesional confirmada
+
+Perfil público del médico en Google (no confundir con clínicas ni con Doctoralia):
+
+- **Nombre:** Dr. Alexis García de los Santos | Traumatología y Ortopedia
+- **kgmid:** `/g/11z1x56bs6`
+- **URL pública:** https://www.google.com/search?kgmid=%2Fg%2F11z1x56bs6&q=Dr.%20Alexis%20Garc%C3%ADa%20de%20los%20Santos%20%7C%20Traumatolog%C3%ADa%20y%20Ortopedia
+
+**Importante:**
+
+- El **kgmid** identifica la ficha en Google Search, pero **no** es el Place ID de Places API (New).
+- `GOOGLE_PLACES_PLACE_ID` debe configurarse **únicamente** cuando exista confirmación inequívoca del Place ID real (por ejemplo, vía Text Search con API key habilitada o Place ID Finder).
+- El fallback seguirá funcionando aunque todavía no exista Place ID en Vercel.
+- El botón **Ver todas las reseñas en Google** ya abre la ficha profesional confirmada mediante la URL anterior.
+
+Cuando se confirme el Place ID inequívoco, configúralo así (sin subir valores reales al repositorio):
+
+```env
+GOOGLE_PLACES_PLACE_ID=<PLACE_ID_CONFIRMADO>
+```
+
 ## Requisitos previos
 
 - Proyecto en [Google Cloud Console](https://console.cloud.google.com/)
