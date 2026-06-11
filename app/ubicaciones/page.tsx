@@ -1,8 +1,12 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
+import { CLINIC_LOCATIONS, getMapsEmbedUrl } from "@/lib/locations";
 
 export default function UbicacionesPage() {
+  const tula = CLINIC_LOCATIONS.tula;
+  const pachuca = CLINIC_LOCATIONS.pachuca;
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
@@ -24,22 +28,23 @@ export default function UbicacionesPage() {
         <section className="grid gap-8 md:grid-cols-2">
           <article className="flex flex-col gap-6 rounded-[24px] border border-white/15 bg-white/10 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
             <div className="flex flex-col gap-2">
-              <h2 className="font-serif text-xl text-white">Tula — Activa</h2>
+              <h2 className="font-serif text-xl text-white">
+                {tula.publicLabel} — Activa
+              </h2>
               <div className="text-sm text-[#B9C0CC]">
-                <p>Zárate Unidad de Especialidades Médicas</p>
-                <p>Cto. Revolución 19</p>
-                <p>Col. Iturbe</p>
-                <p>42803 Tula de Allende, Hidalgo</p>
-                <p>México</p>
+                <p>{tula.clinicName}</p>
+                {tula.addressLines.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
               </div>
             </div>
 
             <div className="flex flex-col gap-2 text-sm text-[#B9C0CC]">
               <p>
-                <span className="text-white">Atención:</span> Jueves y sábado
+                <span className="text-white">Atención:</span> {tula.daysLabel}
               </p>
               <p>
-                <span className="text-white">Horario:</span> 14:00 – 18:00 h
+                <span className="text-white">Horario:</span> {tula.scheduleLabel}
               </p>
               <p className="text-xs text-[#8C95A3]">
                 Confirmación de cita vía WhatsApp.
@@ -58,7 +63,7 @@ export default function UbicacionesPage() {
                 Agendar cita en Tula
               </Link>
               <a
-                href="https://www.google.com/maps/search/?api=1&query=Z%C3%A1rate+Unidad+de+Especialidades+M%C3%A9dicas+Cto+Revoluci%C3%B3n+19+Tula+de+Allende+Hidalgo"
+                href={tula.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-lg border border-[#0A2540] px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/5"
@@ -70,7 +75,7 @@ export default function UbicacionesPage() {
             <div className="overflow-hidden rounded-xl shadow-md">
               <iframe
                 title="Mapa Tula"
-                src="https://www.google.com/maps?q=Z%C3%A1rate+Unidad+de+Especialidades+M%C3%A9dicas+Cto+Revoluci%C3%B3n+19+Tula+de+Allende+Hidalgo&output=embed"
+                src={getMapsEmbedUrl(tula)}
                 className="w-full"
                 height={200}
                 loading="lazy"
@@ -80,19 +85,23 @@ export default function UbicacionesPage() {
 
           <article className="flex flex-col gap-6 rounded-[24px] border border-white/15 bg-white/10 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
             <div className="flex flex-col gap-2">
-              <h2 className="font-serif text-xl text-white">Pachuca</h2>
+              <h2 className="font-serif text-xl text-white">
+                Consulta en Pachuca — {pachuca.clinicName}
+              </h2>
               <div className="text-sm text-[#B9C0CC]">
-                <p>Consulta privada en Pachuca de Soto, Hidalgo</p>
+                {pachuca.addressLines.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
               </div>
             </div>
 
             <div className="flex flex-col gap-2 text-sm text-[#B9C0CC]">
               <p>
-                <span className="text-white">Atención:</span> Lunes, miércoles y
-                viernes
+                <span className="text-white">Atención:</span> {pachuca.daysLabel}
               </p>
               <p>
-                <span className="text-white">Horario:</span> 14:00 – 18:00 h
+                <span className="text-white">Horario:</span>{" "}
+                {pachuca.scheduleLabel}
               </p>
               <p className="text-xs text-[#8C95A3]">
                 Confirmación de cita vía WhatsApp.
@@ -110,19 +119,20 @@ export default function UbicacionesPage() {
               >
                 Agendar cita en Pachuca
               </Link>
-              <button
-                type="button"
-                className="inline-flex cursor-not-allowed items-center justify-center rounded-lg border border-[#0A2540] px-5 py-2 text-sm font-semibold text-white/60"
-                disabled
+              <a
+                href={pachuca.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-lg border border-[#0A2540] px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/5"
               >
-                Ubicación exacta disponible al confirmar cita.
-              </button>
+                Abrir en Google Maps
+              </a>
             </div>
 
             <div className="overflow-hidden rounded-xl shadow-md">
               <iframe
                 title="Mapa Pachuca"
-                src="https://www.google.com/maps?q=Pachuca+de+Soto+Hidalgo&output=embed"
+                src={getMapsEmbedUrl(pachuca)}
                 className="w-full"
                 height={200}
                 loading="lazy"

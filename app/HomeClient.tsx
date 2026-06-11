@@ -10,12 +10,13 @@ import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { formatCurrency, PRICES, VisitType } from "@/lib/appointmentsPricing";
 import { SCHEDULES, Sede } from "@/lib/appointmentsSchedule";
+import { CLINIC_LOCATIONS } from "@/lib/locations";
 
 type Tipo = VisitType;
 
 const SEDE_LABELS: Record<Sede, string> = {
-  tula: "Tula — Presencial",
-  pachuca: "Pachuca — Presencial",
+  tula: `${CLINIC_LOCATIONS.tula.publicLabel} — Presencial`,
+  pachuca: `${CLINIC_LOCATIONS.pachuca.publicLabel} — Presencial`,
   telemedicina: "Telemedicina — Videoconsulta",
 };
 

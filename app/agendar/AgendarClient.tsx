@@ -103,13 +103,9 @@ export default function AgendarClient() {
     {
       key: "pachuca",
       title: "Consulta Presencial — Pachuca",
-      subtitle: "Próxima apertura.",
+      subtitle: "Atención en Adoy Medical Center.",
       icon: <MapPin className="h-6 w-6 text-white" />,
-      badge: "Próximamente",
-      onClick: () =>
-        showToast(
-          "La consulta presencial en Pachuca estará disponible próximamente."
-        ),
+      href: "/?modalidad=pachuca#agendar",
     },
   ];
 
