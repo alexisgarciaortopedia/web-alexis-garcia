@@ -804,11 +804,11 @@ export default function HomeClient() {
             className={`${styles.heroPortrait} ${styles.heroDoctorMask} order-1 min-w-[300px] lg:order-none lg:basis-[55%] lg:min-w-[340px]`}
           >
             <Image
-              src="/doctor.png"
+              src="/doctor-hero.webp"
               alt="Dr. Alexis Eduardo García de los Santos"
               fill
               priority
-              unoptimized
+              sizes="(max-width: 900px) 100vw, 55vw"
               className={`${styles.heroPortraitImg} object-cover object-[50%_30%]`}
             />
           </div>
