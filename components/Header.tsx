@@ -7,11 +7,7 @@ import { InstagramIcon, PhoneIcon } from "./Icons";
 const WHATSAPP_PHONE = "773 175 4638";
 const INSTAGRAM_URL = "https://instagram.com/dralexisgarcia.ortopedia";
 
-type HeaderProps = {
-  onAgendarClick?: () => void;
-};
-
-export default function Header({ onAgendarClick }: HeaderProps) {
+export default function Header() {
   return (
     <div className="relative z-20 flex w-full justify-center px-3 pt-6 sm:px-4 lg:px-4">
       <GlassPanel className="w-full max-w-6xl px-4 py-3 sm:px-6">
@@ -50,12 +46,7 @@ export default function Header({ onAgendarClick }: HeaderProps) {
               </a>
             </div>
             <Link
-              href="/#agendar"
-              onClick={(event) => {
-                if (!onAgendarClick) return;
-                event.preventDefault();
-                onAgendarClick();
-              }}
+              href="/agendar"
               className="inline-flex w-full min-h-[46px] items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)] sm:w-auto max-[900px]:w-full max-[900px]:justify-center"
             >
               Agendar consulta

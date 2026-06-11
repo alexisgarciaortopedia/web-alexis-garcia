@@ -74,7 +74,7 @@ export default function SobreMiPage() {
 
             <div className="flex flex-col gap-3">
               <a
-                href="/?sede=tula&tipo=programada#agendar"
+                href="/agendar"
                 className="inline-flex w-full items-center justify-center rounded-full bg-[#0A2540] px-6 py-2 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 sm:w-fit"
               >
                 Agendar evaluación

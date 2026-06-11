@@ -1,292 +1,116 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { CalendarCheck, MapPin, MessageCircle, Video } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
+import GlassPanel from "@/components/GlassPanel";
+import Header from "@/components/Header";
+import WhatsAppFloating from "@/components/WhatsAppFloating";
+import { PhoneIcon } from "@/components/Icons";
+import { CLINIC_LOCATIONS } from "@/lib/locations";
 
-type CardConfig = {
-  key: string;
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  href?: string;
-  externalHref?: string;
-  badge?: string;
-  onClick?: () => void;
-};
+const WHATSAPP_MESSAGE =
+  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.\nRef: WEB-2026";
+const WHATSAPP_URL = `https://wa.me/527731754638?text=${encodeURIComponent(
+  WHATSAPP_MESSAGE,
+)}`;
+const PHONE_TEL = "tel:+527731754638";
+const PHONE_DISPLAY = "773 175 4638";
+
+const MODALITIES = [
+  `Consulta presencial en ${CLINIC_LOCATIONS.tula.publicLabel}`,
+  `Consulta presencial en ${CLINIC_LOCATIONS.pachuca.publicLabel}`,
+  "Telemedicina",
+];
 
 const cardBaseClasses =
-  "group relative flex w-full items-center gap-4 overflow-hidden rounded-[22px] border border-white/20 bg-white/6 px-5 py-4 text-left text-white/90 backdrop-blur-[22px] shadow-[0_0_20px_rgba(255,255,255,0.06),0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
-
-const ICON_STYLES = {
-  whatsapp: {
-    color: "#25D366",
-    glow: "0 0 20px rgba(37,211,102,0.35)",
-    glowHover: "0 0 30px rgba(37,211,102,0.5)",
-    tint: "rgba(37,211,102,0.35)",
-  },
-  doctoralia: {
-    color: "#4A7DFF",
-    glow: "0 0 20px rgba(74,125,255,0.35)",
-    glowHover: "0 0 28px rgba(74,125,255,0.42)",
-    tint: "rgba(74,125,255,0.30)",
-  },
-  telemedicina: {
-    color: "#9BB3FF",
-    glow: "0 0 16px rgba(155,179,255,0.22)",
-    glowHover: "0 0 26px rgba(155,179,255,0.34)",
-    tint: "rgba(155,179,255,0.18)",
-  },
-  map: {
-    color: "#A8B4D8",
-    glow: "0 0 16px rgba(168,180,216,0.22)",
-    glowHover: "0 0 24px rgba(168,180,216,0.32)",
-    tint: "rgba(168,180,216,0.18)",
-  },
-} as const;
-
-function getIconStyle(key: string) {
-  if (key === "whatsapp") return ICON_STYLES.whatsapp;
-  if (key === "doctoralia") return ICON_STYLES.doctoralia;
-  if (key === "telemedicina") return ICON_STYLES.telemedicina;
-  return ICON_STYLES.map;
-}
+  "group flex w-full items-center justify-center gap-3 rounded-[22px] border border-white/20 bg-white/6 px-6 py-5 text-center text-sm font-semibold text-white backdrop-blur-[22px] shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
 
 export default function AgendarClient() {
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastVisible, setToastVisible] = useState(false);
-
-  const showToast = useCallback((message: string) => {
-    setToastMessage(message);
-    setToastVisible(true);
-  }, []);
-
-  useEffect(() => {
-    if (!toastVisible) return;
-    const timeout = window.setTimeout(() => setToastVisible(false), 2600);
-    return () => window.clearTimeout(timeout);
-  }, [toastVisible]);
-
-  const cards: CardConfig[] = [
-    {
-      key: "whatsapp",
-      title: "Agendar valoración",
-      subtitle: "Respuesta rápida por WhatsApp.",
-      icon: <MessageCircle className="h-6 w-6 text-white" />,
-      externalHref:
-        "https://wa.me/527731754638?text=Hola%20Dr%20Alexis%20Garcia,%20me%20gustaria%20informacion%20para%20agendar%20una%20consulta%20de%20Traumatologia%20y%20Ortopedia.",
-    },
-    {
-      key: "doctoralia",
-      title: "Agendar en Doctoralia",
-      subtitle: "Reserva inmediata con horarios disponibles.",
-      icon: <CalendarCheck className="h-6 w-6 text-white" />,
-      externalHref:
-        "https://www.doctoralia.com.mx/alexis-garcia-de-los-santos/traumatologo/doxey-2#address-id=634240&is-online-only=false&filters%5Bspecializations%5D%5B%5D=69",
-    },
-    {
-      key: "telemedicina",
-      title: "Consulta en línea",
-      subtitle:
-        "Videoconsulta para orientación inicial y revisión de estudios.",
-      icon: <Video className="h-6 w-6 text-white" />,
-      href: "/?modalidad=telemedicina#agendar",
-    },
-    {
-      key: "tula",
-      title: "Consulta Presencial — Tula",
-      subtitle: "Atención en consultorio.",
-      icon: <MapPin className="h-6 w-6 text-white" />,
-      href: "/?modalidad=tula#agendar",
-    },
-    {
-      key: "pachuca",
-      title: "Consulta Presencial — Pachuca",
-      subtitle: "Atención en Adoy Medical Center.",
-      icon: <MapPin className="h-6 w-6 text-white" />,
-      href: "/?modalidad=pachuca#agendar",
-    },
-  ];
-
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050608] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(10,40,120,0.35),transparent_60%)]" />
-      <div className="pointer-events-none absolute -left-32 top-12 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(120,160,255,0.18),transparent_70%)] blur-[90px]" />
-      <div className="pointer-events-none absolute -right-40 bottom-[-120px] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(60,90,160,0.2),transparent_65%)] blur-[100px]" />
+    <div className="relative min-h-screen overflow-x-hidden bg-[#050608] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
+      <div className="pointer-events-none absolute -right-28 top-16 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(148,156,170,0.18),transparent_70%)] blur-[90px]" />
+      <div className="pointer-events-none absolute inset-0 noise-overlay opacity-20" />
 
-      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-6 pb-24 pt-16 text-center sm:px-10 lg:pt-20">
-        <section className="flex flex-col items-center gap-4">
-          <h1 className="font-serif text-[clamp(2.4rem,5vw,3.8rem)] text-white">
+      <Header />
+
+      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-col gap-10 px-8 pb-24 pt-10 sm:px-10 lg:pt-14">
+        <section className="flex flex-col gap-4 text-center">
+          <h1 className="font-serif text-[clamp(2rem,4vw,3rem)] text-white">
             Agenda tu consulta
           </h1>
-          <p className="max-w-2xl text-sm text-white/70 sm:text-base">
-            Selecciona cómo deseas agendar tu valoración.
+          <p className="text-sm text-[#B9C0CC] sm:text-base">
+            Nuestro equipo te ayudará a confirmar la sede, el horario y la
+            disponibilidad que mejor se adapten a tus necesidades.
           </p>
         </section>
 
-        <section className="relative mt-10 w-full max-w-[560px] space-y-6">
-          <span className="pointer-events-none absolute -top-14 left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.15),rgba(255,255,255,0.05),transparent_70%)] blur-[60px]" />
-          {cards.map((card) => {
-            const iconStyle = getIconStyle(card.key);
-            const content = (
-              <div className="flex w-full items-center gap-4">
-                <span
-                  className="relative flex h-12 w-12 items-center justify-center rounded-[18px] border border-white/10 backdrop-blur-[12px]"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))",
-                    backgroundColor: iconStyle.tint,
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
-                  }}
-                >
-                  <span
-                    className="pointer-events-none absolute inset-0 rounded-[18px] opacity-70 transition-opacity duration-300 group-hover:opacity-100"
-                    style={{ boxShadow: iconStyle.glow }}
-                  />
-                  <span
-                    className="pointer-events-none absolute inset-0 rounded-[18px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                    style={{ boxShadow: iconStyle.glowHover }}
-                  />
-                  <span
-                    className="relative transition-transform duration-300 group-hover:scale-[1.03]"
-                    style={{
-                      color: iconStyle.color,
-                      filter: `drop-shadow(${iconStyle.glow})`,
-                    }}
-                  >
-                    {card.icon}
-                  </span>
-                </span>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-semibold text-white">{card.title}</p>
-                    {card.badge && (
-                      <span className="rounded-full border border-white/20 px-3 py-1 text-[11px] text-white/70">
-                        {card.badge}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-sm text-white/65">
-                    {card.subtitle}
-                  </p>
-                  {card.key === "tula" && (
-                    <p className="mt-2 text-xs text-white/50">Tula, Hidalgo.</p>
-                  )}
-                </div>
-              </div>
-            );
+        <section className="flex flex-col gap-4">
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Agendar por WhatsApp"
+            className={`${cardBaseClasses} bg-[linear-gradient(180deg,rgba(37,211,102,0.16),rgba(255,255,255,0.06))]`}
+          >
+            <MessageCircle className="h-5 w-5 text-[#25D366]" aria-hidden="true" />
+            Agendar por WhatsApp
+          </a>
 
-            const isPrimary = card.key === "whatsapp";
-            const cardBody = (
-              <>
-                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,180,90,0.14),transparent_60%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="relative z-10 w-full">{content}</div>
-              </>
-            );
-
-            if (card.externalHref) {
-              return (
-                <a
-                  key={card.key}
-                  href={card.externalHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${cardBaseClasses} ${
-                    isPrimary
-                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_0_24px_rgba(255,255,255,0.08),0_12px_40px_rgba(0,0,0,0.45)]"
-                      : ""
-                  }`}
-                >
-                  {cardBody}
-                </a>
-              );
-            }
-
-            if (card.href) {
-              return (
-                <Link
-                  key={card.key}
-                  href={card.href}
-                  className={`${cardBaseClasses} ${
-                    isPrimary
-                      ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_0_24px_rgba(255,255,255,0.08),0_12px_40px_rgba(0,0,0,0.45)]"
-                      : ""
-                  }`}
-                >
-                  {cardBody}
-                </Link>
-              );
-            }
-
-            return (
-              <button
-                key={card.key}
-                type="button"
-                onClick={card.onClick}
-                className={`${cardBaseClasses} ${
-                  isPrimary
-                    ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06))] shadow-[0_0_24px_rgba(255,255,255,0.08),0_12px_40px_rgba(0,0,0,0.45)]"
-                    : ""
-                }`}
-              >
-                {cardBody}
-              </button>
-            );
-          })}
+          <a
+            href={PHONE_TEL}
+            aria-label="Llamar para agendar"
+            className={cardBaseClasses}
+          >
+            <Phone className="h-5 w-5 text-white/80" aria-hidden="true" />
+            Llamar para agendar
+            <span className="sr-only">{PHONE_DISPLAY}</span>
+          </a>
         </section>
 
-        <section className="mt-[100px] flex flex-col items-center gap-3 pt-10 text-center">
-          <Image
-            src="/brand/ag-logo.png"
-            alt="AG logo"
-            width={120}
-            height={120}
-            className="h-auto w-[120px] opacity-90"
-            style={{
-              filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))",
-              mixBlendMode: "screen",
-            }}
-          />
-          <div className="font-serif text-2xl text-white">Dr Alexis García</div>
-          <div className="text-sm text-white/65">
-            <p>Diagnóstico claro. Plan preciso.</p>
-            <p>Recuperación con objetivos.</p>
+        <p className="text-center text-xs text-[#8C95A3] sm:text-sm">
+          La cita queda confirmada únicamente después de recibir respuesta de
+          nuestro equipo.
+        </p>
+
+        <GlassPanel className="px-6 py-6">
+          <div className="flex flex-col gap-4 text-sm text-[#B9C0CC]">
+            <p className="font-serif text-base text-white">
+              Modalidades disponibles
+            </p>
+            <ul className="flex flex-col gap-2">
+              {MODALITIES.map((modality) => (
+                <li key={modality} className="flex items-start gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-white/50" />
+                  <span>{modality}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </section>
+        </GlassPanel>
+
+        <div className="flex justify-center">
+          <Link
+            href="/ubicaciones"
+            className="text-sm text-[#B9C0CC] transition-colors hover:text-white"
+          >
+            Consultar sedes y horarios
+          </Link>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 text-sm text-white/70">
+          <PhoneIcon className="h-4 w-4 text-white/80" aria-hidden="true" />
+          <a
+            href={PHONE_TEL}
+            className="transition-colors hover:text-white"
+            aria-label={`Llamar al ${PHONE_DISPLAY}`}
+          >
+            {PHONE_DISPLAY}
+          </a>
+        </div>
       </main>
 
-      <div className="pointer-events-none absolute bottom-0 right-0 z-0 w-[220px] sm:w-[300px] lg:w-[320px]">
-        <span className="pointer-events-none absolute -bottom-10 right-[-30px] h-[380px] w-[380px] rounded-full bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.28),rgba(255,255,255,0.12),transparent_70%)] blur-[35px]" />
-        <Image
-          src="/brand/dr-alexis.png"
-          alt="Dr Alexis García"
-          width={720}
-          height={900}
-          className="h-auto w-full object-contain opacity-90"
-          style={{
-            maskImage:
-              "linear-gradient(to top, black 58%, transparent), linear-gradient(to left, black 65%, transparent)",
-            WebkitMaskImage:
-              "linear-gradient(to top, black 58%, transparent), linear-gradient(to left, black 65%, transparent)",
-            WebkitMaskComposite: "destination-in",
-            maskComposite: "intersect",
-            filter: "drop-shadow(0 0 24px rgba(255,255,255,0.08))",
-          }}
-          priority
-        />
-      </div>
-
-      {toastVisible && (
-        <div className="fixed bottom-6 left-1/2 z-30 -translate-x-1/2">
-          <div
-            role="status"
-            className="rounded-full border border-white/15 bg-[#0C111C]/90 px-6 py-3 text-sm text-white shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl"
-          >
-            {toastMessage}
-          </div>
-        </div>
-      )}
+      <WhatsAppFloating />
     </div>
   );
 }
