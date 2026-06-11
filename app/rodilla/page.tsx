@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://alexisgarciaortopedia.com/rodilla",
+    canonical: "https://www.alexisgarciaortopedia.com/rodilla",
   },
 };
 
