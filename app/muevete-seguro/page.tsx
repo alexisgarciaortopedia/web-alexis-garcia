@@ -432,6 +432,9 @@ export default function MueveteSeguroPage() {
             a la práctica profesional del Dr. Alexis García.
           </p>
           <p className="mt-3 text-center text-xs text-[#4B5563]">
+            Responsable: Dr. Alexis Eduardo García de los Santos.
+          </p>
+          <p className="mt-3 text-center text-xs text-[#4B5563]">
             © {new Date().getFullYear()} Muévete Seguro by Ortik
           </p>
         </div>

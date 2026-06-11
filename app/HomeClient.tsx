@@ -1028,6 +1028,12 @@ export default function HomeClient() {
         </section>
       </main>
 
+      <footer className="relative z-10 border-t border-white/5 px-8 py-6">
+        <p className="text-center text-xs text-[#8C95A3]">
+          Responsable: Dr. Alexis Eduardo García de los Santos.
+        </p>
+      </footer>
+
       <WhatsAppFloating />
     </div>
   );
