@@ -798,6 +798,16 @@ export default function HomeClient() {
                 Ortopedia y Traumatología con enfoque en diagnóstico preciso y
                 tratamiento basado en evidencia.
               </p>
+              <Link
+                href="/#agendar"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleHeaderAgendar();
+                }}
+                className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)] sm:w-fit"
+              >
+                Agendar consulta
+              </Link>
             </div>
           </div>
 
@@ -1030,6 +1040,32 @@ export default function HomeClient() {
       </main>
 
       <footer className="relative z-10 border-t border-white/5 px-8 py-6">
+        <nav
+          className="mb-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#8C95A3]"
+          aria-label="Enlaces del sitio"
+        >
+          <a
+            href="https://instagram.com/dralexisgarcia.ortopedia"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="transition-colors hover:text-white"
+          >
+            Instagram
+          </a>
+          <Link href="/ubicaciones" className="transition-colors hover:text-white">
+            Ubicaciones
+          </Link>
+          <a
+            href="https://wa.me/527731754638?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20del%20Dr.%20Alexis%20Garc%C3%ADa.%20Me%20gustar%C3%ADa%20agendar%20una%20consulta.%0ARef%3A%20WEB-2026"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            className="transition-colors hover:text-white"
+          >
+            WhatsApp
+          </a>
+        </nav>
         <p className="text-center text-xs text-[#8C95A3]">
           Responsable: Dr. Alexis Eduardo García de los Santos.
         </p>
