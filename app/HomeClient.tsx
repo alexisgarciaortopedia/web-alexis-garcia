@@ -8,6 +8,7 @@ import styles from "./page.module.css";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
+import ReviewsCarousel from "@/components/ReviewsCarousel";
 import { formatCurrency, PRICES, VisitType } from "@/lib/appointmentsPricing";
 import { SCHEDULES, Sede } from "@/lib/appointmentsSchedule";
 import { CLINIC_LOCATIONS } from "@/lib/locations";
@@ -41,33 +42,6 @@ const VISIT_TYPE_PARAM_MAP: Record<string, Tipo> = {
   programada: "programada",
   prioritaria: "prioritaria",
 };
-
-const GOOGLE_REVIEWS = [
-  {
-    name: "Sonia Ortega",
-    text: "“El Dr. García es un excelente traumatólogo. Me atendió por un problema de rodilla y desde la primera consulta explicó claramente el diagnóstico y las opciones de tratamiento. El trato fue muy profesional y humano. Gracias a su manejo y rehabilitación, pude volver a caminar sin dolor en pocas semanas. Lo recomiendo ampliamente.”",
-  },
-  {
-    name: "Fabiyola Lopez Trejo",
-    text: "“Excelente profesional. El no solo destaca por su brillantez técnica, sino por su calidez humana. Explica de forma clara, tiene paciencia y transmite una seguridad que es fundamental en cualquier tratamiento. Lo recomiendo sin reservas.”",
-  },
-  {
-    name: "Isabel Jiménez",
-    text: "“Excelente Doctor. Muy claro al dar su diagnóstico, se toma su tiempo para aclarar tus dudas. Muy amable”",
-  },
-  {
-    name: "Alondra Amaro",
-    text: "“Excelente atención. Es un médico muy comprometido y sabe explicarte muy bien en qué consiste el tratamiento y el por qué.”",
-  },
-  {
-    name: "Virginia López N",
-    text: "“Excelente servicio, muy recomendado.”",
-  },
-  {
-    name: "Vanessa Itzel Trejo López",
-    text: "“Excelente 🤩”",
-  },
-];
 
 function getUpcomingDates(days: number[], count = 14) {
   const result: Date[] = [];
@@ -825,45 +799,7 @@ export default function HomeClient() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-8">
-          <div className="flex flex-col items-center gap-2 text-center">
-            <span className="font-serif text-xl text-white">
-              Opiniones de pacientes
-            </span>
-            <span className="text-sm text-[#B9C0CC]">
-              Reseñas reales de pacientes atendidos en consulta
-            </span>
-            <div className="flex items-center gap-2 text-xs text-[#B9C0CC]">
-              <span className="text-[#F5C26B]">★★★★★</span>
-              <span>5.0 en Google</span>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {GOOGLE_REVIEWS.map((review) => (
-              <GlassPanel key={review.name} className="px-5 py-6">
-                <div className="flex h-full flex-col gap-4">
-                  <div className="flex items-center justify-between text-sm text-white">
-                    <span className="font-semibold">{review.name}</span>
-                    <span className="text-xs text-[#F5C26B]">★★★★★</span>
-                  </div>
-                  <p className="text-sm leading-relaxed text-[#B9C0CC]">
-                    {review.text}
-                  </p>
-                </div>
-              </GlassPanel>
-            ))}
-          </div>
-          <div className="flex justify-center">
-            <a
-              href="https://www.google.com/search?q=dr+alexis+garcia+ortopedia"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
-            >
-              Ver reseñas en Google
-            </a>
-          </div>
-        </section>
+        <ReviewsCarousel />
 
         <GlassPanel className="px-6 py-9 lg:px-10 lg:py-12">
           <div className="flex flex-col gap-2 text-center text-sm text-[#B9C0CC] md:text-left">
