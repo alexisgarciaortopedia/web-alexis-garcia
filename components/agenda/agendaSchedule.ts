@@ -27,31 +27,45 @@ type SiteSchedule = {
 export const siteSchedule: Record<ClinicSite, SiteSchedule> = {
   Adoy: {
     workingDays: [1, 2, 3, 4, 5],
-    start: "11:00",
+    start: "08:00",
     end: "13:00",
-    slotMinutes: 60,
+    slotMinutes: 30,
   },
   Zarate: {
     workingDays: [0, 6],
-    start: "09:00",
-    end: "13:00",
-    slotMinutes: 60,
-    note: "Horario provisional. Ajustar con datos reales antes de producción.",
+    start: "10:00",
+    end: "19:00",
+    slotMinutes: 30,
+    note: "Sede principal de fin de semana.",
   },
   Vidal: {
-    workingDays: [1, 3, 5],
-    start: "09:00",
-    end: "13:00",
-    slotMinutes: 60,
-    note: "Horario provisional. Confirmar días y horas exactas antes de producción.",
+    workingDays: [0, 6],
+    start: "10:00",
+    end: "19:00",
+    slotMinutes: 30,
+    note: "Sede opcional de fin de semana.",
   },
   Doxey: {
-    workingDays: [2, 4],
+    workingDays: [0, 6],
     start: "10:00",
-    end: "14:00",
-    slotMinutes: 60,
-    note: "Horario provisional. Confirmar días y horas exactas antes de producción.",
+    end: "19:00",
+    slotMinutes: 30,
+    note: "Sede opcional de fin de semana.",
   },
 };
 
-export const dayLabels = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"] as const;
+export const dayLabels = ["Dom", "Lun", "Mar", "Mi\u00e9", "Jue", "Vie", "S\u00e1b"] as const;
+
+export const siteShortNames: Record<ClinicSite, string> = {
+  Adoy: "Adoy",
+  Zarate: "Z\u00e1rate",
+  Vidal: "Vidal",
+  Doxey: "OB Doxey",
+};
+
+export const siteFullNames: Record<ClinicSite, string> = {
+  Adoy: "Adoy Medical Center",
+  Zarate: "Z\u00e1rate Unidad de Especialidades M\u00e9dicas",
+  Vidal: "M\u00e9dica Vidal",
+  Doxey: "Cl\u00ednica de Especialidades OB",
+};

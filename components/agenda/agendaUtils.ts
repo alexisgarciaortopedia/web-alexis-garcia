@@ -1,4 +1,11 @@
-import { appointmentStatuses, clinicSites, dayLabels, siteSchedule } from "./agendaSchedule";
+import {
+  appointmentStatuses,
+  clinicSites,
+  dayLabels,
+  siteFullNames,
+  siteSchedule,
+  siteShortNames,
+} from "./agendaSchedule";
 import type {
   Appointment,
   AppointmentStatus,
@@ -117,11 +124,15 @@ export function formatShortDate(dateKey: string) {
 }
 
 export function displaySite(site: SiteFilter | ClinicSite) {
-  return site === "Zarate" ? "Zárate" : site;
+  return site === "Todas" ? "Todas" : siteShortNames[site];
+}
+
+export function displaySiteFull(site: ClinicSite) {
+  return siteFullNames[site];
 }
 
 export function displayView(view: string) {
-  return view === "Dia" ? "Día" : view;
+  return view === "Dia" ? "D\u00eda" : view;
 }
 
 export function getDayName(dateKey: string) {
@@ -154,6 +165,10 @@ function getNextWorkingDate(site: ClinicSite, fromDateKey: string) {
   return fromDateKey;
 }
 
+function getNextWeekendDate(fromDateKey: string) {
+  return getNextWorkingDate("Zarate", fromDateKey);
+}
+
 export function timeToMinutes(time: string) {
   const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
@@ -173,6 +188,15 @@ export function isSiteWorkingOnDate(site: ClinicSite, dateKey: string) {
   return siteSchedule[site].workingDays.includes(dateFromKey(dateKey).getDay());
 }
 
+export function getSitesForDate(dateKey: string) {
+  return clinicSites.filter((site) => isSiteWorkingOnDate(site, dateKey));
+}
+
+export function getDefaultSiteForDate(dateKey: string): ClinicSite {
+  const day = dateFromKey(dateKey).getDay();
+  return day === 0 || day === 6 ? "Zarate" : "Adoy";
+}
+
 export function isTimeWithinSchedule(site: ClinicSite, dateKey: string, time: string) {
   if (!isSiteWorkingOnDate(site, dateKey)) {
     return false;
@@ -180,8 +204,10 @@ export function isTimeWithinSchedule(site: ClinicSite, dateKey: string, time: st
 
   const schedule = siteSchedule[site];
   const current = timeToMinutes(time);
+  const start = timeToMinutes(schedule.start);
+  const end = timeToMinutes(schedule.end);
 
-  return current >= timeToMinutes(schedule.start) && current <= timeToMinutes(schedule.end);
+  return current >= start && current < end && (current - start) % schedule.slotMinutes === 0;
 }
 
 export function getSlotsForSite(site: ClinicSite, dateKey: string): AvailableSlot[] {
@@ -194,7 +220,7 @@ export function getSlotsForSite(site: ClinicSite, dateKey: string): AvailableSlo
   const end = timeToMinutes(schedule.end);
   const slots: AvailableSlot[] = [];
 
-  for (let minutes = start; minutes <= end; minutes += schedule.slotMinutes) {
+  for (let minutes = start; minutes < end; minutes += schedule.slotMinutes) {
     const time = minutesToTime(minutes);
     slots.push({
       id: `slot-${dateKey}-${site}-${time}`,
@@ -218,6 +244,22 @@ export function sortAppointments(appointments: Appointment[]) {
   });
 }
 
+export function getSlotOccupant(
+  appointments: Appointment[],
+  dateKey: string,
+  time: string,
+  _site: ClinicSite,
+  ignoreAppointmentId?: string,
+) {
+  return appointments.find(
+    (appointment) =>
+      appointment.id !== ignoreAppointmentId &&
+      appointment.date === dateKey &&
+      appointment.time === time &&
+      appointment.status !== "Cancelada",
+  );
+}
+
 export function isSlotOccupied(
   appointments: Appointment[],
   dateKey: string,
@@ -225,14 +267,46 @@ export function isSlotOccupied(
   site: ClinicSite,
   ignoreAppointmentId?: string,
 ) {
+  return Boolean(getSlotOccupant(appointments, dateKey, time, site, ignoreAppointmentId));
+}
+
+export function isDoctorSlotOccupied(
+  appointments: Appointment[],
+  dateKey: string,
+  time: string,
+  ignoreAppointmentId?: string,
+) {
   return appointments.some(
     (appointment) =>
       appointment.id !== ignoreAppointmentId &&
       appointment.date === dateKey &&
       appointment.time === time &&
-      appointment.site === site &&
       appointment.status !== "Cancelada",
   );
+}
+
+export function hasConsecutiveSiteChange(
+  appointments: Appointment[],
+  dateKey: string,
+  time: string,
+  site: ClinicSite,
+  ignoreAppointmentId?: string,
+) {
+  // Future strict mode can convert this warning into a 30-minute transfer buffer.
+  const currentMinutes = timeToMinutes(time);
+
+  return appointments.some((appointment) => {
+    if (
+      appointment.id === ignoreAppointmentId ||
+      appointment.date !== dateKey ||
+      appointment.site === site ||
+      appointment.status === "Cancelada"
+    ) {
+      return false;
+    }
+
+    return Math.abs(timeToMinutes(appointment.time) - currentMinutes) === 30;
+  });
 }
 
 export function getAvailableSlots(
@@ -240,9 +314,14 @@ export function getAvailableSlots(
   dateKey: string,
   siteFilter: SiteFilter,
 ) {
-  return getSitesForFilter(siteFilter)
+  const sites =
+    siteFilter === "Todas"
+      ? [getDefaultSiteForDate(dateKey)]
+      : getSitesForFilter(siteFilter).filter((site) => isSiteWorkingOnDate(site, dateKey));
+
+  return sites
     .flatMap((site) => getSlotsForSite(site, dateKey))
-    .filter((slot) => !isSlotOccupied(appointments, slot.date, slot.time, slot.site))
+    .filter((slot) => !isDoctorSlotOccupied(appointments, slot.date, slot.time))
     .sort((a, b) => a.time.localeCompare(b.time) || a.site.localeCompare(b.site));
 }
 
@@ -262,7 +341,9 @@ export function appointmentMatchesSearch(appointment: Appointment, search: strin
   }
 
   return normalizeSearch(
-    `${appointment.patient} ${appointment.phone} ${appointment.reason} ${displaySite(appointment.site)}`,
+    `${appointment.patient} ${appointment.phone} ${appointment.reason} ${displaySite(
+      appointment.site,
+    )} ${displaySiteFull(appointment.site)}`,
   ).includes(query);
 }
 
@@ -277,10 +358,7 @@ export function parseStoredAgenda(raw: string | null): StoredAgendaState | null 
       surgicalBlock?: boolean;
     };
 
-    if (
-      !Array.isArray(parsed.appointments) ||
-      !parsed.appointments.every(isValidAppointment)
-    ) {
+    if (!Array.isArray(parsed.appointments) || !parsed.appointments.every(isValidAppointment)) {
       return null;
     }
 
@@ -295,34 +373,32 @@ export function parseStoredAgenda(raw: string | null): StoredAgendaState | null 
 
 export function createInitialAppointments(dateKey = toDateKey()): Appointment[] {
   const adoyDate = getNextWorkingDate("Adoy", dateKey);
-  const zarateDate = getNextWorkingDate("Zarate", dateKey);
-  const vidalDate = getNextWorkingDate("Vidal", dateKey);
-  const doxeyDate = getNextWorkingDate("Doxey", dateKey);
+  const weekendDate = getNextWeekendDate(dateKey);
 
   return [
     {
-      id: `maria-${adoyDate}-1100`,
+      id: `maria-${adoyDate}-0800`,
       date: adoyDate,
-      time: "11:00",
-      patient: "María Fernanda López",
+      time: "08:00",
+      patient: "Mar\u00eda Fernanda L\u00f3pez",
       phone: "555 010 1100",
       reason: "Rodilla derecha",
       site: "Adoy",
       status: "Confirmada",
     },
     {
-      id: `jose-${adoyDate}-1200`,
+      id: `jose-${adoyDate}-0830`,
       date: adoyDate,
-      time: "12:00",
-      patient: "José Antonio Martínez",
+      time: "08:30",
+      patient: "Jos\u00e9 Antonio Mart\u00ednez",
       phone: "555 010 1200",
       reason: "Hombro",
       site: "Adoy",
       status: "En consulta",
     },
     {
-      id: `bloqueo-${zarateDate}-1000`,
-      date: zarateDate,
+      id: `bloqueo-${weekendDate}-1000`,
+      date: weekendDate,
       time: "10:00",
       patient: "Bloqueo de tiempo",
       phone: "",
@@ -331,30 +407,31 @@ export function createInitialAppointments(dateKey = toDateKey()): Appointment[] 
       status: "Finalizada",
     },
     {
-      id: `ana-${vidalDate}-1100`,
-      date: vidalDate,
+      id: `ana-${weekendDate}-1100`,
+      date: weekendDate,
       time: "11:00",
-      patient: "Ana Gabriela Sánchez",
+      patient: "Ana Gabriela S\u00e1nchez",
       phone: "555 010 2100",
       reason: "Columna",
       site: "Vidal",
       status: "Pendiente",
     },
     {
-      id: `carlos-${doxeyDate}-1200`,
-      date: doxeyDate,
+      id: `carlos-${weekendDate}-1200`,
+      date: weekendDate,
       time: "12:00",
-      patient: "Carlos Alberto Pérez",
+      patient: "Carlos Alberto P\u00e9rez",
       phone: "555 010 2200",
       reason: "Postoperatorio",
-      site: "Doxey",
+      site: "Zarate",
       status: "Confirmada",
     },
   ];
 }
 
 export function getNextAppointment(appointments: Appointment[], fromDateKey: string) {
-  const nowMinutes = toDateKey() === fromDateKey ? new Date().getHours() * 60 + new Date().getMinutes() : 0;
+  const nowMinutes =
+    toDateKey() === fromDateKey ? new Date().getHours() * 60 + new Date().getMinutes() : 0;
 
   return sortAppointments(appointments).find(
     (appointment) =>

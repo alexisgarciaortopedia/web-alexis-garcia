@@ -42,16 +42,20 @@ import {
   canTransitionAppointmentStatus,
   createInitialAppointments,
   displaySite,
+  displaySiteFull,
   displayView,
   formatLongDate,
   formatShortDate,
   getAvailableSlots,
+  getDefaultSiteForDate,
   getDayName,
   getNextAppointment,
   getPatientsFromAppointments,
+  getSlotOccupant,
   getSitesForFilter,
+  getSitesForDate,
   getWeekDates,
-  isSlotOccupied,
+  hasConsecutiveSiteChange,
   isSiteWorkingOnDate,
   isTimeWithinSchedule,
   normalizeSearch,
@@ -142,11 +146,11 @@ function sectionLabel(section: DashboardSection) {
 }
 
 function getDefaultSite(activeSite: SiteFilter, dateKey: string): ClinicSite {
-  if (activeSite !== "Todas") {
+  if (activeSite !== "Todas" && isSiteWorkingOnDate(activeSite, dateKey)) {
     return activeSite;
   }
 
-  return clinicSites.find((site) => isSiteWorkingOnDate(site, dateKey)) ?? "Adoy";
+  return getDefaultSiteForDate(dateKey);
 }
 
 function createEmptyForm(date: string, site: ClinicSite): AppointmentFormState {
@@ -175,7 +179,7 @@ function safeReadStorage() {
 function buildAppointmentMessage(appointment: Appointment) {
   return `Hola ${appointment.patient}. Tu cita en Alexis García Ortopedia está programada para el ${formatLongDate(
     appointment.date,
-  )} a las ${appointment.time} en sede ${displaySite(appointment.site)}. Motivo: ${
+  )} a las ${appointment.time} en sede ${displaySiteFull(appointment.site)}. Motivo: ${
     appointment.reason
   }.`;
 }
@@ -276,7 +280,7 @@ export default function AgendaDashboardClient() {
   const [viewedPatientName, setViewedPatientName] = useState<string | null>(null);
   const [patientDetailAppointmentId, setPatientDetailAppointmentId] = useState<string | null>(null);
   const [formState, setFormState] = useState<AppointmentFormState>(() =>
-    createEmptyForm(toDateKey(), "Adoy"),
+    createEmptyForm(toDateKey(), getDefaultSiteForDate(toDateKey())),
   );
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [notice, setNotice] = useState("");
@@ -423,6 +427,22 @@ export default function AgendaDashboardClient() {
     () => dayAppointments.filter((appointment) => appointment.status === "Pendiente").length,
     [dayAppointments],
   );
+  const activeWorkingSites = useMemo(() => getSitesForDate(activeDate), [activeDate]);
+  const formTravelWarning = useMemo(() => {
+    if (!formState.date || !formState.time || !formState.site) {
+      return "";
+    }
+
+    return hasConsecutiveSiteChange(
+      appointments,
+      formState.date,
+      formState.time,
+      formState.site,
+      editingAppointmentId ?? undefined,
+    )
+      ? "Considerar traslado entre sedes."
+      : "";
+  }, [appointments, editingAppointmentId, formState.date, formState.site, formState.time]);
 
   useEffect(() => {
     if (selectedAppointmentId && !selectedAppointmentIsVisible) {
@@ -435,10 +455,13 @@ export default function AgendaDashboardClient() {
   }
 
   function getSiteCount(site: SiteFilter) {
-    return appointments.filter(
+    const appointmentCount = appointments.filter(
       (appointment) =>
         appointment.date === activeDate && (site === "Todas" || appointment.site === site),
     ).length;
+    const slotCount = getAvailableSlots(appointments, activeDate, site).length;
+
+    return `${appointmentCount}/${slotCount}`;
   }
 
   function openDashboardSection(section: DashboardSection) {
@@ -541,27 +564,35 @@ export default function AgendaDashboardClient() {
     }
 
     if (!Object.keys(errors).length) {
+      const slotOccupant = getSlotOccupant(
+        appointments,
+        formState.date,
+        formState.time,
+        formState.site,
+        editingAppointmentId ?? undefined,
+      );
+
+      if (!isSiteWorkingOnDate(formState.site, formState.date)) {
+        errors.form = "Sin horario disponible para esta sede en este d\u00eda.";
+        return errors;
+      }
+
       if (surgicalBlock) {
         errors.form = editingAppointmentId
           ? "El bloqueo quirúrgico global impide reprogramar citas."
           : "El bloqueo quirúrgico global impide crear nuevas citas.";
       } else if (!isSiteWorkingOnDate(formState.site, formState.date)) {
-        errors.form = `${displaySite(formState.site)} no tiene horario configurado para ese día.`;
+        errors.form = "Sin horario disponible para esta sede en este d\u00eda.";
       } else if (!isTimeWithinSchedule(formState.site, formState.date, formState.time)) {
         const schedule = siteSchedule[formState.site];
         errors.form = `La hora debe estar entre ${schedule.start} y ${schedule.end} para ${displaySite(
           formState.site,
-        )}.`;
-      } else if (
-        isSlotOccupied(
-          appointments,
-          formState.date,
-          formState.time,
-          formState.site,
-          editingAppointmentId ?? undefined,
-        )
-      ) {
-        errors.form = "Ya existe una cita ocupando esa fecha, hora y sede.";
+        )}. La ultima cita inicia 30 minutos antes del cierre.`;
+      } else if (slotOccupant) {
+        errors.form =
+          slotOccupant.site === formState.site
+            ? "Ya existe una cita ocupando esa fecha, hora y sede."
+            : "Este horario ya est\u00e1 ocupado en otra sede.";
       }
     }
 
@@ -604,7 +635,11 @@ export default function AgendaDashboardClient() {
         ),
       );
       setSelectedAppointmentId(editingAppointmentId);
-      showNotice("Cita reprogramada en la agenda local.");
+      showNotice(
+        formTravelWarning
+          ? `Cita reprogramada en la agenda local. ${formTravelWarning}`
+          : "Cita reprogramada en la agenda local.",
+      );
     } else {
       const newAppointment: Appointment = {
         id: `local-${Date.now()}`,
@@ -617,7 +652,11 @@ export default function AgendaDashboardClient() {
 
       setAppointments((current) => sortAppointments([...current, newAppointment]));
       setSelectedAppointmentId(newAppointment.id);
-      showNotice("Cita creada en demo local.");
+      showNotice(
+        formTravelWarning
+          ? `Cita creada en demo local. ${formTravelWarning}`
+          : "Cita creada en demo local.",
+      );
     }
 
     setActiveDate(formState.date);
@@ -705,7 +744,17 @@ export default function AgendaDashboardClient() {
     key: K,
     value: AppointmentFormState[K],
   ) {
-    setFormState((current) => ({ ...current, [key]: value }));
+    setFormState((current) => {
+      if (key === "date" && typeof value === "string") {
+        return {
+          ...current,
+          date: value,
+          site: isSiteWorkingOnDate(current.site, value) ? current.site : getDefaultSiteForDate(value),
+        };
+      }
+
+      return { ...current, [key]: value };
+    });
     setFormErrors((current) => ({ ...current, [key]: undefined, form: undefined }));
   }
 
@@ -735,6 +784,12 @@ export default function AgendaDashboardClient() {
       {formErrors.form ? (
         <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
           {formErrors.form}
+        </div>
+      ) : null}
+
+      {!formErrors.form && formTravelWarning ? (
+        <div className="rounded-2xl border border-sky-300/20 bg-sky-300/10 px-4 py-3 text-sm text-sky-100">
+          {formTravelWarning}
         </div>
       ) : null}
 
@@ -783,8 +838,13 @@ export default function AgendaDashboardClient() {
           aria-invalid={Boolean(formErrors.site)}
         >
           {clinicSites.map((site) => (
-            <option key={site} value={site} className="bg-slate-950">
-              {displaySite(site)}
+            <option
+              key={site}
+              value={site}
+              className="bg-slate-950"
+              disabled={!isSiteWorkingOnDate(site, formState.date)}
+            >
+              {displaySiteFull(site)}
             </option>
           ))}
         </select>
@@ -938,9 +998,15 @@ export default function AgendaDashboardClient() {
       )}
       {!dayRows.length ? (
         <div className="rounded-[24px] border border-white/10 bg-white/[0.045] p-8 text-center shadow-inner shadow-white/[0.02]">
-          <p className="text-lg font-semibold text-white">Sin resultados para esta vista</p>
+          <p className="text-lg font-semibold text-white">
+            {activeSite !== "Todas" && !isSiteWorkingOnDate(activeSite, activeDate)
+              ? "Sin horario disponible para esta sede en este d\u00eda."
+              : "Sin resultados para esta vista"}
+          </p>
           <p className="mt-2 text-sm text-slate-400">
-            Ajusta la busqueda, cambia la sede o crea una nueva cita local.
+            {activeSite !== "Todas" && !isSiteWorkingOnDate(activeSite, activeDate)
+              ? "Cambia de sede o fecha para ver espacios disponibles."
+              : "Ajusta la busqueda, cambia la sede o crea una nueva cita local."}
           </p>
         </div>
       ) : null}
@@ -1015,6 +1081,7 @@ export default function AgendaDashboardClient() {
   const renderSiteView = () => (
     <div className="relative grid gap-3">
       {getSitesForFilter(activeSite).map((site) => {
+        const siteWorksToday = isSiteWorkingOnDate(site, activeDate);
         const siteAppointments = sortAppointments(
           visibleAppointments.filter(
             (appointment) => appointment.site === site && appointment.date === activeDate,
@@ -1048,7 +1115,12 @@ export default function AgendaDashboardClient() {
               </button>
             </div>
             <div className="mt-4 grid gap-2">
-              {siteAppointments.map((appointment) => (
+              {!siteWorksToday ? (
+                <p className="rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-slate-500">
+                  Sin horario disponible para esta sede en este d\u00eda.
+                </p>
+              ) : null}
+              {siteWorksToday ? siteAppointments.map((appointment) => (
                 <button
                   key={appointment.id}
                   type="button"
@@ -1062,8 +1134,8 @@ export default function AgendaDashboardClient() {
                   <span className="min-w-0 truncate text-slate-200">{appointment.patient}</span>
                   <span className="text-xs text-slate-500">{appointment.status}</span>
                 </button>
-              ))}
-              {!siteAppointments.length ? (
+              )) : null}
+              {siteWorksToday && !siteAppointments.length ? (
                 <p className="rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-slate-500">
                   Sin citas para esta fecha.
                 </p>
@@ -1154,7 +1226,7 @@ export default function AgendaDashboardClient() {
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {[
                 ["Motivo", patientDetailAppointment.reason],
-                ["Sede", displaySite(patientDetailAppointment.site)],
+                ["Sede", displaySiteFull(patientDetailAppointment.site)],
                 ["Fecha y hora", `${formatShortDate(patientDetailAppointment.date)} ${patientDetailAppointment.time}`],
                 ["Estado", patientDetailAppointment.status],
               ].map(([label, value]) => (
@@ -1252,7 +1324,7 @@ export default function AgendaDashboardClient() {
               <p className="mt-4 text-sm font-medium text-slate-300">Motivo reciente</p>
               <p className="mt-1 text-sm text-slate-400">{selectedPatient.recentReason}</p>
               <p className="mt-4 text-sm font-medium text-slate-300">Sede</p>
-              <p className="mt-1 text-sm text-slate-400">{displaySite(selectedPatient.site)}</p>
+              <p className="mt-1 text-sm text-slate-400">{displaySiteFull(selectedPatient.site)}</p>
             </div>
           ) : (
             <p className="mt-3 text-sm text-slate-400">Selecciona un paciente para ver su detalle.</p>
@@ -1267,6 +1339,7 @@ export default function AgendaDashboardClient() {
       {clinicSites.map((site) => {
         const schedule = siteSchedule[site];
         const slots = getAvailableSlots(appointments, activeDate, site);
+        const siteWorksToday = isSiteWorkingOnDate(site, activeDate);
 
         return (
           <article
@@ -1276,7 +1349,7 @@ export default function AgendaDashboardClient() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-white">{displaySite(site)}</h2>
-                <p className="mt-1 text-sm text-slate-400">Configuración local de demostración</p>
+                <p className="mt-1 text-sm text-slate-400">{displaySiteFull(site)}</p>
               </div>
               <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
                 {slots.length} libres hoy
@@ -1291,8 +1364,13 @@ export default function AgendaDashboardClient() {
                 Horario: <span className="text-slate-400">{schedule.start} a {schedule.end}</span>
               </p>
               {schedule.note ? <p className="text-xs text-amber-100/80">{schedule.note}</p> : null}
+              {!siteWorksToday ? (
+                <p className="text-xs text-slate-500">
+                  Sin horario disponible para esta sede en este d\u00eda.
+                </p>
+              ) : null}
               <div className="mt-2 flex flex-wrap gap-2">
-                {slots.slice(0, 6).map((slot) => (
+                {siteWorksToday ? slots.slice(0, 6).map((slot) => (
                   <button
                     key={slot.id}
                     type="button"
@@ -1301,8 +1379,10 @@ export default function AgendaDashboardClient() {
                   >
                     {slot.time}
                   </button>
-                ))}
-                {!slots.length ? <span className="text-xs text-slate-500">Sin espacios disponibles.</span> : null}
+                )) : null}
+                {siteWorksToday && !slots.length ? (
+                  <span className="text-xs text-slate-500">Sin espacios disponibles.</span>
+                ) : null}
               </div>
             </div>
           </article>
@@ -1426,7 +1506,7 @@ export default function AgendaDashboardClient() {
               {selectedAppointment.time} · {selectedAppointment.patient}
             </h2>
             <p className="mt-2 text-sm text-slate-400">
-              {selectedAppointment.reason} · {displaySite(selectedAppointment.site)}
+              {selectedAppointment.reason} · {displaySiteFull(selectedAppointment.site)}
             </p>
             <p className="mt-1 text-sm text-slate-500">{selectedAppointment.phone || "Sin teléfono"}</p>
           </div>
@@ -1495,7 +1575,7 @@ export default function AgendaDashboardClient() {
           </h2>
           <p className="mt-2 text-sm text-slate-400">
             {nextAppointment
-              ? `${nextAppointment.reason} · ${displaySite(nextAppointment.site)}`
+              ? `${nextAppointment.reason} · ${displaySiteFull(nextAppointment.site)}`
               : "La agenda local no tiene citas futuras visibles."}
           </p>
         </div>
@@ -1707,17 +1787,22 @@ export default function AgendaDashboardClient() {
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {siteFilters.map((site) => {
                   const isActive = activeSite === site;
+                  const isWorking = site === "Todas" || activeWorkingSites.includes(site);
 
                   return (
                     <button
                       key={site}
                       type="button"
                       onClick={() => setActiveSite(site)}
+                      title={isWorking ? undefined : "Sin horario disponible para esta sede en este d\u00eda."}
                       className={[
                         "flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium backdrop-blur-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-sky-400/12",
                         isActive
                           ? "border-sky-300/35 bg-sky-300/13 text-white shadow-[0_0_26px_rgba(56,189,248,0.15)]"
-                          : "border-white/10 bg-white/[0.05] text-slate-400 hover:-translate-y-0.5 hover:border-sky-300/20 hover:bg-white/[0.08] hover:text-slate-100",
+                          : [
+                              "border-white/10 bg-white/[0.05] text-slate-400 hover:-translate-y-0.5 hover:border-sky-300/20 hover:bg-white/[0.08] hover:text-slate-100",
+                              !isWorking ? "opacity-60" : "",
+                            ].join(" "),
                       ].join(" ")}
                     >
                       <span>{displaySite(site)}</span>
@@ -1784,7 +1869,7 @@ export default function AgendaDashboardClient() {
                     </h2>
                     <p className="mt-2 text-sm text-slate-400">
                       {nextAppointment
-                        ? `${nextAppointment.reason} · ${displaySite(nextAppointment.site)}`
+                        ? `${nextAppointment.reason} · ${displaySiteFull(nextAppointment.site)}`
                         : "Agenda local sin citas futuras."}
                     </p>
                   </div>
