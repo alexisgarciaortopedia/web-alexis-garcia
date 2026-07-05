@@ -181,7 +181,7 @@ export default function AgendaDashboardClient() {
     <main className="min-h-screen overflow-x-hidden bg-[#EAF1F6] text-slate-950">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.92),transparent_34%),linear-gradient(135deg,#F8FBFD_0%,#E7F0F6_46%,#DCE9F1_100%)]" />
       <div className="relative z-10 flex min-h-screen pb-24 md:pb-0">
-        <aside className="hidden w-[232px] shrink-0 border-r border-white/70 bg-white/42 px-5 py-6 backdrop-blur-2xl md:flex md:flex-col">
+        <aside className="hidden w-[232px] shrink-0 border-r border-white/70 bg-white/42 px-5 py-6 backdrop-blur-2xl xl:flex xl:flex-col">
           <div className="mb-10 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0B3558] text-white shadow-[0_16px_38px_rgba(11,53,88,0.22)]">
               <Stethoscope className="h-5 w-5" aria-hidden="true" />
@@ -217,7 +217,7 @@ export default function AgendaDashboardClient() {
         </aside>
 
         <section className="flex min-w-0 flex-1 flex-col">
-          <header className="hidden border-b border-white/70 bg-white/35 px-6 py-4 backdrop-blur-2xl md:block">
+          <header className="hidden border-b border-white/70 bg-white/35 px-6 py-4 backdrop-blur-2xl xl:block">
             <div className="flex items-center gap-4">
               <div className="min-w-[210px]">
                 <p className="text-base font-semibold text-slate-950">
@@ -232,7 +232,7 @@ export default function AgendaDashboardClient() {
                 />
                 <input
                   type="search"
-                  placeholder="Buscar paciente, cita o teléfono..."
+                  placeholder={"Buscar paciente, cita o tel\u00e9fono..."}
                   className="h-11 w-full rounded-2xl border border-white/75 bg-white/68 pl-11 pr-4 text-sm text-slate-800 outline-none shadow-sm placeholder:text-slate-400 focus:border-[#8AB8CF] focus:ring-4 focus:ring-[#8AB8CF]/18"
                 />
               </label>
@@ -272,18 +272,68 @@ export default function AgendaDashboardClient() {
             </div>
           </header>
 
-          <header className="px-4 pb-3 pt-5 md:hidden">
-            <div>
-              <div>
-                <p className="text-base font-semibold text-slate-950">
+          <header className="px-4 pb-3 pt-5 sm:px-6 md:px-8 xl:hidden">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-base font-semibold text-slate-950">
                   Alexis García Ortopedia
                 </p>
                 <p className="text-sm text-slate-500">Agenda del día</p>
               </div>
+
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  className="hidden h-10 rounded-2xl border border-white/75 bg-white/68 px-4 text-sm font-semibold text-slate-700 shadow-sm sm:block"
+                >
+                  Hoy
+                </button>
+                <button
+                  type="button"
+                  onClick={openNewAppointment}
+                  className="hidden h-10 rounded-2xl bg-[#0B3558] px-4 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(11,53,88,0.20)] sm:block"
+                >
+                  + Nueva cita
+                </button>
+              </div>
+            </div>
+
+            <div className="hidden grid-cols-[minmax(0,1fr)_auto] gap-3 sm:grid">
+              <label className="relative min-w-0">
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
+                />
+                <input
+                  type="search"
+                  placeholder={"Buscar paciente, cita o tel\u00e9fono..."}
+                  className="h-11 w-full rounded-2xl border border-white/75 bg-white/68 pl-11 pr-4 text-sm text-slate-800 outline-none shadow-sm placeholder:text-slate-400 focus:border-[#8AB8CF] focus:ring-4 focus:ring-[#8AB8CF]/18"
+                />
+              </label>
+
+              <div className="flex rounded-2xl border border-white/75 bg-white/62 p-1 shadow-sm">
+                {views.map((view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    onClick={() => setActiveView(view)}
+                    className={[
+                      "rounded-xl px-3 py-2 text-sm font-medium transition",
+                      activeView === view
+                        ? "bg-[#0B3558] text-white shadow-sm"
+                        : "text-slate-500 hover:text-slate-900",
+                    ].join(" ")}
+                  >
+                    {displayView(view)}
+                  </button>
+                ))}
+              </div>
+            </div>
             </div>
           </header>
 
-          <div className="grid flex-1 gap-5 px-4 pb-5 md:grid-cols-[minmax(0,1fr)_340px] md:px-6 md:py-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid flex-1 gap-5 px-4 pb-5 sm:px-6 md:px-8 md:py-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:px-6">
             <section className="flex min-w-0 flex-col gap-4">
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {sites.map((site) => (
@@ -303,7 +353,7 @@ export default function AgendaDashboardClient() {
                 ))}
               </div>
 
-              <div className="flex min-h-[calc(100vh-168px)] flex-col rounded-[28px] border border-white/75 bg-white/52 p-4 shadow-[0_28px_80px_rgba(15,44,71,0.10)] backdrop-blur-2xl md:p-5">
+              <div className="flex min-h-[calc(100vh-168px)] flex-col rounded-[28px] border border-white/75 bg-white/52 p-4 shadow-[0_28px_80px_rgba(15,44,71,0.10)] backdrop-blur-2xl md:min-h-0 md:p-5 xl:min-h-[calc(100vh-168px)]">
                 <div className="mb-4 flex flex-col gap-3 border-b border-slate-200/70 pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-500">Hoy</p>
@@ -395,7 +445,7 @@ export default function AgendaDashboardClient() {
               </div>
             </section>
 
-            <aside className="hidden md:block">
+            <aside className="hidden xl:block">
               <div className="sticky top-6 rounded-[28px] border border-white/75 bg-white/50 p-5 shadow-[0_28px_80px_rgba(15,44,71,0.10)] backdrop-blur-2xl">
                 {isCreating ? (
                   <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -499,7 +549,7 @@ export default function AgendaDashboardClient() {
             </aside>
 
             {isCreating ? (
-              <section className="order-first rounded-[24px] border border-white/75 bg-white/62 p-4 shadow-[0_22px_60px_rgba(15,44,71,0.10)] backdrop-blur-2xl md:hidden">
+              <section className="order-first rounded-[24px] border border-white/75 bg-white/62 p-4 shadow-[0_22px_60px_rgba(15,44,71,0.10)] backdrop-blur-2xl xl:hidden">
                 <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                   <div className="flex items-center justify-between">
                     <div>
@@ -547,6 +597,48 @@ export default function AgendaDashboardClient() {
                     Confirmar cita
                   </button>
                 </form>
+              </section>
+            ) : null}
+
+            {!isCreating ? (
+              <section className="hidden rounded-[24px] border border-white/75 bg-white/54 p-4 shadow-[0_22px_60px_rgba(15,44,71,0.08)] backdrop-blur-2xl md:block xl:hidden">
+                <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(180px,0.8fr)_minmax(180px,0.8fr)]">
+                  <div className="rounded-2xl border border-white/70 bg-white/62 p-4">
+                    <p className="text-sm font-medium text-slate-500">
+                      {"Pr\u00f3xima cita"}
+                    </p>
+                    <h2 className="mt-1 truncate text-lg font-semibold text-slate-950">
+                      {selectedAppointment?.time ?? "09:00"}
+                      {" \u00b7 "}
+                      {selectedAppointment?.patient ??
+                        "Jos\u00e9 Antonio Mart\u00ednez"}
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-500">
+                      {selectedAppointment?.reason ?? "Hombro"}
+                      {" \u00b7 "}
+                      {displaySite(selectedAppointment?.site ?? "Adoy")}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/70 bg-white/62 p-4">
+                    <p className="text-sm font-medium text-slate-500">
+                      Pendientes por confirmar
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold text-slate-950">1</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-700">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold">
+                        Disponibilidad actualizada
+                      </p>
+                      <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    </div>
+                    <p className="mt-2 text-sm font-medium text-emerald-700/80">
+                      1 espacio disponible
+                    </p>
+                  </div>
+                </div>
               </section>
             ) : null}
           </div>
