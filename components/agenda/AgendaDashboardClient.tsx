@@ -51,10 +51,11 @@ import {
   getPatientsFromAppointments,
   getSitesForFilter,
   getWeekDates,
-  isValidAppointment,
   isSlotOccupied,
   isSiteWorkingOnDate,
   isTimeWithinSchedule,
+  normalizeSearch,
+  parseStoredAgenda,
   sortAppointments,
   toDateKey,
 } from "./agendaUtils";
@@ -165,27 +166,7 @@ function safeReadStorage() {
   }
 
   try {
-    const raw = window.localStorage.getItem(AGENDA_STORAGE_KEY);
-    if (!raw) {
-      return null;
-    }
-
-    const parsed = JSON.parse(raw) as {
-      appointments?: unknown;
-      surgicalBlock?: boolean;
-    };
-
-    if (
-      !Array.isArray(parsed.appointments) ||
-      !parsed.appointments.every(isValidAppointment)
-    ) {
-      return null;
-    }
-
-    return {
-      appointments: parsed.appointments,
-      surgicalBlock: Boolean(parsed.surgicalBlock),
-    };
+    return parseStoredAgenda(window.localStorage.getItem(AGENDA_STORAGE_KEY));
   } catch {
     return null;
   }
@@ -293,6 +274,7 @@ export default function AgendaDashboardClient() {
   const [editingAppointmentId, setEditingAppointmentId] = useState<string | null>(null);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [viewedPatientName, setViewedPatientName] = useState<string | null>(null);
+  const [patientDetailAppointmentId, setPatientDetailAppointmentId] = useState<string | null>(null);
   const [formState, setFormState] = useState<AppointmentFormState>(() =>
     createEmptyForm(toDateKey(), "Adoy"),
   );
@@ -328,7 +310,7 @@ export default function AgendaDashboardClient() {
     }
   }, [appointments, storageReady, surgicalBlock]);
 
-  const selectedAppointment = appointments.find(
+  const selectedAppointmentRaw = appointments.find(
     (appointment) => appointment.id === selectedAppointmentId,
   );
 
@@ -379,6 +361,36 @@ export default function AgendaDashboardClient() {
         appointmentMatchesSearch(appointment, searchQuery),
     );
   }, [activeSite, appointments, searchQuery]);
+  const selectedAppointmentIsVisible = useMemo(() => {
+    if (!selectedAppointmentRaw || activeSection !== "Agenda") {
+      return false;
+    }
+
+    if (activeView === "Dia") {
+      return dayAppointments.some((appointment) => appointment.id === selectedAppointmentRaw.id);
+    }
+
+    if (activeView === "Semana") {
+      return (
+        weekDates.includes(selectedAppointmentRaw.date) &&
+        visibleAppointments.some((appointment) => appointment.id === selectedAppointmentRaw.id)
+      );
+    }
+
+    return (
+      selectedAppointmentRaw.date === activeDate &&
+      visibleAppointments.some((appointment) => appointment.id === selectedAppointmentRaw.id)
+    );
+  }, [
+    activeDate,
+    activeSection,
+    activeView,
+    dayAppointments,
+    selectedAppointmentRaw,
+    visibleAppointments,
+    weekDates,
+  ]);
+  const selectedAppointment = selectedAppointmentIsVisible ? selectedAppointmentRaw : undefined;
   const patients = useMemo(() => getPatientsFromAppointments(appointments), [appointments]);
   const filteredPatients = useMemo(() => {
     const query = searchQuery.trim();
@@ -412,6 +424,12 @@ export default function AgendaDashboardClient() {
     [dayAppointments],
   );
 
+  useEffect(() => {
+    if (selectedAppointmentId && !selectedAppointmentIsVisible) {
+      setSelectedAppointmentId(null);
+    }
+  }, [selectedAppointmentId, selectedAppointmentIsVisible]);
+
   function showNotice(message: string) {
     setNotice(message);
   }
@@ -423,14 +441,33 @@ export default function AgendaDashboardClient() {
     ).length;
   }
 
+  function openDashboardSection(section: DashboardSection) {
+    setActiveSection(section);
+    setIsCreating(false);
+    setEditingAppointmentId(null);
+    setFormErrors({});
+
+    if (section === "Pacientes") {
+      setViewedPatientName(null);
+      setPatientDetailAppointmentId(null);
+    }
+  }
+
   function resetToToday() {
     const currentToday = toDateKey();
     setTodayKey(currentToday);
     setActiveDate(currentToday);
+    setActiveSite("Todas");
     setActiveView("Dia");
     setSearchQuery("");
     setActiveSection("Agenda");
+    setSelectedAppointmentId(null);
+    setIsCreating(false);
+    setEditingAppointmentId(null);
+    setFormErrors({});
     setViewedPatientName(null);
+    setPatientDetailAppointmentId(null);
+    setFormState(createEmptyForm(currentToday, getDefaultSite("Todas", currentToday)));
     showNotice("Agenda del día restablecida a hoy.");
   }
 
@@ -448,6 +485,8 @@ export default function AgendaDashboardClient() {
     setFormErrors({});
     setIsCreating(true);
     setSelectedAppointmentId(null);
+    setViewedPatientName(null);
+    setPatientDetailAppointmentId(null);
     setActiveSection("Agenda");
   }
 
@@ -474,6 +513,8 @@ export default function AgendaDashboardClient() {
     setFormErrors({});
     setIsCreating(true);
     setSelectedAppointmentId(appointment.id);
+    setViewedPatientName(null);
+    setPatientDetailAppointmentId(null);
     setActiveSection("Agenda");
   }
 
@@ -626,6 +667,7 @@ export default function AgendaDashboardClient() {
 
   function viewPatient(appointment: Appointment) {
     setViewedPatientName(appointment.patient);
+    setPatientDetailAppointmentId(appointment.id);
     setActiveSection("Pacientes");
     setIsCreating(false);
     showNotice("Detalle local del paciente abierto.");
@@ -643,8 +685,12 @@ export default function AgendaDashboardClient() {
     setSearchQuery("");
     setSelectedAppointmentId(null);
     setViewedPatientName(null);
+    setPatientDetailAppointmentId(null);
     setSurgicalBlock(false);
     setIsCreating(false);
+    setEditingAppointmentId(null);
+    setFormErrors({});
+    setFormState(createEmptyForm(currentToday, getDefaultSite("Todas", currentToday)));
 
     try {
       window.localStorage.removeItem(AGENDA_STORAGE_KEY);
@@ -799,9 +845,10 @@ export default function AgendaDashboardClient() {
           onClick={() => {
             setSelectedAppointmentId(appointment.id);
             setViewedPatientName(null);
+            setPatientDetailAppointmentId(null);
             setIsCreating(false);
           }}
-          className="contents text-left focus:outline-none"
+          className="grid min-w-0 gap-3 rounded-[18px] text-left focus:outline-none focus:ring-4 focus:ring-sky-400/12 md:col-span-2 md:grid-cols-[92px_minmax(0,1fr)]"
           aria-label={`Seleccionar cita de ${appointment.patient}`}
         >
           <div className="flex items-center gap-3 md:block">
@@ -848,23 +895,20 @@ export default function AgendaDashboardClient() {
   };
 
   const renderSlotCard = (slot: AvailableSlot) => (
-    <article
+    <button
       key={slot.id}
-      className="group relative grid gap-3 overflow-hidden rounded-[22px] border border-dashed border-cyan-300/25 bg-white/[0.045] p-4 text-left shadow-[0_18px_50px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-all duration-200 before:absolute before:inset-y-3 before:left-0 before:w-1 before:rounded-r-full before:bg-gradient-to-b before:from-cyan-300/70 before:to-cyan-300/10 hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-cyan-300/[0.075] focus-within:ring-4 focus-within:ring-sky-400/10 md:grid-cols-[92px_minmax(0,1fr)_auto]"
+      type="button"
+      onClick={() =>
+        openNewAppointment({
+          date: slot.date,
+          time: slot.time,
+          site: slot.site,
+        })
+      }
+      className="group relative grid w-full gap-3 overflow-hidden rounded-[22px] border border-dashed border-cyan-300/25 bg-white/[0.045] p-4 text-left shadow-[0_18px_50px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-all duration-200 before:absolute before:inset-y-3 before:left-0 before:w-1 before:rounded-r-full before:bg-gradient-to-b before:from-cyan-300/70 before:to-cyan-300/10 hover:-translate-y-0.5 hover:border-cyan-300/45 hover:bg-cyan-300/[0.075] focus:outline-none focus:ring-4 focus:ring-sky-400/12 md:grid-cols-[92px_minmax(0,1fr)_auto]"
+      aria-label={`Agendar espacio disponible ${slot.time} ${displaySite(slot.site)}`}
     >
-      <button
-        type="button"
-        onClick={() =>
-          openNewAppointment({
-            date: slot.date,
-            time: slot.time,
-            site: slot.site,
-          })
-        }
-        className="contents text-left focus:outline-none"
-        aria-label={`Agendar espacio disponible ${slot.time} ${displaySite(slot.site)}`}
-      >
-        <div className="flex items-center gap-3 md:block">
+      <div className="flex items-center gap-3 md:block">
           <p className="text-xl font-semibold text-cyan-100 md:text-2xl">{slot.time}</p>
           <p className="text-xs font-medium uppercase text-slate-500 md:mt-1">Libre</p>
         </div>
@@ -882,8 +926,7 @@ export default function AgendaDashboardClient() {
             </span>
           </div>
         </div>
-      </button>
-    </article>
+    </button>
   );
 
   const renderDayView = () => (
@@ -1046,6 +1089,116 @@ export default function AgendaDashboardClient() {
 
   const renderPatientsView = () => {
     const selectedPatient = filteredPatients.find((patient) => patient.name === viewedPatientName);
+    const patientDetailAppointment = patientDetailAppointmentId
+      ? appointments.find((appointment) => appointment.id === patientDetailAppointmentId)
+      : undefined;
+    const patientHistory = patientDetailAppointment
+      ? sortAppointments(
+          appointments.filter((appointment) => {
+            if (appointment.patient === "Bloqueo de tiempo") {
+              return false;
+            }
+
+            const samePhone =
+              patientDetailAppointment.phone &&
+              normalizeSearch(appointment.phone) === normalizeSearch(patientDetailAppointment.phone);
+            const samePatient =
+              normalizeSearch(appointment.patient) === normalizeSearch(patientDetailAppointment.patient);
+
+            return samePhone || samePatient;
+          }),
+        )
+      : [];
+
+    if (patientDetailAppointment) {
+      return (
+        <div className="relative grid gap-4">
+          <article className="rounded-[24px] border border-white/10 bg-white/[0.05] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-sky-200/75">Detalle local del paciente</p>
+                <h2 className="mt-1 truncate text-2xl font-semibold text-white">
+                  {patientDetailAppointment.patient}
+                </h2>
+                <p className="mt-2 text-sm text-slate-400">
+                  {patientDetailAppointment.phone || "Sin telÃ©fono"}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPatientDetailAppointmentId(null);
+                    setViewedPatientName(null);
+                  }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-slate-200 transition-all hover:border-sky-300/25 hover:text-white focus:outline-none focus:ring-4 focus:ring-sky-400/12"
+                >
+                  Ver lista
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("Agenda");
+                    setActiveDate(patientDetailAppointment.date);
+                    setActiveSite(patientDetailAppointment.site);
+                    setActiveView("Dia");
+                    setSelectedAppointmentId(patientDetailAppointment.id);
+                  }}
+                  className="rounded-2xl border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-sm font-semibold text-sky-100 transition-all hover:border-sky-300/35 focus:outline-none focus:ring-4 focus:ring-sky-400/12"
+                >
+                  Volver a Agenda
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {[
+                ["Motivo", patientDetailAppointment.reason],
+                ["Sede", displaySite(patientDetailAppointment.site)],
+                ["Fecha y hora", `${formatShortDate(patientDetailAppointment.date)} ${patientDetailAppointment.time}`],
+                ["Estado", patientDetailAppointment.status],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                  <p className="text-xs font-semibold uppercase text-slate-500">{label}</p>
+                  <p className="mt-2 text-sm font-medium text-slate-200">{value}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="rounded-[24px] border border-white/10 bg-white/[0.05] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.18)]">
+            <p className="text-sm font-medium text-sky-200/75">Historial local</p>
+            <div className="mt-3 grid gap-2">
+              {patientHistory.map((appointment) => (
+                <button
+                  key={appointment.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveSection("Agenda");
+                    setActiveDate(appointment.date);
+                    setActiveSite(appointment.site);
+                    setActiveView("Dia");
+                    setSelectedAppointmentId(appointment.id);
+                  }}
+                  className="grid gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-left text-sm transition-all hover:bg-white/[0.07] focus:outline-none focus:ring-4 focus:ring-sky-400/12 sm:grid-cols-[82px_minmax(0,1fr)_auto]"
+                >
+                  <span className="font-semibold text-sky-100">{appointment.time}</span>
+                  <span className="min-w-0 truncate text-slate-200">
+                    {formatShortDate(appointment.date)} Â· {appointment.reason} Â· {displaySite(appointment.site)}
+                  </span>
+                  <span className="text-xs text-slate-500">{appointment.status}</span>
+                </button>
+              ))}
+              {!patientHistory.length ? (
+                <p className="rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-slate-500">
+                  Sin historial local para este paciente.
+                </p>
+              ) : null}
+            </div>
+          </article>
+        </div>
+      );
+    }
 
     return (
       <div className="relative grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -1054,7 +1207,10 @@ export default function AgendaDashboardClient() {
             <button
               key={`${patient.name}-${patient.phone}`}
               type="button"
-              onClick={() => setViewedPatientName(patient.name)}
+              onClick={() => {
+                setViewedPatientName(patient.name);
+                setPatientDetailAppointmentId(null);
+              }}
               className={[
                 "rounded-[22px] border bg-white/[0.05] p-4 text-left shadow-[0_16px_46px_rgba(0,0,0,0.18)] transition-all hover:-translate-y-0.5 hover:border-sky-300/24 hover:bg-white/[0.075] focus:outline-none focus:ring-4 focus:ring-sky-400/12",
                 viewedPatientName === patient.name ? "border-sky-300/35" : "border-white/10",
@@ -1213,7 +1369,7 @@ export default function AgendaDashboardClient() {
           <button
             key={item.label}
             type="button"
-            onClick={() => setActiveSection(item.section)}
+            onClick={() => openDashboardSection(item.section)}
             className="flex items-center justify-between rounded-[22px] border border-white/10 bg-white/[0.05] p-4 text-left text-slate-200 transition-all hover:border-sky-300/24 hover:bg-white/[0.075] focus:outline-none focus:ring-4 focus:ring-sky-400/12"
           >
             <span className="flex items-center gap-3">
@@ -1396,10 +1552,7 @@ export default function AgendaDashboardClient() {
                   <button
                     key={item.label}
                     type="button"
-                    onClick={() => {
-                      setActiveSection(item.label);
-                      setIsCreating(false);
-                    }}
+                    onClick={() => openDashboardSection(item.label)}
                     className={[
                       "group flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-sky-400/12",
                       isActive
@@ -1680,10 +1833,7 @@ export default function AgendaDashboardClient() {
             <button
               key={item.label}
               type="button"
-              onClick={() => {
-                setActiveSection(item.section);
-                setIsCreating(false);
-              }}
+              onClick={() => openDashboardSection(item.section)}
               className={[
                 "flex flex-col items-center gap-1 rounded-2xl py-2 text-xs font-medium transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-sky-400/12",
                 isActive

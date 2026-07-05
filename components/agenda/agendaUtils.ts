@@ -10,6 +10,11 @@ import type {
 const dateKeyPattern = /^\d{4}-\d{2}-\d{2}$/;
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+export type StoredAgendaState = {
+  appointments: Appointment[];
+  surgicalBlock: boolean;
+};
+
 const allowedStatusTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
   Pendiente: ["Confirmada", "Cancelada"],
   Confirmada: ["En consulta", "Cancelada"],
@@ -137,6 +142,18 @@ export function getWeekDates(dateKey: string) {
   return Array.from({ length: 7 }, (_, index) => addDays(dateKey, mondayOffset + index));
 }
 
+function getNextWorkingDate(site: ClinicSite, fromDateKey: string) {
+  for (let offset = 0; offset < 14; offset += 1) {
+    const candidateDate = addDays(fromDateKey, offset);
+
+    if (isSiteWorkingOnDate(site, candidateDate)) {
+      return candidateDate;
+    }
+  }
+
+  return fromDateKey;
+}
+
 export function timeToMinutes(time: string) {
   const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
@@ -249,31 +266,63 @@ export function appointmentMatchesSearch(appointment: Appointment, search: strin
   ).includes(query);
 }
 
+export function parseStoredAgenda(raw: string | null): StoredAgendaState | null {
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as {
+      appointments?: unknown;
+      surgicalBlock?: boolean;
+    };
+
+    if (
+      !Array.isArray(parsed.appointments) ||
+      !parsed.appointments.every(isValidAppointment)
+    ) {
+      return null;
+    }
+
+    return {
+      appointments: parsed.appointments,
+      surgicalBlock: Boolean(parsed.surgicalBlock),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function createInitialAppointments(dateKey = toDateKey()): Appointment[] {
+  const adoyDate = getNextWorkingDate("Adoy", dateKey);
+  const zarateDate = getNextWorkingDate("Zarate", dateKey);
+  const vidalDate = getNextWorkingDate("Vidal", dateKey);
+  const doxeyDate = getNextWorkingDate("Doxey", dateKey);
+
   return [
     {
-      id: `maria-${dateKey}-0800`,
-      date: dateKey,
-      time: "08:00",
+      id: `maria-${adoyDate}-1100`,
+      date: adoyDate,
+      time: "11:00",
       patient: "María Fernanda López",
-      phone: "555 010 0800",
+      phone: "555 010 1100",
       reason: "Rodilla derecha",
       site: "Adoy",
       status: "Confirmada",
     },
     {
-      id: `jose-${dateKey}-0900`,
-      date: dateKey,
-      time: "09:00",
+      id: `jose-${adoyDate}-1200`,
+      date: adoyDate,
+      time: "12:00",
       patient: "José Antonio Martínez",
-      phone: "555 010 0900",
+      phone: "555 010 1200",
       reason: "Hombro",
       site: "Adoy",
       status: "En consulta",
     },
     {
-      id: `bloqueo-${dateKey}-1000`,
-      date: dateKey,
+      id: `bloqueo-${zarateDate}-1000`,
+      date: zarateDate,
       time: "10:00",
       patient: "Bloqueo de tiempo",
       phone: "",
@@ -282,21 +331,21 @@ export function createInitialAppointments(dateKey = toDateKey()): Appointment[] 
       status: "Finalizada",
     },
     {
-      id: `ana-${dateKey}-1100`,
-      date: dateKey,
+      id: `ana-${vidalDate}-1100`,
+      date: vidalDate,
       time: "11:00",
       patient: "Ana Gabriela Sánchez",
-      phone: "555 010 1100",
+      phone: "555 010 2100",
       reason: "Columna",
       site: "Vidal",
       status: "Pendiente",
     },
     {
-      id: `carlos-${dateKey}-1200`,
-      date: dateKey,
+      id: `carlos-${doxeyDate}-1200`,
+      date: doxeyDate,
       time: "12:00",
       patient: "Carlos Alberto Pérez",
-      phone: "555 010 1200",
+      phone: "555 010 2200",
       reason: "Postoperatorio",
       site: "Doxey",
       status: "Confirmada",
