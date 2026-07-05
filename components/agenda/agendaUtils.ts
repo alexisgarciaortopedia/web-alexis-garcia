@@ -1,10 +1,88 @@
-import { clinicSites, dayLabels, siteSchedule } from "./agendaSchedule";
+import { appointmentStatuses, clinicSites, dayLabels, siteSchedule } from "./agendaSchedule";
 import type {
   Appointment,
+  AppointmentStatus,
   AvailableSlot,
   ClinicSite,
   SiteFilter,
 } from "./agendaTypes";
+
+const dateKeyPattern = /^\d{4}-\d{2}-\d{2}$/;
+const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+const allowedStatusTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
+  Pendiente: ["Confirmada", "Cancelada"],
+  Confirmada: ["En consulta", "Cancelada"],
+  "En consulta": ["Finalizada"],
+  Finalizada: [],
+  Cancelada: [],
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isValidDateKey(dateKey: unknown): dateKey is string {
+  if (typeof dateKey !== "string" || !dateKeyPattern.test(dateKey)) {
+    return false;
+  }
+
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const parsed = dateFromKey(dateKey);
+
+  return (
+    parsed.getFullYear() === year &&
+    parsed.getMonth() === month - 1 &&
+    parsed.getDate() === day
+  );
+}
+
+export function isValidTime(time: unknown): time is string {
+  return typeof time === "string" && timePattern.test(time);
+}
+
+export function isClinicSite(site: unknown): site is ClinicSite {
+  return typeof site === "string" && clinicSites.includes(site as ClinicSite);
+}
+
+export function isAppointmentStatus(status: unknown): status is AppointmentStatus {
+  return typeof status === "string" && appointmentStatuses.includes(status as AppointmentStatus);
+}
+
+export function isValidAppointment(value: unknown): value is Appointment {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    typeof value.id === "string" &&
+    value.id.trim().length > 0 &&
+    typeof value.patient === "string" &&
+    value.patient.trim().length > 0 &&
+    typeof value.phone === "string" &&
+    typeof value.reason === "string" &&
+    value.reason.trim().length > 0 &&
+    isClinicSite(value.site) &&
+    isValidDateKey(value.date) &&
+    isValidTime(value.time) &&
+    isAppointmentStatus(value.status)
+  );
+}
+
+export function getAllowedStatusTransitions(status: AppointmentStatus) {
+  return allowedStatusTransitions[status];
+}
+
+export function canTransitionAppointmentStatus(
+  currentStatus: AppointmentStatus,
+  nextStatus: AppointmentStatus,
+) {
+  return allowedStatusTransitions[currentStatus].includes(nextStatus);
+}
+
+export function canReprogramAppointment(status: AppointmentStatus) {
+  return status === "Pendiente" || status === "Confirmada";
+}
 
 export function toDateKey(date = new Date()) {
   const year = date.getFullYear();

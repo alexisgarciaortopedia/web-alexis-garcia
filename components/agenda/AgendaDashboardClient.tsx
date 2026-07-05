@@ -38,6 +38,8 @@ import type {
 } from "./agendaTypes";
 import {
   appointmentMatchesSearch,
+  canReprogramAppointment,
+  canTransitionAppointmentStatus,
   createInitialAppointments,
   displaySite,
   displayView,
@@ -49,6 +51,7 @@ import {
   getPatientsFromAppointments,
   getSitesForFilter,
   getWeekDates,
+  isValidAppointment,
   isSlotOccupied,
   isSiteWorkingOnDate,
   isTimeWithinSchedule,
@@ -60,6 +63,12 @@ type FormErrors = Partial<Record<keyof AppointmentFormState | "form", string>>;
 type AppointmentRow =
   | { kind: "appointment"; appointment: Appointment }
   | { kind: "slot"; slot: AvailableSlot };
+type StatusAction = {
+  label: string;
+  status: AppointmentStatus;
+  icon: typeof Check;
+  tone?: "danger";
+};
 
 const sectionLabels: Record<DashboardSection, string> = {
   Agenda: "Agenda",
@@ -103,6 +112,30 @@ const statusRailStyles: Record<AppointmentStatus, string> = {
 const inputClass =
   "h-11 rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-slate-100 outline-none shadow-inner shadow-black/10 transition-all duration-200 placeholder:text-slate-500 focus:border-sky-300/45 focus:ring-4 focus:ring-sky-400/10";
 
+const statusActionConfigs: StatusAction[] = [
+  {
+    label: "Confirmar",
+    status: "Confirmada",
+    icon: Check,
+  },
+  {
+    label: "En consulta",
+    status: "En consulta",
+    icon: Stethoscope,
+  },
+  {
+    label: "Finalizada",
+    status: "Finalizada",
+    icon: Check,
+  },
+  {
+    label: "Cancelar",
+    status: "Cancelada",
+    icon: X,
+    tone: "danger",
+  },
+];
+
 function sectionLabel(section: DashboardSection) {
   return sectionLabels[section];
 }
@@ -138,11 +171,14 @@ function safeReadStorage() {
     }
 
     const parsed = JSON.parse(raw) as {
-      appointments?: Appointment[];
+      appointments?: unknown;
       surgicalBlock?: boolean;
     };
 
-    if (!Array.isArray(parsed.appointments)) {
+    if (
+      !Array.isArray(parsed.appointments) ||
+      !parsed.appointments.every(isValidAppointment)
+    ) {
       return null;
     }
 
@@ -176,42 +212,29 @@ function AppointmentActions({
   onCopy: () => void;
   onViewPatient: () => void;
 }) {
-  const locked = appointment.status === "Cancelada" || appointment.status === "Finalizada";
   const actions: Array<{
     label: string;
     icon: typeof Check;
     onClick: () => void;
-    disabled?: boolean;
+    tone?: "danger";
   }> = [
-    {
-      label: "Confirmar",
-      icon: Check,
-      onClick: () => onStatusChange("Confirmada"),
-      disabled: appointment.status === "Confirmada" || locked,
-    },
-    {
-      label: "En consulta",
-      icon: Stethoscope,
-      onClick: () => onStatusChange("En consulta"),
-      disabled: locked,
-    },
-    {
-      label: "Finalizada",
-      icon: Check,
-      onClick: () => onStatusChange("Finalizada"),
-      disabled: appointment.status === "Cancelada" || appointment.status === "Finalizada",
-    },
-    {
-      label: "Reprogramar",
-      icon: Clock3,
-      onClick: onReprogram,
-    },
-    {
-      label: "Cancelar",
-      icon: X,
-      onClick: () => onStatusChange("Cancelada"),
-      disabled: appointment.status === "Cancelada" || appointment.status === "Finalizada",
-    },
+    ...statusActionConfigs
+      .filter((action) => canTransitionAppointmentStatus(appointment.status, action.status))
+      .map((action) => ({
+        label: action.label,
+        icon: action.icon,
+        onClick: () => onStatusChange(action.status),
+        tone: action.tone,
+      })),
+    ...(canReprogramAppointment(appointment.status)
+      ? [
+          {
+            label: "Reprogramar",
+            icon: Clock3,
+            onClick: onReprogram,
+          },
+        ]
+      : []),
     {
       label: "Ver paciente",
       icon: UserRound,
@@ -240,9 +263,11 @@ function AppointmentActions({
             <button
               key={action.label}
               type="button"
-              disabled={action.disabled}
               onClick={action.onClick}
-              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-slate-300 transition-all duration-200 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400/20 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:bg-transparent"
+              className={[
+                "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition-all duration-200 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400/20",
+                action.tone === "danger" ? "text-rose-100" : "text-slate-300",
+              ].join(" ")}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />
               {action.label}
@@ -379,15 +404,12 @@ export default function AgendaDashboardClient() {
   }, [activeDate, patients, searchQuery]);
 
   const nextAppointment = useMemo(
-    () => getNextAppointment(appointments, activeDate),
-    [activeDate, appointments],
+    () => getNextAppointment(dayAppointments, activeDate),
+    [activeDate, dayAppointments],
   );
   const pendingCount = useMemo(
-    () =>
-      appointments.filter(
-        (appointment) => appointment.date === activeDate && appointment.status === "Pendiente",
-      ).length,
-    [activeDate, appointments],
+    () => dayAppointments.filter((appointment) => appointment.status === "Pendiente").length,
+    [dayAppointments],
   );
 
   function showNotice(message: string) {
@@ -430,6 +452,16 @@ export default function AgendaDashboardClient() {
   }
 
   function openReprogramAppointment(appointment: Appointment) {
+    if (!canReprogramAppointment(appointment.status)) {
+      showNotice("Esta cita ya no se puede reprogramar por su estado actual.");
+      return;
+    }
+
+    if (surgicalBlock) {
+      showNotice("El bloqueo quirúrgico global está activo. Desactívalo para reprogramar citas.");
+      return;
+    }
+
     setFormState({
       patient: appointment.patient,
       phone: appointment.phone,
@@ -468,8 +500,10 @@ export default function AgendaDashboardClient() {
     }
 
     if (!Object.keys(errors).length) {
-      if (surgicalBlock && !editingAppointmentId) {
-        errors.form = "El bloqueo quirúrgico global impide crear nuevas citas.";
+      if (surgicalBlock) {
+        errors.form = editingAppointmentId
+          ? "El bloqueo quirúrgico global impide reprogramar citas."
+          : "El bloqueo quirúrgico global impide crear nuevas citas.";
       } else if (!isSiteWorkingOnDate(formState.site, formState.date)) {
         errors.form = `${displaySite(formState.site)} no tiene horario configurado para ese día.`;
       } else if (!isTimeWithinSchedule(formState.site, formState.date, formState.time)) {
@@ -504,6 +538,17 @@ export default function AgendaDashboardClient() {
     }
 
     if (editingAppointmentId) {
+      const appointmentBeingEdited = appointments.find(
+        (appointment) => appointment.id === editingAppointmentId,
+      );
+
+      if (!appointmentBeingEdited || !canReprogramAppointment(appointmentBeingEdited.status)) {
+        setFormErrors({
+          form: "Esta cita ya no se puede reprogramar por su estado actual.",
+        });
+        return;
+      }
+
       setAppointments((current) =>
         current.map((appointment) =>
           appointment.id === editingAppointmentId
@@ -544,6 +589,18 @@ export default function AgendaDashboardClient() {
   }
 
   function updateAppointmentStatus(appointmentId: string, status: AppointmentStatus) {
+    const appointment = appointments.find((item) => item.id === appointmentId);
+
+    if (!appointment) {
+      showNotice("No se encontró la cita en la agenda local.");
+      return;
+    }
+
+    if (!canTransitionAppointmentStatus(appointment.status, status)) {
+      showNotice(`No se permite cambiar de ${appointment.status} a ${status}.`);
+      return;
+    }
+
     setAppointments((current) =>
       current.map((appointment) =>
         appointment.id === appointmentId ? { ...appointment, status } : appointment,
@@ -1201,6 +1258,10 @@ export default function AgendaDashboardClient() {
     }
 
     if (selectedAppointment) {
+      const clinicalActions = statusActionConfigs.filter((action) =>
+        canTransitionAppointmentStatus(selectedAppointment.status, action.status),
+      );
+
       return (
         <div className="relative flex flex-col gap-4">
           <div>
@@ -1222,45 +1283,34 @@ export default function AgendaDashboardClient() {
             {selectedAppointment.status}
           </span>
           <div className="grid gap-2">
-            <button
-              type="button"
-              disabled={selectedAppointment.status === "Confirmada" || selectedAppointment.status === "Cancelada" || selectedAppointment.status === "Finalizada"}
-              onClick={() => updateAppointmentStatus(selectedAppointment.id, "Confirmada")}
-              className="rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-left text-sm font-semibold text-slate-200 transition-all hover:bg-white/[0.08] focus:outline-none focus:ring-4 focus:ring-sky-400/12 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:bg-white/[0.055]"
-            >
-              Confirmar
-            </button>
-            <button
-              type="button"
-              disabled={selectedAppointment.status === "Cancelada" || selectedAppointment.status === "Finalizada"}
-              onClick={() => updateAppointmentStatus(selectedAppointment.id, "En consulta")}
-              className="rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-left text-sm font-semibold text-slate-200 transition-all hover:bg-white/[0.08] focus:outline-none focus:ring-4 focus:ring-sky-400/12 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:bg-white/[0.055]"
-            >
-              Marcar en consulta
-            </button>
-            <button
-              type="button"
-              disabled={selectedAppointment.status === "Cancelada" || selectedAppointment.status === "Finalizada"}
-              onClick={() => updateAppointmentStatus(selectedAppointment.id, "Finalizada")}
-              className="rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-left text-sm font-semibold text-slate-200 transition-all hover:bg-white/[0.08] focus:outline-none focus:ring-4 focus:ring-sky-400/12 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:bg-white/[0.055]"
-            >
-              Marcar finalizada
-            </button>
-            <button
-              type="button"
-              disabled={selectedAppointment.status === "Cancelada" || selectedAppointment.status === "Finalizada"}
-              onClick={() => updateAppointmentStatus(selectedAppointment.id, "Cancelada")}
-              className="rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-left text-sm font-semibold text-rose-100 transition-all hover:border-rose-300/35 focus:outline-none focus:ring-4 focus:ring-rose-400/12 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:border-rose-300/20"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => openReprogramAppointment(selectedAppointment)}
-              className="rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-left text-sm font-semibold text-slate-200 transition-all hover:bg-white/[0.08] focus:outline-none focus:ring-4 focus:ring-sky-400/12"
-            >
-              Reprogramar
-            </button>
+            {clinicalActions.map((action) => (
+              <button
+                key={action.status}
+                type="button"
+                onClick={() => updateAppointmentStatus(selectedAppointment.id, action.status)}
+                className={[
+                  "rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition-all focus:outline-none focus:ring-4",
+                  action.tone === "danger"
+                    ? "border-rose-300/20 bg-rose-300/10 text-rose-100 hover:border-rose-300/35 focus:ring-rose-400/12"
+                    : "border-white/10 bg-white/[0.055] text-slate-200 hover:bg-white/[0.08] focus:ring-sky-400/12",
+                ].join(" ")}
+              >
+                {action.status === "En consulta"
+                  ? "Marcar en consulta"
+                  : action.status === "Finalizada"
+                    ? "Marcar finalizada"
+                    : action.label}
+              </button>
+            ))}
+            {canReprogramAppointment(selectedAppointment.status) ? (
+              <button
+                type="button"
+                onClick={() => openReprogramAppointment(selectedAppointment)}
+                className="rounded-2xl border border-white/10 bg-white/[0.055] px-4 py-3 text-left text-sm font-semibold text-slate-200 transition-all hover:bg-white/[0.08] focus:outline-none focus:ring-4 focus:ring-sky-400/12"
+              >
+                Reprogramar
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => void copyAppointmentMessage(selectedAppointment)}
