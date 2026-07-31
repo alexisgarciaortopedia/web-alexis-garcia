@@ -264,6 +264,12 @@ button { font: inherit; }
 .region-pill { flex: 0 0 auto; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-soft-ink); }
 .readonly-banner { flex: 0 0 auto; text-align: center; color: var(--ink-faint); font-size: 12.5px; padding: 10px 20px; border-top: 1px solid var(--border); }
 .view-case-btn { margin-top: 12px; width: 100%; background: var(--accent-soft); border: none; color: var(--accent-soft-ink); font-size: 15px; font-weight: 600; padding: 11px; border-radius: var(--radius-sm); cursor: pointer; }
+.conv-toolbar { flex: 0 0 auto; padding: 0 18px 10px; display: flex; flex-direction: column; gap: 8px; }
+.conv-search { width: 100%; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 14px; font-family: inherit; color: var(--ink); }
+.conv-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { background: var(--surface-2); border: none; color: var(--ink-muted); font-size: 12.5px; font-weight: 600; padding: 6px 11px; border-radius: 999px; cursor: pointer; }
+.chip.active { background: var(--accent-soft); color: var(--accent-soft-ink); }
 `;
 
 // ---------------------------------------------------------------------
@@ -287,6 +293,14 @@ const PANEL_BODY_HTML = `<div class="stage" id="stage">
       <button class="tab-btn active" type="button" data-tab="cases">Casos</button>
       <button class="tab-btn" type="button" data-tab="conversations">Conversaciones</button>
     </nav>
+    <div class="conv-toolbar" id="conv-toolbar" style="display:none">
+      <input type="search" id="conv-search" class="conv-search" placeholder="Buscar por nombre o número…" />
+      <div class="chip-row" id="conv-chips">
+        <button class="chip active" type="button" data-filter="all">Todos</button>
+        <button class="chip" type="button" data-filter="active_region">Con molestia activa</button>
+        <button class="chip" type="button" data-filter="stale">Sin actividad &gt;7 días</button>
+      </div>
+    </div>
     <div class="list-scroll">
       <div id="case-list"></div>
       <p class="empty-hint" id="list-empty-hint">Ordenado por urgencia — lo que espera respuesta va primero.</p>
@@ -388,6 +402,8 @@ var accessToken = null;
 var cases = [];
 var conversations = [];
 var activeTab = "cases";
+var convSearchQuery = "";
+var convFilter = "all";
 var activeCaseId = null;
 var activeConversationId = null;
 var activeThreadKind = "case";
@@ -472,15 +488,41 @@ async function loadCases() {
 }
 
 // BLOQUE C — piso 2: TODAS las conversaciones, no solo las escaladas.
+// MEJORAS PISO 2 — buscador (nombre + número) y chips de filtro rápido,
+// ambos client-side sobre los datos ya cargados (sin ida y vuelta al
+// servidor por cada tecla).
+function conversationMatchesSearch(c, query) {
+  if (!query) return true;
+  var q = query.toLowerCase();
+  if ((c.displayName || "").toLowerCase().indexOf(q) !== -1) return true;
+  var qDigits = query.replace(/\\D/g, "");
+  return !!(qDigits && (c.phoneDigitsForSearch || "").indexOf(qDigits) !== -1);
+}
+
+function conversationMatchesFilter(c, filter) {
+  if (filter === "active_region") return !!c.activeRegionLabel;
+  if (filter === "stale") {
+    if (!c.lastMessageAt) return true;
+    var days = (Date.now() - new Date(c.lastMessageAt).getTime()) / 86400000;
+    return days > 7;
+  }
+  return true;
+}
+
 function renderConversationList() {
-  var sorted = conversations.slice().sort(function (a, b) {
+  var filtered = conversations.filter(function (c) {
+    return conversationMatchesSearch(c, convSearchQuery) && conversationMatchesFilter(c, convFilter);
+  });
+  var sorted = filtered.slice().sort(function (a, b) {
     var ta = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
     var tb = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
     return tb - ta;
   });
   if (sorted.length === 0) {
     listEl.innerHTML = "";
-    document.getElementById("list-empty-hint").textContent = "Sin conversaciones todavía.";
+    document.getElementById("list-empty-hint").textContent = conversations.length === 0
+      ? "Sin conversaciones todavía."
+      : "Sin resultados para este filtro/búsqueda.";
     return;
   }
   document.getElementById("list-empty-hint").textContent = "Todas las conversaciones, más reciente primero.";
@@ -515,7 +557,25 @@ document.getElementById("panel-tabs").addEventListener("click", function (e) {
     b.classList.toggle("active", b.getAttribute("data-tab") === activeTab);
   });
   document.getElementById("list-title").textContent = activeTab === "cases" ? "Casos" : "Conversaciones";
+  document.getElementById("conv-toolbar").style.display = activeTab === "conversations" ? "flex" : "none";
   if (activeTab === "cases") { renderList(); } else { loadConversations(); }
+});
+
+document.getElementById("conv-search").addEventListener("input", function (e) {
+  convSearchQuery = e.target.value.trim();
+  renderConversationList();
+});
+
+document.getElementById("conv-chips").addEventListener("click", function (e) {
+  var chip = e.target.closest(".chip");
+  if (!chip) return;
+  var filter = chip.getAttribute("data-filter");
+  if (filter === convFilter) return;
+  convFilter = filter;
+  document.querySelectorAll("#conv-chips .chip").forEach(function (b) {
+    b.classList.toggle("active", b === chip);
+  });
+  renderConversationList();
 });
 
 function findCase(handoffId) {
