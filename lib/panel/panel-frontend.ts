@@ -257,6 +257,13 @@ button { font: inherit; }
 .gate { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px; gap: 14px; }
 .gate h1 { font-size: 19px; margin: 0; }
 .gate p { color: var(--ink-muted); font-size: 14.5px; line-height: 1.5; margin: 0; max-width: 320px; }
+.tabs { flex: 0 0 auto; display: flex; gap: 6px; padding: 0 18px 10px; }
+.tab-btn { flex: 1 1 auto; background: var(--surface-2); border: none; color: var(--ink-muted); font-size: 14px; font-weight: 600; padding: 9px; border-radius: var(--radius-sm); cursor: pointer; }
+.tab-btn.active { background: var(--accent); color: var(--accent-ink); }
+.dot.escalado { background: var(--danger); }
+.region-pill { flex: 0 0 auto; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-soft-ink); }
+.readonly-banner { flex: 0 0 auto; text-align: center; color: var(--ink-faint); font-size: 12.5px; padding: 10px 20px; border-top: 1px solid var(--border); }
+.view-case-btn { margin-top: 12px; width: 100%; background: var(--accent-soft); border: none; color: var(--accent-soft-ink); font-size: 15px; font-weight: 600; padding: 11px; border-radius: var(--radius-sm); cursor: pointer; }
 `;
 
 // ---------------------------------------------------------------------
@@ -274,8 +281,12 @@ const PANEL_BODY_HTML = `<div class="stage" id="stage">
 
   <section class="view" id="view-list" style="display:none">
     <header class="topbar">
-      <div><p class="eyebrow">Muévete Seguro</p><h1>Casos</h1></div>
+      <div><p class="eyebrow">Muévete Seguro</p><h1 id="list-title">Casos</h1></div>
     </header>
+    <nav class="tabs" id="panel-tabs">
+      <button class="tab-btn active" type="button" data-tab="cases">Casos</button>
+      <button class="tab-btn" type="button" data-tab="conversations">Conversaciones</button>
+    </nav>
     <div class="list-scroll">
       <div id="case-list"></div>
       <p class="empty-hint" id="list-empty-hint">Ordenado por urgencia — lo que espera respuesta va primero.</p>
@@ -298,9 +309,11 @@ const PANEL_BODY_HTML = `<div class="stage" id="stage">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         Resolver caso
       </button>
+      <button class="view-case-btn" id="view-case-btn" type="button" style="display:none">Ver caso escalado</button>
     </header>
     <div class="thread-scroll" id="thread-scroll"></div>
-    <div class="composer">
+    <p class="readonly-banner" id="readonly-banner" style="display:none">Solo lectura — para responder, usa la vista de Casos.</p>
+    <div class="composer" id="composer">
       <textarea id="composer-input" rows="1" placeholder="Responder como Muévete Seguro…"></textarea>
       <button class="send-btn" id="send-btn" type="button" aria-label="Enviar">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11.5L20.5 3 15 20.5l-4-7.5-8-1.5z"/></svg>
@@ -373,8 +386,11 @@ var gateText = document.getElementById("gate-text");
 var listEl = document.getElementById("case-list");
 var accessToken = null;
 var cases = [];
+var conversations = [];
+var activeTab = "cases";
 var activeCaseId = null;
 var activeConversationId = null;
+var activeThreadKind = "case";
 var realtimeChannel = null;
 
 function showOnly(view) {
@@ -455,6 +471,53 @@ async function loadCases() {
   renderList();
 }
 
+// BLOQUE C — piso 2: TODAS las conversaciones, no solo las escaladas.
+function renderConversationList() {
+  var sorted = conversations.slice().sort(function (a, b) {
+    var ta = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+    var tb = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+    return tb - ta;
+  });
+  if (sorted.length === 0) {
+    listEl.innerHTML = "";
+    document.getElementById("list-empty-hint").textContent = "Sin conversaciones todavía.";
+    return;
+  }
+  document.getElementById("list-empty-hint").textContent = "Todas las conversaciones, más reciente primero.";
+  listEl.innerHTML = sorted.map(function (c) {
+    return (
+      '<button class="case-row" type="button" data-kind="conversation" data-id="' + c.conversationId + '" data-handoff-id="' + (c.activeHandoffId || "") + '">' +
+        '<div class="avatar">' + initials(c.displayName) + (c.activeHandoffId ? '<span class="dot escalado"></span>' : '') + '</div>' +
+        '<div class="case-main">' +
+          '<div class="case-top"><span class="case-name">' + c.displayName + '</span>' +
+          '<span class="case-time tabular">' + fmtTime(c.lastMessageAt) + '</span></div>' +
+          '<div class="case-sub">' + (c.activeRegionLabel ? '<span class="region-pill">' + c.activeRegionLabel + '</span>' : '') + '</div>' +
+        '</div>' +
+      '</button>'
+    );
+  }).join("");
+}
+
+async function loadConversations() {
+  var res = await apiFetch("/conversations");
+  var body = await res.json();
+  conversations = body.conversations || [];
+  renderConversationList();
+}
+
+document.getElementById("panel-tabs").addEventListener("click", function (e) {
+  var btn = e.target.closest(".tab-btn");
+  if (!btn) return;
+  var tab = btn.getAttribute("data-tab");
+  if (tab === activeTab) return;
+  activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(function (b) {
+    b.classList.toggle("active", b.getAttribute("data-tab") === activeTab);
+  });
+  document.getElementById("list-title").textContent = activeTab === "cases" ? "Casos" : "Conversaciones";
+  if (activeTab === "cases") { renderList(); } else { loadConversations(); }
+});
+
 function findCase(handoffId) {
   for (var i = 0; i < cases.length; i++) if (cases[i].handoffId === handoffId) return cases[i];
   return null;
@@ -473,19 +536,33 @@ function renderMessages(messages) {
   scroll.scrollTop = scroll.scrollHeight;
 }
 
-function subscribeThreadRealtime(handoffId, conversationId) {
+function subscribeThreadRealtime(channelKey, conversationId, onNewMessage) {
   if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
   if (!conversationId) return;
   realtimeChannel = supabase
-    .channel("panel:case:" + handoffId + ":messages")
+    .channel("panel:" + channelKey + ":messages")
     .on("postgres_changes", {
       event: "INSERT", schema: "public", table: "conversation_messages",
       filter: "conversation_id=eq." + conversationId,
-    }, function () { openThread(handoffId, true); })
+    }, onNewMessage)
     .subscribe();
 }
 
+// BLOQUE C — piso 2 reutiliza el shell del hilo (misma tarjeta de contexto
+// clínico, mismo look), así que cada apertura primero regresa el shell al
+// modo "caso" (composer + resolver visibles, botón "ver caso" oculto)
+// antes de pintar — evita que el estado de solo-lectura de una conversación
+// se quede pegado si el operador abre un caso justo después.
+function resetThreadShellToCaseMode() {
+  activeThreadKind = "case";
+  document.getElementById("composer").style.display = "flex";
+  document.getElementById("readonly-banner").style.display = "none";
+  document.getElementById("view-case-btn").style.display = "none";
+  document.getElementById("resolve-btn").style.display = "flex";
+}
+
 async function openThread(handoffId, silent) {
+  resetThreadShellToCaseMode();
   var c = findCase(handoffId);
   activeCaseId = handoffId;
   document.getElementById("thread-avatar").textContent = initials(c ? c.displayName : "");
@@ -506,23 +583,73 @@ async function openThread(handoffId, silent) {
   var body = await res.json();
   activeConversationId = body.conversationId;
   renderMessages(body.messages || []);
-  if (!silent) subscribeThreadRealtime(handoffId, activeConversationId);
+  if (!silent) {
+    subscribeThreadRealtime("case:" + handoffId, activeConversationId, function () {
+      openThread(handoffId, true);
+    });
+  }
 
   stage.classList.add("thread-open");
   history.replaceState(null, "", PANEL_BASE_PATH + "/c/" + encodeURIComponent(handoffId));
 }
 
+// BLOQUE C — piso 2: hilo SOLO LECTURA de cualquier conversación (no solo
+// escaladas). Sin composer, sin resolver — si tiene un caso escalado
+// abierto, un botón lleva a la vista de caso existente (openThread).
+async function openConversationThread(conversationId, handoffId, silent) {
+  activeThreadKind = "conversation";
+  activeCaseId = null;
+  var c = conversations.filter(function (x) { return x.conversationId === conversationId; })[0];
+  document.getElementById("thread-avatar").textContent = initials(c ? c.displayName : "");
+  document.getElementById("thread-name").textContent = c ? c.displayName : "Conversación";
+  document.getElementById("thread-status").textContent = handoffId
+    ? "Tiene caso escalado abierto"
+    : "Conversación";
+
+  document.getElementById("resolve-btn").style.display = "none";
+  document.getElementById("composer").style.display = "none";
+  document.getElementById("readonly-banner").style.display = "block";
+  var viewCaseBtn = document.getElementById("view-case-btn");
+  if (handoffId) {
+    viewCaseBtn.style.display = "block";
+    viewCaseBtn.onclick = function () { openThread(handoffId); };
+  } else {
+    viewCaseBtn.style.display = "none";
+    viewCaseBtn.onclick = null;
+  }
+
+  var res = await apiFetch("/conversations/" + encodeURIComponent(conversationId) + "/messages");
+  var body = await res.json();
+  activeConversationId = conversationId;
+  renderMessages(body.messages || []);
+  if (!silent) {
+    subscribeThreadRealtime("conv:" + conversationId, conversationId, function () {
+      openConversationThread(conversationId, handoffId, true);
+    });
+  }
+
+  stage.classList.add("thread-open");
+  history.replaceState(null, "", PANEL_BASE_PATH + "/");
+}
+
 function closeThread() {
   stage.classList.remove("thread-open");
+  var wasConversation = activeThreadKind === "conversation";
   activeCaseId = null;
+  activeConversationId = null;
   if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
   history.replaceState(null, "", PANEL_BASE_PATH ? PANEL_BASE_PATH + "/" : "/");
-  loadCases();
+  if (wasConversation) { loadConversations(); } else { loadCases(); }
 }
 
 listEl.addEventListener("click", function (e) {
   var row = e.target.closest(".case-row");
-  if (row) openThread(row.getAttribute("data-id"));
+  if (!row) return;
+  if (row.getAttribute("data-kind") === "conversation") {
+    openConversationThread(row.getAttribute("data-id"), row.getAttribute("data-handoff-id") || null);
+  } else {
+    openThread(row.getAttribute("data-id"));
+  }
 });
 document.getElementById("back-btn").addEventListener("click", closeThread);
 
