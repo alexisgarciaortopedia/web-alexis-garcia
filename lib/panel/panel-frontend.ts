@@ -270,6 +270,20 @@ button { font: inherit; }
 .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { background: var(--surface-2); border: none; color: var(--ink-muted); font-size: 12.5px; font-weight: 600; padding: 6px 11px; border-radius: 999px; cursor: pointer; }
 .chip.active { background: var(--accent-soft); color: var(--accent-soft-ink); }
+#view-report { transform: translateX(100%); z-index: 20; }
+.stage.report-open #view-thread { transform: translateX(-22%); filter: brightness(0.92); }
+.stage.report-open #view-report { transform: translateX(0); }
+.report-hint { color: var(--ink-muted); font-size: 14px; line-height: 1.45; margin: 4px 0 16px; }
+.report-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-muted); margin: 14px 0 6px; }
+.report-textarea { width: 100%; min-height: 120px; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14.5px; font-family: inherit; color: var(--ink); resize: vertical; }
+.report-textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.report-readonly { white-space: pre-wrap; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14.5px; line-height: 1.45; color: var(--ink); }
+.report-status-pill { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--warning-soft); color: var(--warning); margin-bottom: 4px; }
+.report-status-pill.report-status-approved { background: var(--resolved-soft); color: var(--resolved); }
+.report-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.report-btn-primary { border: none; background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 700; padding: 12px; border-radius: var(--radius-sm); cursor: pointer; width: 100%; }
+.report-btn-secondary { border: 1px solid var(--border); background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 600; padding: 11px; border-radius: var(--radius-sm); cursor: pointer; width: 100%; }
+.report-error { color: var(--danger); font-size: 14px; line-height: 1.45; margin: 4px 0 14px; }
 `;
 
 // ---------------------------------------------------------------------
@@ -324,6 +338,7 @@ const PANEL_BODY_HTML = `<div class="stage" id="stage">
         Resolver caso
       </button>
       <button class="view-case-btn" id="view-case-btn" type="button" style="display:none">Ver caso escalado</button>
+      <button class="view-case-btn" id="report-btn" type="button">Reporte semanal</button>
     </header>
     <div class="thread-scroll" id="thread-scroll"></div>
     <p class="readonly-banner" id="readonly-banner" style="display:none">Solo lectura — para responder, usa la vista de Casos.</p>
@@ -335,6 +350,21 @@ const PANEL_BODY_HTML = `<div class="stage" id="stage">
     </div>
   </section>
 
+  <section class="view" id="view-report">
+    <header class="thread-header">
+      <div class="thread-nav">
+        <button class="back-btn" id="report-back-btn" type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Volver
+        </button>
+      </div>
+      <div class="thread-identity">
+        <div><div class="thread-name">Reporte semanal</div><div class="thread-status" id="report-athlete-name"></div></div>
+      </div>
+    </header>
+    <div class="thread-scroll" id="report-body"></div>
+  </section>
+
   <div class="sheet-backdrop" id="sheet-backdrop">
     <div class="sheet">
       <h2>¿Resolver este caso?</h2>
@@ -342,6 +372,17 @@ const PANEL_BODY_HTML = `<div class="stage" id="stage">
       <div class="sheet-actions">
         <button class="sheet-confirm" id="sheet-confirm" type="button">Resolver y avisar al paciente</button>
         <button class="sheet-cancel" id="sheet-cancel" type="button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="report-sheet-backdrop">
+    <div class="sheet">
+      <h2>¿Aprobar este reporte?</h2>
+      <p>El texto queda congelado como versión aprobada — ya no se podrá editar. El PDF solo puede generarse a partir de esta versión.</p>
+      <div class="sheet-actions">
+        <button class="sheet-confirm" id="report-sheet-confirm" type="button">Aprobar y congelar texto</button>
+        <button class="sheet-cancel" id="report-sheet-cancel" type="button">Cancelar</button>
       </div>
     </div>
   </div>
@@ -406,8 +447,10 @@ var convSearchQuery = "";
 var convFilter = "all";
 var activeCaseId = null;
 var activeConversationId = null;
+var activeAthleteId = null;
 var activeThreadKind = "case";
 var realtimeChannel = null;
+var reportDraft = null;
 
 function showOnly(view) {
   [viewGate, viewList].forEach(function (v) { v.style.display = v === view ? "flex" : "none"; });
@@ -623,8 +666,10 @@ function resetThreadShellToCaseMode() {
 
 async function openThread(handoffId, silent) {
   resetThreadShellToCaseMode();
+  stage.classList.remove("report-open");
   var c = findCase(handoffId);
   activeCaseId = handoffId;
+  activeAthleteId = c ? c.athleteId : null;
   document.getElementById("thread-avatar").textContent = initials(c ? c.displayName : "");
   document.getElementById("thread-name").textContent = c ? c.displayName : "Caso";
   var band = c ? bandFor(c.status) : "amarillo";
@@ -659,7 +704,9 @@ async function openThread(handoffId, silent) {
 async function openConversationThread(conversationId, handoffId, silent) {
   activeThreadKind = "conversation";
   activeCaseId = null;
+  stage.classList.remove("report-open");
   var c = conversations.filter(function (x) { return x.conversationId === conversationId; })[0];
+  activeAthleteId = c ? c.athleteId : null;
   document.getElementById("thread-avatar").textContent = initials(c ? c.displayName : "");
   document.getElementById("thread-name").textContent = c ? c.displayName : "Conversación";
   document.getElementById("thread-status").textContent = handoffId
@@ -694,9 +741,12 @@ async function openConversationThread(conversationId, handoffId, silent) {
 
 function closeThread() {
   stage.classList.remove("thread-open");
+  stage.classList.remove("report-open");
   var wasConversation = activeThreadKind === "conversation";
   activeCaseId = null;
   activeConversationId = null;
+  activeAthleteId = null;
+  reportDraft = null;
   if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
   history.replaceState(null, "", PANEL_BASE_PATH ? PANEL_BASE_PATH + "/" : "/");
   if (wasConversation) { loadConversations(); } else { loadCases(); }
@@ -766,6 +816,186 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 2200);
 }
+
+// D3 (BLOQUE D) — "reporte semanal": generar -> editar -> aprobar ->
+// descargar PDF, sobre los 5 endpoints de panel-api (2 de D3 + 3 de D4).
+// 4 estados posibles del borrador más reciente del atleta: sin borrador,
+// borrador/editado (editable), aprobado (solo lectura + descarga), error
+// de red/servidor (con reintentar). El texto aprobado (approved_*) es
+// SIEMPRE de solo lectura aquí — el único lugar donde se edita es el
+// borrador mutable, antes de aprobar (regla dura del backend, D5).
+function escapeHtml(text) {
+  return String(text == null ? "" : text).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+}
+
+function reportPeriodDefault() {
+  var end = new Date();
+  var start = new Date(end.getTime() - 7 * 86400000);
+  return { periodStart: start.toISOString(), periodEnd: end.toISOString() };
+}
+
+function fmtDateEs(iso) {
+  try {
+    return new Date(iso).toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" });
+  } catch (e) { return iso; }
+}
+
+function renderReportNoDraft() {
+  var period = reportPeriodDefault();
+  document.getElementById("report-body").innerHTML =
+    '<p class="report-hint">Sin borrador todavía para este paciente. Se genera con IA a partir de los últimos 7 días de seguimiento (' +
+    fmtDateEs(period.periodStart) + ' — ' + fmtDateEs(period.periodEnd) + ') y del historial de episodios previos.</p>' +
+    '<button class="report-btn-primary" id="report-generate-btn" type="button">Generar borrador</button>';
+  document.getElementById("report-generate-btn").addEventListener("click", function () {
+    generateReportDraft(period.periodStart, period.periodEnd);
+  });
+}
+
+function renderReportEditable() {
+  document.getElementById("report-body").innerHTML =
+    '<span class="report-status-pill">' + (reportDraft.status === "edited" ? "Editado — sin aprobar" : "Borrador — sin aprobar") + '</span>' +
+    '<label class="report-label">Resumen</label>' +
+    '<textarea class="report-textarea" id="report-summary-input">' + escapeHtml(reportDraft.summaryText) + '</textarea>' +
+    '<label class="report-label">Indicaciones</label>' +
+    '<textarea class="report-textarea" id="report-indications-input">' + escapeHtml(reportDraft.indicationsText) + '</textarea>' +
+    '<div class="report-actions">' +
+      '<button class="report-btn-secondary" id="report-save-btn" type="button">Guardar cambios</button>' +
+      '<button class="report-btn-primary" id="report-approve-btn" type="button">Aprobar reporte</button>' +
+    '</div>';
+  document.getElementById("report-save-btn").addEventListener("click", saveReportDraft);
+  document.getElementById("report-approve-btn").addEventListener("click", function () {
+    reportSheetBackdrop.classList.add("open");
+  });
+}
+
+function renderReportApproved() {
+  document.getElementById("report-body").innerHTML =
+    '<span class="report-status-pill report-status-approved">Aprobado el ' + fmtDateEs(reportDraft.approvedAt) + '</span>' +
+    '<label class="report-label">Resumen (aprobado)</label>' +
+    '<div class="report-readonly">' + escapeHtml(reportDraft.approvedSummaryText) + '</div>' +
+    '<label class="report-label">Indicaciones (aprobadas)</label>' +
+    '<div class="report-readonly">' + escapeHtml(reportDraft.approvedIndicationsText) + '</div>' +
+    '<div class="report-actions">' +
+      '<button class="report-btn-primary" id="report-download-btn" type="button">Descargar PDF</button>' +
+    '</div>';
+  document.getElementById("report-download-btn").addEventListener("click", downloadReportPdf);
+}
+
+function renderReportError(message) {
+  document.getElementById("report-body").innerHTML =
+    '<p class="report-error">' + escapeHtml(message) + '</p>' +
+    '<button class="report-btn-secondary" id="report-retry-btn" type="button">Reintentar</button>';
+  document.getElementById("report-retry-btn").addEventListener("click", openReportView);
+}
+
+function renderReportState() {
+  if (!reportDraft) { renderReportNoDraft(); return; }
+  if (reportDraft.status === "approved") { renderReportApproved(); return; }
+  renderReportEditable();
+}
+
+async function openReportView() {
+  if (!activeAthleteId) return;
+  document.getElementById("report-athlete-name").textContent = document.getElementById("thread-name").textContent;
+  document.getElementById("report-body").innerHTML = '<p class="report-hint">Cargando…</p>';
+  stage.classList.add("report-open");
+  try {
+    var res = await apiFetch("/reports/" + encodeURIComponent(activeAthleteId) + "/latest");
+    if (!res.ok) throw new Error("latest_failed");
+    var body = await res.json();
+    reportDraft = body.draft || null;
+    renderReportState();
+  } catch (e) {
+    if (e.message !== "unauthorized") renderReportError("No se pudo cargar el reporte. Revisa tu conexión e intenta de nuevo.");
+  }
+}
+
+function closeReportView() {
+  stage.classList.remove("report-open");
+}
+
+async function generateReportDraft(periodStart, periodEnd) {
+  document.getElementById("report-body").innerHTML = '<p class="report-hint">Generando borrador con IA…</p>';
+  try {
+    var res = await apiFetch("/reports/" + encodeURIComponent(activeAthleteId) + "/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ period_start: periodStart, period_end: periodEnd }),
+    });
+    if (!res.ok) throw new Error("generate_failed");
+    var body = await res.json();
+    reportDraft = body.draft;
+    renderReportState();
+  } catch (e) {
+    if (e.message !== "unauthorized") renderReportError("No se pudo generar el borrador. Intenta de nuevo.");
+  }
+}
+
+async function saveReportDraft() {
+  var summaryText = document.getElementById("report-summary-input").value.trim();
+  var indicationsText = document.getElementById("report-indications-input").value.trim();
+  if (!summaryText || !indicationsText) { showToast("Resumen e indicaciones no pueden quedar vacíos"); return; }
+  try {
+    var res = await apiFetch("/reports/draft/" + encodeURIComponent(reportDraft.id), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ summary_text: summaryText, indications_text: indicationsText }),
+    });
+    if (!res.ok) throw new Error("save_failed");
+    var body = await res.json();
+    reportDraft = body.draft;
+    showToast("Cambios guardados");
+    renderReportState();
+  } catch (e) {
+    if (e.message !== "unauthorized") showToast("No se pudo guardar. Intenta de nuevo.");
+  }
+}
+
+async function approveReportDraft() {
+  try {
+    var res = await apiFetch("/reports/draft/" + encodeURIComponent(reportDraft.id) + "/approve", { method: "POST" });
+    if (!res.ok) throw new Error("approve_failed");
+    var body = await res.json();
+    reportDraft = body.draft;
+    showToast("Reporte aprobado");
+    renderReportState();
+  } catch (e) {
+    if (e.message !== "unauthorized") showToast("No se pudo aprobar. Intenta de nuevo.");
+  }
+}
+
+async function downloadReportPdf() {
+  try {
+    var res = await apiFetch("/reports/draft/" + encodeURIComponent(reportDraft.id) + "/pdf");
+    if (!res.ok) throw new Error("pdf_failed");
+    var blob = await res.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "reporte-semanal-" + reportDraft.id + ".pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  } catch (e) {
+    if (e.message !== "unauthorized") showToast("No se pudo descargar el PDF. Intenta de nuevo.");
+  }
+}
+
+document.getElementById("report-btn").addEventListener("click", openReportView);
+document.getElementById("report-back-btn").addEventListener("click", closeReportView);
+
+var reportSheetBackdrop = document.getElementById("report-sheet-backdrop");
+document.getElementById("report-sheet-cancel").addEventListener("click", function () {
+  reportSheetBackdrop.classList.remove("open");
+});
+reportSheetBackdrop.addEventListener("click", function (e) {
+  if (e.target === reportSheetBackdrop) reportSheetBackdrop.classList.remove("open");
+});
+document.getElementById("report-sheet-confirm").addEventListener("click", function () {
+  reportSheetBackdrop.classList.remove("open");
+  approveReportDraft();
+});
 
 function deepLinkHandoffId() {
   var match = /\\/c\\/([^/]+)\\/?$/.exec(window.location.pathname);
