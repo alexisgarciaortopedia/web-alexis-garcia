@@ -7,8 +7,14 @@ import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
+import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
+
+const WHATSAPP_MESSAGE =
+  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
 
 export default function HomeClient() {
+  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
@@ -247,9 +253,10 @@ export default function HomeClient() {
             Ubicaciones
           </Link>
           <a
-            href="https://wa.me/527731754638?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20del%20Dr.%20Alexis%20Garc%C3%ADa.%20Me%20gustar%C3%ADa%20agendar%20una%20consulta.%0ARef%3A%20WEB-2026"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={trackWhatsAppClick}
             aria-label="WhatsApp"
             className="transition-colors hover:text-white"
           >
