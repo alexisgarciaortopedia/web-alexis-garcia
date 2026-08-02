@@ -7,12 +7,10 @@ import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { PhoneIcon } from "@/components/Icons";
 import { CLINIC_LOCATIONS } from "@/lib/locations";
+import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
 const WHATSAPP_MESSAGE =
-  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.\nRef: WEB-2026";
-const WHATSAPP_URL = `https://wa.me/527731754638?text=${encodeURIComponent(
-  WHATSAPP_MESSAGE,
-)}`;
+  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
 const PHONE_TEL = "tel:+527731754638";
 const PHONE_DISPLAY = "773 175 4638";
 
@@ -26,6 +24,8 @@ const cardBaseClasses =
   "group flex w-full items-center justify-center gap-3 rounded-[22px] border border-white/20 bg-white/6 px-6 py-5 text-center text-sm font-semibold text-white backdrop-blur-[22px] shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
 
 export default function AgendarClient() {
+  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
@@ -47,9 +47,10 @@ export default function AgendarClient() {
 
         <section className="flex flex-col gap-4">
           <a
-            href={WHATSAPP_URL}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={trackWhatsAppClick}
             aria-label="Agendar por WhatsApp"
             className={`${cardBaseClasses} bg-[linear-gradient(180deg,rgba(37,211,102,0.16),rgba(255,255,255,0.06))]`}
           >

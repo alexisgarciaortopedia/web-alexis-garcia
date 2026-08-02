@@ -1,15 +1,19 @@
+"use client";
+
+import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
+
 const WHATSAPP_MESSAGE =
-  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.\nRef: WEB-2026";
-const WHATSAPP_URL = `https://wa.me/527731754638?text=${encodeURIComponent(
-  WHATSAPP_MESSAGE
-)}`;
+  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
 
 export default function WhatsAppFloating() {
+  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
+
   return (
     <a
-      href={WHATSAPP_URL}
+      href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={trackWhatsAppClick}
       className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-[rgba(16,18,22,0.6)] text-white shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-[22px] transition-transform hover:-translate-y-1"
       aria-label="WhatsApp"
     >

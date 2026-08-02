@@ -5,12 +5,10 @@ import { MessageCircle, Phone } from "lucide-react";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
+import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
 const WHATSAPP_MESSAGE =
-  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.\nRef: WEB-2026";
-const WHATSAPP_URL = `https://wa.me/527731754638?text=${encodeURIComponent(
-  WHATSAPP_MESSAGE,
-)}`;
+  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
 const PHONE_TEL = "tel:+527731754638";
 const PHONE_DISPLAY = "773 175 4638";
 
@@ -18,6 +16,8 @@ const actionButtonClasses =
   "inline-flex w-full items-center justify-center gap-3 rounded-[20px] border border-white/20 bg-white/6 px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:w-auto sm:min-w-[240px]";
 
 export default function CitaPage() {
+  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
@@ -41,9 +41,10 @@ export default function CitaPage() {
           <div className="flex flex-col items-center gap-6">
             <div className="flex w-full flex-col gap-4 sm:flex-row sm:justify-center">
               <a
-                href={WHATSAPP_URL}
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={trackWhatsAppClick}
                 aria-label="Contactar por WhatsApp"
                 className={actionButtonClasses}
               >
