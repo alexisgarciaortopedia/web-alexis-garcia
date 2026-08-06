@@ -407,9 +407,9 @@ function vistaDetalle(atleta, transcript) {
         <option value="pausado">Pausado</option>
         <option value="baja">Baja</option>
       </select>
+      \` : ""}
       <label><input type="checkbox" id="agendo" style="width:auto;display:inline-block;vertical-align:middle"> Agendó cita</label>
       <label><input type="checkbox" id="asistio" style="width:auto;display:inline-block;vertical-align:middle"> Asistió</label>
-      \` : ""}
       <label>Notas del equipo</label>
       <textarea id="notas" rows="3">\${atleta.notas_equipo || ""}</textarea>
       <button class="accion primario" id="guardar" style="margin-top:12px">Guardar</button>
@@ -418,15 +418,17 @@ function vistaDetalle(atleta, transcript) {
   \`);
   if (esAdmin) {
     form.querySelector("#estado").value = atleta.estado;
-    form.querySelector("#agendo").checked = !!atleta.agendo;
-    form.querySelector("#asistio").checked = !!atleta.asistio;
   }
+  form.querySelector("#agendo").checked = !!atleta.agendo;
+  form.querySelector("#asistio").checked = !!atleta.asistio;
   form.querySelector("#guardar").onclick = async () => {
-    const patch = { notas_equipo: form.querySelector("#notas").value };
+    const patch = {
+      notas_equipo: form.querySelector("#notas").value,
+      agendo: form.querySelector("#agendo").checked,
+      asistio: form.querySelector("#asistio").checked,
+    };
     if (esAdmin) {
       patch.estado = form.querySelector("#estado").value;
-      patch.agendo = form.querySelector("#agendo").checked;
-      patch.asistio = form.querySelector("#asistio").checked;
     }
     const msg = form.querySelector("#msg-guardar");
     msg.textContent = "Guardando...";
