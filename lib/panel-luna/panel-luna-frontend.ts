@@ -1,25 +1,18 @@
 /**
- * Panel-luna (el panel NUEVO, conectado a luna_atletas) -- servido desde
- * este sitio por el mismo motivo que el panel viejo: Supabase reescribe
- * cualquier respuesta text/html a text/plain en su dominio por defecto
- * (confirmado con curl -I contra panel-luna en Supabase -- misma huella
- * exacta que ya documentó panel-frontend.ts: CSP "default-src 'none';
- * sandbox" + nosniff). Next.js/Vercel sí respeta Content-Type real.
+ * Shell del panel nuevo -- HTML + CSS + JS vanilla en un solo archivo,
+ * sin framework, servido directo por la Edge Function (igual criterio
+ * que el panel viejo: el HTML es público, sin datos; todo dato real pasa
+ * por /api/* con Bearer token real de Supabase Auth).
  *
- * ORIGEN: portado literal desde muevete-seguro
- * (src/panel-luna-frontend.ts) -- ese repo sigue siendo la fuente
- * canónica del look/lógica (tests automatizados viven ahí, con Deno
- * test). Cualquier cambio de comportamiento se hace primero ahí, se
- * prueba, y se vuelve a portar aquí -- este archivo no tiene su propia
- * suite de tests en este repo.
+ * Auth: magic link real de Supabase Auth, disparado desde el propio
+ * navegador con la anon key (supabase.auth.signInWithOtp) -- sin
+ * WhatsApp, sin whatsapp-worker.ts, sin nada del sistema viejo. Al volver
+ * del link, supabase-js resuelve la sesión solo (detectSessionInUrl).
  *
- * La API real (datos, auth, permisos por rol) sigue viviendo en Supabase
- * (Edge Function panel-luna, repo muevete-seguro) -- este archivo solo
- * genera el HTML/CSS/JS del shell; todo dato real cruza el origen vía
- * fetch() con CORS (PANEL_ALLOWED_ORIGIN configurado del lado de
- * Supabase, mismo secret que ya usa el panel viejo).
- *
- * Convive con /panel (el panel viejo, sin tocar) mientras se valida este.
+ * El filtro por rol que aplica aquí (ocultar/deshabilitar campos) es solo
+ * cosmético -- la autorización real vive en panel-luna/index.ts
+ * (src/panel-permissions.ts), que valida cada request sin importar lo que
+ * mande el cliente.
  */
 export function renderPanelLunaHtml(params: {
   supabaseUrl: string;
@@ -28,7 +21,9 @@ export function renderPanelLunaHtml(params: {
    * Base absoluta de la API (sin slash final), p.ej.
    * "https://xxx.supabase.co/functions/v1/panel-luna". Siempre absoluta y
    * nunca relativa -- una ruta relativa como "api/me" se resuelve distinto
-   * según si la URL de la página trae o no slash final.
+   * según si la URL de la página trae o no slash final, y panel-luna se
+   * sirve sin él. Necesaria también para el mirror en el repo `privada`,
+   * donde la API vive en otro origen (ver panel-luna-frontend.ts portado).
    */
   panelApiBase: string;
 }): string {
@@ -444,6 +439,11 @@ function vistaDetalle(atleta, transcript) {
   };
   cont.appendChild(form);
 
+  // Reportes clínicos ("El Erudito") -- de cualquier operador autenticado
+  // (generar/listar/ver/editar); aprobar y descargar PDF son solo admin,
+  // ver vistaRevisionReporte.
+  cont.appendChild(cardReportes(atleta.phone_hash));
+
   const hilo = el(\`<div class="card"><div class="meta" style="margin-bottom:4px">Conversación completa</div><div class="transcript"></div></div>\`);
   const lista = hilo.querySelector(".transcript");
   for (const m of transcript) {
@@ -451,6 +451,215 @@ function vistaDetalle(atleta, transcript) {
   }
   cont.appendChild(hilo);
 
+  return cont;
+}
+
+// ---- "El Erudito": reporte clínico en 2 etapas. Solo admin (ver
+// puedeGestionarReportes en src/panel-permissions.ts, validado también en
+// el servidor -- esto es solo cosmético).
+
+function cardReportes(phoneHash) {
+  const card = el(\`
+    <div class="card">
+      <div class="meta" style="margin-bottom:6px">Reportes clínicos (El Erudito)</div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1">
+          <label>Del</label>
+          <input type="date" id="periodo-inicio">
+        </div>
+        <div style="flex:1">
+          <label>Al</label>
+          <input type="date" id="periodo-fin">
+        </div>
+      </div>
+      <button class="accion primario" id="generar-reporte" style="margin-top:12px">Generar reporte</button>
+      <div id="msg-reporte"></div>
+      <div id="lista-reportes" style="margin-top:10px"></div>
+    </div>
+  \`);
+
+  card.querySelector("#generar-reporte").onclick = async (ev) => {
+    const inicio = card.querySelector("#periodo-inicio").value;
+    const fin = card.querySelector("#periodo-fin").value;
+    const msg = card.querySelector("#msg-reporte");
+    if (!inicio || !fin) {
+      msg.textContent = "Elige ambas fechas.";
+      msg.className = "msg-error";
+      return;
+    }
+    ev.target.disabled = true;
+    msg.textContent = "Generando... esto puede tardar un momento (2 etapas de IA).";
+    msg.className = "";
+    try {
+      const { reporte } = await api(\`api/atletas/\${phoneHash}/reportes\`, {
+        method: "POST",
+        body: JSON.stringify({
+          periodo_inicio: new Date(inicio + "T00:00:00").toISOString(),
+          periodo_fin: new Date(fin + "T23:59:59").toISOString(),
+        }),
+      });
+      irARevisionReporte(phoneHash, reporte.id);
+    } catch (e) {
+      ev.target.disabled = false;
+      msg.textContent = "No se pudo generar: " + (e.message || "error desconocido");
+      msg.className = "msg-error";
+    }
+  };
+
+  cargarListaReportes(phoneHash, card.querySelector("#lista-reportes"));
+  return card;
+}
+
+async function cargarListaReportes(phoneHash, contenedor) {
+  contenedor.textContent = "Cargando reportes...";
+  try {
+    const { reportes } = await api(\`api/atletas/\${phoneHash}/reportes\`);
+    contenedor.innerHTML = "";
+    if (!reportes.length) {
+      contenedor.appendChild(el(\`<div class="meta">Sin reportes generados todavía.</div>\`));
+      return;
+    }
+    for (const r of reportes) {
+      const fila = el(\`
+        <div class="card tocable" style="margin:6px 0;padding:10px">
+          <div class="fila-top">
+            <div class="meta">\${(r.periodo_inicio || "").slice(0, 10)} → \${(r.periodo_fin || "").slice(0, 10)}</div>
+            <span class="badge \${r.estado === "aprobado" ? "verde" : "ambar"}">\${r.estado.toUpperCase()}</span>
+          </div>
+        </div>
+      \`);
+      fila.onclick = () => irARevisionReporte(phoneHash, r.id);
+      contenedor.appendChild(fila);
+    }
+  } catch {
+    contenedor.innerHTML = "";
+    contenedor.appendChild(el(\`<div class="meta">No se pudieron cargar los reportes.</div>\`));
+  }
+}
+
+async function irARevisionReporte(phoneHash, reporteId) {
+  render(el(\`<div class="vacio">Cargando...</div>\`));
+  try {
+    const { reportes } = await api(\`api/atletas/\${phoneHash}/reportes\`);
+    const reporte = reportes.find((r) => r.id === reporteId);
+    if (!reporte) throw new Error("no encontrado");
+    render(vistaRevisionReporte(phoneHash, reporte));
+  } catch {
+    render(el(\`<div class="vacio">No se pudo cargar el reporte.</div>\`));
+  }
+}
+
+function vistaRevisionReporte(phoneHash, reporte) {
+  const cont = el(\`<div></div>\`);
+  const volver = el(\`<button class="volver">← Volver a la ficha</button>\`);
+  volver.onclick = () => irADetalle(phoneHash);
+  cont.appendChild(volver);
+
+  const aprobado = reporte.estado === "aprobado";
+  const esAdmin = operador?.rol === "admin";
+
+  cont.appendChild(el(\`
+    <div class="card">
+      <div class="fila-top">
+        <div class="nombre">Reporte clínico</div>
+        <span class="badge \${aprobado ? "verde" : "ambar"}">\${reporte.estado.toUpperCase()}</span>
+      </div>
+      <div class="meta">\${(reporte.periodo_inicio || "").slice(0, 10)} → \${(reporte.periodo_fin || "").slice(0, 10)}</div>
+      \${aprobado ? \`<div class="meta">Aprobado: \${hace(reporte.aprobado_at)}</div>\` : ""}
+    </div>
+  \`));
+
+  // Editar (nota y carta) y "Guardar cambios" son de cualquier operador
+  // mientras esté en borrador. "Aprobar y firmar" y "Descargar PDF" son
+  // solo del admin -- esto es cosmético, la autorización real la aplica
+  // panel-luna/index.ts (puedeAprobarReportes) sin importar lo que mande
+  // el cliente.
+  const form = el(\`
+    <div class="card">
+      <label>Nota para el doctor (nunca sale en el PDF ni se manda al atleta)</label>
+      <textarea id="nota-doctor" rows="8" \${aprobado ? "disabled" : ""}></textarea>
+      <label style="margin-top:16px">Carta al atleta</label>
+      <textarea id="carta-atleta" rows="10" \${aprobado ? "disabled" : ""}></textarea>
+      <div class="fila-acciones" style="margin-top:12px">
+        \${!aprobado ? \`<button class="accion" id="guardar-cambios">Guardar cambios</button>\` : ""}
+        \${!aprobado && esAdmin ? \`<button class="accion primario" id="aprobar">Aprobar y firmar</button>\` : ""}
+      </div>
+      \${!aprobado && !esAdmin ? \`<div class="meta" style="margin-top:6px">Solo Alexis puede aprobar y firmar este reporte.</div>\` : ""}
+      <div id="msg-revision"></div>
+      \${aprobado && esAdmin ? \`<button class="accion primario" id="descargar-pdf" style="margin-top:10px">Descargar PDF (solo la carta)</button>\` : ""}
+    </div>
+  \`);
+  form.querySelector("#nota-doctor").value = reporte.nota_doctor || "";
+  form.querySelector("#carta-atleta").value = reporte.carta_atleta || "";
+  const msg = form.querySelector("#msg-revision");
+
+  if (!aprobado) {
+    form.querySelector("#guardar-cambios").onclick = async () => {
+      msg.textContent = "Guardando...";
+      msg.className = "";
+      try {
+        await api(\`api/reportes/\${reporte.id}\`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            nota_doctor: form.querySelector("#nota-doctor").value,
+            carta_atleta: form.querySelector("#carta-atleta").value,
+          }),
+        });
+        msg.textContent = "Guardado.";
+        msg.className = "msg-ok";
+      } catch {
+        msg.textContent = "No se pudo guardar.";
+        msg.className = "msg-error";
+      }
+    };
+
+    if (esAdmin) {
+      form.querySelector("#aprobar").onclick = async () => {
+        if (!confirm("¿Aprobar y firmar este reporte? Ya no se podrá editar después.")) return;
+        msg.textContent = "Aprobando...";
+        msg.className = "";
+        try {
+          await api(\`api/reportes/\${reporte.id}/aprobar\`, {
+            method: "POST",
+            body: JSON.stringify({
+              nota_doctor: form.querySelector("#nota-doctor").value,
+              carta_atleta: form.querySelector("#carta-atleta").value,
+            }),
+          });
+          irARevisionReporte(phoneHash, reporte.id);
+        } catch {
+          msg.textContent = "No se pudo aprobar.";
+          msg.className = "msg-error";
+        }
+      };
+    }
+  } else if (esAdmin) {
+    form.querySelector("#descargar-pdf").onclick = async (ev) => {
+      const boton = ev.target;
+      boton.disabled = true;
+      try {
+        const token = sesion?.access_token;
+        const res = await fetch(\`\${PANEL_API_BASE}/api/reportes/\${reporte.id}/pdf\`, {
+          headers: token ? { Authorization: \`Bearer \${token}\` } : {},
+        });
+        if (!res.ok) throw new Error("fallo");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = \`carta-atleta-\${reporte.id}.pdf\`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch {
+        msg.textContent = "No se pudo descargar el PDF.";
+        msg.className = "msg-error";
+      } finally {
+        boton.disabled = false;
+      }
+    };
+  }
+
+  cont.appendChild(form);
   return cont;
 }
 
