@@ -192,12 +192,15 @@ function layout(contenido) {
     const tabs = el(\`
       <nav class="tabs">
         <button data-tab="alertas">Alertas</button>
+        <button data-tab="casos">Casos</button>
         <button data-tab="atletas">Atletas</button>
       </nav>
     \`);
     tabs.querySelector('[data-tab="alertas"]').classList.toggle("activo", vista.nombre === "alertas");
+    tabs.querySelector('[data-tab="casos"]').classList.toggle("activo", vista.nombre === "casos");
     tabs.querySelector('[data-tab="atletas"]').classList.toggle("activo", vista.nombre === "atletas");
     tabs.querySelector('[data-tab="alertas"]').onclick = irAAlertas;
+    tabs.querySelector('[data-tab="casos"]').onclick = irACasos;
     tabs.querySelector('[data-tab="atletas"]').onclick = irAAtletas;
     wrap.appendChild(tabs);
   }
@@ -305,6 +308,48 @@ function vistaAlertas(alertas) {
   return cont;
 }
 
+// ---- Puente humano (Fase 4): lista de casos abiertos ----
+
+const ETIQUETA_TIPO_HANDOFF = {
+  revision_clinica: "Revisión clínica -- Luna sigue respondiendo",
+  toma_humana: "Puente activo -- Luna está callada",
+};
+
+async function irACasos() {
+  vista = { nombre: "casos" };
+  render(el(\`<div class="vacio">Cargando...</div>\`));
+  try {
+    const { handoffs } = await api("api/handoffs");
+    render(vistaCasos(handoffs));
+  } catch {
+    render(el(\`<div class="vacio">No se pudieron cargar los casos.</div>\`));
+  }
+}
+
+function vistaCasos(handoffs) {
+  const cont = el(\`<div></div>\`);
+  if (!handoffs.length) {
+    cont.appendChild(el(\`<div class="vacio">Sin casos abiertos. 🎉</div>\`));
+    return cont;
+  }
+  for (const h of handoffs) {
+    const card = el(\`
+      <div class="card tocable">
+        <div class="fila-top">
+          <div class="nombre">\${h.nombreAtleta || "sin nombre"}</div>
+          \${h.nivelOrigen ? \`<span class="badge \${h.nivelOrigen}">\${h.nivelOrigen.toUpperCase()}</span>\` : ""}
+        </div>
+        <div class="meta">\${ETIQUETA_TIPO_HANDOFF[h.tipo] || h.tipo}</div>
+        \${h.razon ? \`<div class="mensaje">\${h.razon}</div>\` : ""}
+        <div class="meta">Abierto \${hace(h.creadoAt)}</div>
+      </div>
+    \`);
+    card.onclick = () => irADetalle(h.phoneHash);
+    cont.appendChild(card);
+  }
+  return cont;
+}
+
 async function irAAtletas() {
   vista = { nombre: "atletas" };
   render(el(\`<div class="vacio">Cargando...</div>\`));
@@ -391,7 +436,11 @@ function vistaDetalle(atleta, transcript) {
   const esAdmin = operador?.rol === "admin";
   const cont = el(\`<div></div>\`);
   const volver = el(\`<button class="volver">← Volver</button>\`);
-  volver.onclick = () => (vista.nombre === "atletas" ? irAAtletas() : irAAlertas());
+  volver.onclick = () => {
+    if (vista.nombre === "atletas") return irAAtletas();
+    if (vista.nombre === "casos") return irACasos();
+    return irAAlertas();
+  };
   cont.appendChild(volver);
 
   cont.appendChild(el(\`
@@ -407,6 +456,8 @@ function vistaDetalle(atleta, transcript) {
       \${esAdmin ? \`<div class="meta">\${atleta.origen || "origen sin registrar"} · doctor: \${atleta.doctor_asignado || "-"}</div>\` : ""}
     </div>
   \`));
+
+  cont.appendChild(cardPuenteHumano(atleta.phone_hash));
 
   const form = el(\`
     <div class="card">
@@ -467,6 +518,67 @@ function vistaDetalle(atleta, transcript) {
   cont.appendChild(hilo);
 
   return cont;
+}
+
+// ---- Puente humano (Fase 4): tomar conversación y responder desde el
+// panel. "Tomar conversación" activa el candado (Luna se calla para
+// este atleta); el mensaje que se manda aquí se firma siempre "— Equipo
+// Muévete Seguro" (nunca un nombre propio) y queda en la conversación
+// completa de abajo en cuanto se recarga la ficha.
+
+function cardPuenteHumano(phoneHash) {
+  const card = el(\`
+    <div class="card">
+      <div class="meta" style="margin-bottom:6px">Puente humano</div>
+      <button class="accion primario" id="tomar-conversacion">Tomar conversación</button>
+      <div id="msg-tomar"></div>
+      <label style="margin-top:14px">Responder al atleta (WhatsApp)</label>
+      <textarea id="mensaje-operador" rows="3" placeholder="Escribe tu mensaje..."></textarea>
+      <button class="accion primario" id="enviar-mensaje" style="margin-top:8px">Enviar</button>
+      <div id="msg-enviar"></div>
+    </div>
+  \`);
+
+  card.querySelector("#tomar-conversacion").onclick = async (ev) => {
+    ev.target.disabled = true;
+    const msg = card.querySelector("#msg-tomar");
+    msg.textContent = "Tomando conversación...";
+    msg.className = "";
+    try {
+      await api(\`api/atletas/\${phoneHash}/tomar\`, { method: "POST" });
+      msg.textContent = "Listo -- Luna se calla, tú sigues la conversación.";
+      msg.className = "msg-ok";
+    } catch {
+      msg.textContent = "No se pudo tomar la conversación.";
+      msg.className = "msg-error";
+      ev.target.disabled = false;
+    }
+  };
+
+  card.querySelector("#enviar-mensaje").onclick = async (ev) => {
+    const texto = card.querySelector("#mensaje-operador").value;
+    const msg = card.querySelector("#msg-enviar");
+    if (!texto.trim()) {
+      msg.textContent = "Escribe un mensaje primero.";
+      msg.className = "msg-error";
+      return;
+    }
+    ev.target.disabled = true;
+    msg.textContent = "Enviando...";
+    msg.className = "";
+    try {
+      await api(\`api/atletas/\${phoneHash}/responder\`, { method: "POST", body: JSON.stringify({ mensaje: texto }) });
+      msg.textContent = "Enviado.";
+      msg.className = "msg-ok";
+      irADetalle(phoneHash);
+    } catch {
+      msg.textContent = "No se pudo enviar.";
+      msg.className = "msg-error";
+      ev.target.disabled = false;
+    }
+  };
+
+  return card;
 }
 
 // ---- "El Erudito": reporte clínico en 2 etapas. Solo admin (ver
