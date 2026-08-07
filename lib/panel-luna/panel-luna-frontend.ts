@@ -425,14 +425,14 @@ function vistaAtletas(atletas, filtrosActuales) {
 async function irADetalle(phoneHash) {
   render(el(\`<div class="vacio">Cargando...</div>\`));
   try {
-    const { atleta, transcript } = await api(\`api/atletas/\${phoneHash}\`);
-    render(vistaDetalle(atleta, transcript));
+    const { atleta, transcript, handoffTomaHumanaAbierto, lunaCallada } = await api(\`api/atletas/\${phoneHash}\`);
+    render(vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, lunaCallada));
   } catch {
     render(el(\`<div class="vacio">No se pudo cargar la ficha.</div>\`));
   }
 }
 
-function vistaDetalle(atleta, transcript) {
+function vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, lunaCallada) {
   const esAdmin = operador?.rol === "admin";
   const cont = el(\`<div></div>\`);
   const volver = el(\`<button class="volver">← Volver</button>\`);
@@ -457,7 +457,7 @@ function vistaDetalle(atleta, transcript) {
     </div>
   \`));
 
-  cont.appendChild(cardPuenteHumano(atleta.phone_hash));
+  cont.appendChild(cardPuenteHumano(atleta.phone_hash, handoffTomaHumanaAbierto, lunaCallada));
 
   const form = el(\`
     <div class="card">
@@ -520,21 +520,40 @@ function vistaDetalle(atleta, transcript) {
   return cont;
 }
 
-// ---- Puente humano (Fase 4): tomar conversación y responder desde el
-// panel. "Tomar conversación" activa el candado (Luna se calla para
-// este atleta); el mensaje que se manda aquí se firma siempre "— Equipo
-// Muévete Seguro" (nunca un nombre propio) y queda en la conversación
-// completa de abajo en cuanto se recarga la ficha.
+// ---- Puente humano (Fase 4, ajuste "decisión explícita"): tomar
+// conversación y responder desde el panel.
+//
+// "Tomar conversación" (se queda igual) activa el candado sin
+// preguntar nada -- es una acción deliberada de un solo paso.
+//
+// "Enviar" es distinto: si NO hay un puente tipo='toma_humana' abierto
+// todavía, el panel PREGUNTA antes de mandar ("Mandar y tomar la
+// conversación" vs. "Solo mandar este mensaje") -- nunca asume. Si ya
+// hay uno abierto, manda directo (tomarConversacion:true de todos
+// modos -- el backend lo reusa sin duplicar, ver
+// src/panel-handoffs.ts::tomarConversacion).
+//
+// El indicador de arriba ("Luna activa" / "Luna callada") viene del
+// backend (lunaCallada, mismo debeCallarLuna que aplica el candado
+// real) -- nunca se calcula ni se adivina en el cliente.
+//
+// El mensaje que se manda aquí se firma siempre "— Equipo Muévete
+// Seguro" (nunca un nombre propio, eso lo agrega el backend) y queda
+// en la conversación completa de abajo en cuanto se recarga la ficha.
 
-function cardPuenteHumano(phoneHash) {
+function cardPuenteHumano(phoneHash, handoffTomaHumanaAbierto, lunaCallada) {
   const card = el(\`
     <div class="card">
-      <div class="meta" style="margin-bottom:6px">Puente humano</div>
-      <button class="accion primario" id="tomar-conversacion">Tomar conversación</button>
+      <div class="fila-top">
+        <div class="meta">Puente humano</div>
+        <span class="badge \${lunaCallada ? "rojo" : "verde"}">\${lunaCallada ? "🔇 Luna callada" : "🟢 Luna activa"}</span>
+      </div>
+      <button class="accion primario" id="tomar-conversacion" style="margin-top:8px">Tomar conversación</button>
       <div id="msg-tomar"></div>
       <label style="margin-top:14px">Responder al atleta (WhatsApp)</label>
       <textarea id="mensaje-operador" rows="3" placeholder="Escribe tu mensaje..."></textarea>
       <button class="accion primario" id="enviar-mensaje" style="margin-top:8px">Enviar</button>
+      <div id="eleccion-tomar"></div>
       <div id="msg-enviar"></div>
     </div>
   \`);
@@ -548,6 +567,7 @@ function cardPuenteHumano(phoneHash) {
       await api(\`api/atletas/\${phoneHash}/tomar\`, { method: "POST" });
       msg.textContent = "Listo -- Luna se calla, tú sigues la conversación.";
       msg.className = "msg-ok";
+      irADetalle(phoneHash);
     } catch {
       msg.textContent = "No se pudo tomar la conversación.";
       msg.className = "msg-error";
@@ -555,7 +575,43 @@ function cardPuenteHumano(phoneHash) {
     }
   };
 
-  card.querySelector("#enviar-mensaje").onclick = async (ev) => {
+  async function mandarMensaje(texto, tomarConversacionElegido) {
+    const msg = card.querySelector("#msg-enviar");
+    card.querySelector("#eleccion-tomar").innerHTML = "";
+    msg.textContent = "Enviando...";
+    msg.className = "";
+    try {
+      await api(\`api/atletas/\${phoneHash}/responder\`, {
+        method: "POST",
+        body: JSON.stringify({ mensaje: texto, tomarConversacion: tomarConversacionElegido }),
+      });
+      msg.textContent = "Enviado.";
+      msg.className = "msg-ok";
+      irADetalle(phoneHash);
+    } catch {
+      msg.textContent = "No se pudo enviar.";
+      msg.className = "msg-error";
+    }
+  }
+
+  function preguntarSiTomar(texto) {
+    const contenedor = card.querySelector("#eleccion-tomar");
+    contenedor.innerHTML = "";
+    const pregunta = el(\`
+      <div class="card" style="margin-top:8px;padding:10px">
+        <div class="meta" style="margin-bottom:8px">Luna sigue activa para este atleta. ¿Qué quieres hacer?</div>
+        <div class="fila-acciones">
+          <button class="accion primario" id="elegir-tomar">Mandar y tomar la conversación</button>
+          <button class="accion" id="elegir-solo-mandar">Solo mandar este mensaje</button>
+        </div>
+      </div>
+    \`);
+    pregunta.querySelector("#elegir-tomar").onclick = () => mandarMensaje(texto, true);
+    pregunta.querySelector("#elegir-solo-mandar").onclick = () => mandarMensaje(texto, false);
+    contenedor.appendChild(pregunta);
+  }
+
+  card.querySelector("#enviar-mensaje").onclick = () => {
     const texto = card.querySelector("#mensaje-operador").value;
     const msg = card.querySelector("#msg-enviar");
     if (!texto.trim()) {
@@ -563,18 +619,14 @@ function cardPuenteHumano(phoneHash) {
       msg.className = "msg-error";
       return;
     }
-    ev.target.disabled = true;
-    msg.textContent = "Enviando...";
+    msg.textContent = "";
     msg.className = "";
-    try {
-      await api(\`api/atletas/\${phoneHash}/responder\`, { method: "POST", body: JSON.stringify({ mensaje: texto }) });
-      msg.textContent = "Enviado.";
-      msg.className = "msg-ok";
-      irADetalle(phoneHash);
-    } catch {
-      msg.textContent = "No se pudo enviar.";
-      msg.className = "msg-error";
-      ev.target.disabled = false;
+    if (handoffTomaHumanaAbierto) {
+      // Ya hay un puente abierto -- no se pregunta nada (punto 2 del
+      // ajuste), se manda directo y el backend lo reusa sin duplicar.
+      mandarMensaje(texto, true);
+    } else {
+      preguntarSiTomar(texto);
     }
   };
 
