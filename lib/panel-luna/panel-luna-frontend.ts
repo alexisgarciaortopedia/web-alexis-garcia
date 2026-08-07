@@ -99,6 +99,7 @@ export function renderPanelLunaHtml(params: {
   .turno.in { background: #22303f; align-self: flex-start; }
   .turno.out { background: #232a1f; align-self: flex-end; }
   .turno.alert { background: #3a2320; align-self: center; font-size: 12px; color: var(--text-muted); max-width: 100%; }
+  .turno-hora { color: var(--text-muted); font-size: 11px; margin-top: 3px; }
   .volver { background: none; border: none; color: var(--accent); font-size: 14px; padding: 0 0 10px; }
   .campo-negocio-oculto { display: none; }
 </style>
@@ -132,6 +133,20 @@ function hace(iso) {
   const h = Math.floor(min / 60);
   if (h < 24) return \`hace \${h} h\`;
   return \`hace \${Math.floor(h / 24)} d\`;
+}
+
+/** Fecha y hora absolutas de un mensaje del transcript -- a diferencia de
+ * hace() (relativo, para "última actividad"), aquí el punto es poder leer
+ * CUÁNDO pasó cada turno de la conversación, sin que el dato se vuelva
+ * ambiguo al releerlo días después. "" si el timestamp viene vacío o
+ * inválido -- nunca truena el render de la conversación completa. */
+function horaMensaje(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const fecha = d.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+  const hora = d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+  return \`\${fecha}, \${hora}\`;
 }
 
 async function api(path, options = {}) {
@@ -447,7 +462,7 @@ function vistaDetalle(atleta, transcript) {
   const hilo = el(\`<div class="card"><div class="meta" style="margin-bottom:4px">Conversación completa</div><div class="transcript"></div></div>\`);
   const lista = hilo.querySelector(".transcript");
   for (const m of transcript) {
-    lista.appendChild(el(\`<div class="turno \${m.direccion}">\${(m.texto || "").replace(/</g, "&lt;")}</div>\`));
+    lista.appendChild(el(\`<div class="turno \${m.direccion}">\${(m.texto || "").replace(/</g, "&lt;")}<div class="turno-hora">\${horaMensaje(m.created_at)}</div></div>\`));
   }
   cont.appendChild(hilo);
 
