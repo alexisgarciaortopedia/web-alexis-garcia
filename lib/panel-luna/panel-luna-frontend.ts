@@ -342,9 +342,26 @@ function vistaCasos(handoffs) {
         <div class="meta">\${ETIQUETA_TIPO_HANDOFF[h.tipo] || h.tipo}</div>
         \${h.razon ? \`<div class="mensaje">\${h.razon}</div>\` : ""}
         <div class="meta">Abierto \${hace(h.creadoAt)}</div>
+        <div class="fila-acciones">
+          <button class="accion" data-cerrar>Cerrar caso</button>
+        </div>
       </div>
     \`);
     card.onclick = () => irADetalle(h.phoneHash);
+    const botonCerrar = card.querySelector("[data-cerrar]");
+    botonCerrar.onclick = async (ev) => {
+      ev.stopPropagation(); // no navegar a la ficha al cerrar desde la lista
+      ev.target.disabled = true;
+      ev.target.textContent = "...";
+      try {
+        await api(\`api/handoffs/\${h.id}/cerrar\`, { method: "POST" });
+        card.remove();
+        if (!cont.querySelector(".card")) irACasos();
+      } catch {
+        ev.target.disabled = false;
+        ev.target.textContent = "Cerrar caso";
+      }
+    };
     cont.appendChild(card);
   }
   return cont;
@@ -425,14 +442,14 @@ function vistaAtletas(atletas, filtrosActuales) {
 async function irADetalle(phoneHash) {
   render(el(\`<div class="vacio">Cargando...</div>\`));
   try {
-    const { atleta, transcript, handoffTomaHumanaAbierto, lunaCallada } = await api(\`api/atletas/\${phoneHash}\`);
-    render(vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, lunaCallada));
+    const { atleta, transcript, handoffTomaHumanaAbierto, handoffTomaHumanaId, lunaCallada } = await api(\`api/atletas/\${phoneHash}\`);
+    render(vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, handoffTomaHumanaId, lunaCallada));
   } catch {
     render(el(\`<div class="vacio">No se pudo cargar la ficha.</div>\`));
   }
 }
 
-function vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, lunaCallada) {
+function vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, handoffTomaHumanaId, lunaCallada) {
   const esAdmin = operador?.rol === "admin";
   const cont = el(\`<div></div>\`);
   const volver = el(\`<button class="volver">← Volver</button>\`);
@@ -457,7 +474,7 @@ function vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, lunaCallada)
     </div>
   \`));
 
-  cont.appendChild(cardPuenteHumano(atleta.phone_hash, handoffTomaHumanaAbierto, lunaCallada));
+  cont.appendChild(cardPuenteHumano(atleta.phone_hash, handoffTomaHumanaAbierto, handoffTomaHumanaId, lunaCallada));
 
   const form = el(\`
     <div class="card">
@@ -541,14 +558,17 @@ function vistaDetalle(atleta, transcript, handoffTomaHumanaAbierto, lunaCallada)
 // Seguro" (nunca un nombre propio, eso lo agrega el backend) y queda
 // en la conversación completa de abajo en cuanto se recarga la ficha.
 
-function cardPuenteHumano(phoneHash, handoffTomaHumanaAbierto, lunaCallada) {
+function cardPuenteHumano(phoneHash, handoffTomaHumanaAbierto, handoffTomaHumanaId, lunaCallada) {
   const card = el(\`
     <div class="card">
       <div class="fila-top">
         <div class="meta">Puente humano</div>
         <span class="badge \${lunaCallada ? "rojo" : "verde"}">\${lunaCallada ? "🔇 Luna callada" : "🟢 Luna activa"}</span>
       </div>
-      <button class="accion primario" id="tomar-conversacion" style="margin-top:8px">Tomar conversación</button>
+      <div class="fila-acciones" style="margin-top:8px">
+        <button class="accion primario" id="tomar-conversacion">Tomar conversación</button>
+        \${handoffTomaHumanaAbierto ? \`<button class="accion" id="cerrar-caso">Cerrar caso</button>\` : ""}
+      </div>
       <div id="msg-tomar"></div>
       <label style="margin-top:14px">Responder al atleta (WhatsApp)</label>
       <textarea id="mensaje-operador" rows="3" placeholder="Escribe tu mensaje..."></textarea>
@@ -574,6 +594,25 @@ function cardPuenteHumano(phoneHash, handoffTomaHumanaAbierto, lunaCallada) {
       ev.target.disabled = false;
     }
   };
+
+  if (handoffTomaHumanaAbierto) {
+    card.querySelector("#cerrar-caso").onclick = async (ev) => {
+      ev.target.disabled = true;
+      const msg = card.querySelector("#msg-tomar");
+      msg.textContent = "Cerrando caso...";
+      msg.className = "";
+      try {
+        await api(\`api/handoffs/\${handoffTomaHumanaId}/cerrar\`, { method: "POST" });
+        msg.textContent = "Cerrado -- Luna retoma la conversación.";
+        msg.className = "msg-ok";
+        irADetalle(phoneHash);
+      } catch {
+        msg.textContent = "No se pudo cerrar el caso.";
+        msg.className = "msg-error";
+        ev.target.disabled = false;
+      }
+    };
+  }
 
   async function mandarMensaje(texto, tomarConversacionElegido) {
     const msg = card.querySelector("#msg-enviar");
