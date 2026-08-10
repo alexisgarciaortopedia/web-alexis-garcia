@@ -194,14 +194,17 @@ function layout(contenido) {
         <button data-tab="alertas">Alertas</button>
         <button data-tab="casos">Casos</button>
         <button data-tab="atletas">Atletas</button>
+        <button data-tab="organizaciones">Orgs</button>
       </nav>
     \`);
     tabs.querySelector('[data-tab="alertas"]').classList.toggle("activo", vista.nombre === "alertas");
     tabs.querySelector('[data-tab="casos"]').classList.toggle("activo", vista.nombre === "casos");
     tabs.querySelector('[data-tab="atletas"]').classList.toggle("activo", vista.nombre === "atletas");
+    tabs.querySelector('[data-tab="organizaciones"]').classList.toggle("activo", vista.nombre === "organizaciones");
     tabs.querySelector('[data-tab="alertas"]').onclick = irAAlertas;
     tabs.querySelector('[data-tab="casos"]').onclick = irACasos;
     tabs.querySelector('[data-tab="atletas"]').onclick = irAAtletas;
+    tabs.querySelector('[data-tab="organizaciones"]').onclick = irAOrganizaciones;
     wrap.appendChild(tabs);
   }
   const main = el(\`<main></main>\`);
@@ -364,6 +367,211 @@ function vistaCasos(handoffs) {
     };
     cont.appendChild(card);
   }
+  return cont;
+}
+
+// ---- Fase D de la puerta de acceso: organizaciones y códigos ----
+
+async function irAOrganizaciones() {
+  vista = { nombre: "organizaciones" };
+  render(el(\`<div class="vacio">Cargando...</div>\`));
+  try {
+    const { organizaciones } = await api("api/organizaciones");
+    render(vistaOrganizaciones(organizaciones));
+  } catch {
+    render(el(\`<div class="vacio">No se pudieron cargar las organizaciones.</div>\`));
+  }
+}
+
+function metaOrganizacion(o) {
+  const limite = o.limiteMiembros ? \`límite \${o.limiteMiembros}\` : "sin límite";
+  return \`\${o.tipo} · \${o.plan} · \${limite}\`;
+}
+
+function vistaOrganizaciones(organizaciones) {
+  const cont = el(\`<div></div>\`);
+
+  const formCard = el(\`
+    <div class="card">
+      <div class="nombre" style="margin-bottom:6px">Nueva organización</div>
+      <label>Nombre</label>
+      <input id="nueva-org-nombre" placeholder="Box Iron, Empresa XYZ...">
+      <label>Tipo</label>
+      <input id="nueva-org-tipo" placeholder="centro_deportivo, empresa, equipo, directo...">
+      <label>Plan</label>
+      <input id="nueva-org-plan" placeholder="estandar, premium...">
+      <label>Límite de miembros (opcional)</label>
+      <input id="nueva-org-limite" type="number" min="1" placeholder="sin límite">
+      <button class="accion primario" id="crear-org" style="margin-top:12px;width:100%">Crear organización</button>
+      <div id="crear-org-msg"></div>
+    </div>
+  \`);
+  formCard.querySelector("#crear-org").onclick = async (ev) => {
+    const nombre = formCard.querySelector("#nueva-org-nombre").value.trim();
+    const tipo = formCard.querySelector("#nueva-org-tipo").value.trim();
+    const plan = formCard.querySelector("#nueva-org-plan").value.trim();
+    const limiteRaw = formCard.querySelector("#nueva-org-limite").value.trim();
+    const msg = formCard.querySelector("#crear-org-msg");
+    msg.textContent = "";
+    if (!nombre || !tipo || !plan) {
+      msg.textContent = "Nombre, tipo y plan son obligatorios.";
+      msg.className = "msg-error";
+      return;
+    }
+    ev.target.disabled = true;
+    try {
+      await api("api/organizaciones", {
+        method: "POST",
+        body: JSON.stringify({ nombre, tipo, plan, limiteMiembros: limiteRaw ? Number(limiteRaw) : null }),
+      });
+      irAOrganizaciones();
+    } catch {
+      msg.textContent = "No se pudo crear la organización.";
+      msg.className = "msg-error";
+      ev.target.disabled = false;
+    }
+  };
+  cont.appendChild(formCard);
+
+  if (!organizaciones.length) {
+    cont.appendChild(el(\`<div class="vacio">Todavía no hay organizaciones.</div>\`));
+    return cont;
+  }
+  for (const o of organizaciones) {
+    const card = el(\`
+      <div class="card tocable">
+        <div class="fila-top">
+          <div class="nombre">\${o.nombre}</div>
+          <span class="badge \${o.estado === "activa" ? "verde" : "rojo"}">\${o.estado.toUpperCase()}</span>
+        </div>
+        <div class="meta">\${metaOrganizacion(o)}</div>
+        <div class="meta">\${o.atletasActivos} atletas activos · \${o.codigosDisponibles} códigos disponibles · \${o.codigosUsados} usados</div>
+      </div>
+    \`);
+    card.onclick = () => irADetalleOrganizacion(o.id);
+    cont.appendChild(card);
+  }
+  return cont;
+}
+
+async function irADetalleOrganizacion(id) {
+  render(el(\`<div class="vacio">Cargando...</div>\`));
+  try {
+    const detalle = await api(\`api/organizaciones/\${id}\`);
+    render(vistaDetalleOrganizacion(detalle));
+  } catch {
+    render(el(\`<div class="vacio">No se pudo cargar la organización.</div>\`));
+  }
+}
+
+function vistaDetalleOrganizacion(detalle) {
+  const o = detalle.organizacion;
+  const codigos = detalle.codigos;
+  const cont = el(\`<div></div>\`);
+  const volver = el(\`<button class="volver">← Volver</button>\`);
+  volver.onclick = () => irAOrganizaciones();
+  cont.appendChild(volver);
+
+  const infoCard = el(\`
+    <div class="card">
+      <div class="fila-top">
+        <div class="nombre">\${o.nombre}</div>
+        <span class="badge \${o.estado === "activa" ? "verde" : "rojo"}">\${o.estado.toUpperCase()}</span>
+      </div>
+      <div class="meta">\${metaOrganizacion(o)}</div>
+      <div class="meta" id="org-conteo-atletas">\${o.atletasActivos} atletas activos</div>
+      <div class="meta" id="org-conteo-codigos">\${o.codigosDisponibles} códigos disponibles · \${o.codigosUsados} usados</div>
+      <div class="fila-acciones">
+        <button class="accion" id="toggle-estado">\${o.estado === "activa" ? "Pausar" : "Reactivar"}</button>
+      </div>
+    </div>
+  \`);
+  infoCard.querySelector("#toggle-estado").onclick = async (ev) => {
+    ev.target.disabled = true;
+    try {
+      const accion = o.estado === "activa" ? "pausar" : "reactivar";
+      await api(\`api/organizaciones/\${o.id}/\${accion}\`, { method: "POST" });
+      irADetalleOrganizacion(o.id);
+    } catch {
+      ev.target.disabled = false;
+    }
+  };
+  cont.appendChild(infoCard);
+
+  const loteCard = el(\`
+    <div class="card">
+      <label>Generar lote de códigos</label>
+      <input id="lote-cantidad" type="number" min="1" max="500" value="10">
+      <button class="accion primario" id="generar-lote" style="margin-top:8px;width:100%">Generar</button>
+      <div id="lote-resultado"></div>
+    </div>
+  \`);
+  loteCard.querySelector("#generar-lote").onclick = async (ev) => {
+    const cantidadInput = loteCard.querySelector("#lote-cantidad");
+    const cantidad = parseInt(cantidadInput.value, 10);
+    const resultadoDiv = loteCard.querySelector("#lote-resultado");
+    if (!cantidad || cantidad < 1) return;
+    ev.target.disabled = true;
+    ev.target.textContent = "Generando...";
+    try {
+      const { codigos: nuevos } = await api(\`api/organizaciones/\${o.id}/codigos\`, {
+        method: "POST",
+        body: JSON.stringify({ cantidad }),
+      });
+      resultadoDiv.innerHTML = "";
+      resultadoDiv.appendChild(el(\`<div class="meta" style="margin-top:8px">\${nuevos.length} códigos generados -- cópialos:</div>\`));
+      const texto = nuevos.join("\\n");
+      resultadoDiv.appendChild(el(\`<textarea readonly rows="\${Math.min(nuevos.length, 12)}" style="margin-top:6px">\${texto}</textarea>\`));
+      // Actualiza el conteo en pantalla sin recargar -- recargar tiraría
+      // los códigos que se acaban de mostrar, y el punto es poder
+      // copiarlos.
+      o.codigosDisponibles += nuevos.length;
+      infoCard.querySelector("#org-conteo-codigos").textContent =
+        \`\${o.codigosDisponibles} códigos disponibles · \${o.codigosUsados} usados\`;
+    } catch {
+      resultadoDiv.innerHTML = "";
+      resultadoDiv.appendChild(el(\`<div class="msg-error">No se pudo generar el lote.</div>\`));
+    } finally {
+      ev.target.disabled = false;
+      ev.target.textContent = "Generar";
+    }
+  };
+  cont.appendChild(loteCard);
+
+  const codigosCard = el(\`<div class="card"><div class="nombre" style="margin-bottom:6px">Códigos</div></div>\`);
+  if (!codigos.length) {
+    codigosCard.appendChild(el(\`<div class="meta">Todavía no hay códigos generados.</div>\`));
+  } else {
+    for (const c of codigos) {
+      const detalleEstado = c.estado === "usado" && c.usadoAt ? \`usado \${hace(c.usadoAt)}\` : c.estado;
+      const fila = el(\`
+        <div class="meta" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--card-border)">
+          <div>
+            <div style="color:var(--text)">\${c.codigo}</div>
+            <div>\${detalleEstado}</div>
+          </div>
+          \${c.estado === "disponible" ? '<button class="accion" data-anular>Anular</button>' : ""}
+        </div>
+      \`);
+      const botonAnular = fila.querySelector("[data-anular]");
+      if (botonAnular) {
+        botonAnular.onclick = async () => {
+          botonAnular.disabled = true;
+          botonAnular.textContent = "...";
+          try {
+            await api(\`api/codigos/\${c.id}/anular\`, { method: "POST" });
+            irADetalleOrganizacion(o.id);
+          } catch {
+            botonAnular.disabled = false;
+            botonAnular.textContent = "Anular";
+          }
+        };
+      }
+      codigosCard.appendChild(fila);
+    }
+  }
+  cont.appendChild(codigosCard);
+
   return cont;
 }
 
