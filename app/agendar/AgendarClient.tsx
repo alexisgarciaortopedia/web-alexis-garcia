@@ -8,11 +8,10 @@ import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { PhoneIcon } from "@/components/Icons";
 import { CLINIC_LOCATIONS } from "@/lib/locations";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
+import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
 
 const WHATSAPP_MESSAGE =
   "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
-const PHONE_TEL = "tel:+527731754638";
-const PHONE_DISPLAY = "773 175 4638";
 
 const MODALITIES = [
   `Consulta presencial en ${CLINIC_LOCATIONS.tula.publicLabel}`,
@@ -60,6 +59,7 @@ export default function AgendarClient() {
 
           <a
             href={PHONE_TEL}
+            onClick={trackPhoneCallClick}
             aria-label="Llamar para agendar"
             className={cardBaseClasses}
           >

@@ -4,7 +4,11 @@ import Link from "next/link";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { InstagramIcon, PhoneIcon } from "@/components/Icons";
+
+const WHATSAPP_MESSAGE =
+  "Hola, quiero agendar una valoración por dolor de rodilla.";
 
 export const metadata: Metadata = {
   title: "Dolor de rodilla en Tula | Traumatología y Ortopedia",
@@ -83,14 +87,12 @@ export default function RodillaPage() {
                 >
                   Agendar valoración
                 </Link>
-                <a
-                  href="https://wa.me/527731754638?text=Hola%2C%20quiero%20agendar%20una%20valoraci%C3%B3n%20por%20dolor%20de%20rodilla."
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <WhatsAppLink
+                  message={WHATSAPP_MESSAGE}
                   className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[rgba(255,255,255,0.04)] px-6 py-2 text-sm font-semibold text-white backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.08)]"
                 >
                   WhatsApp
-                </a>
+                </WhatsAppLink>
                 <a
                   href="https://instagram.com/dralexisgarcia.ortopedia"
                   target="_blank"
@@ -135,15 +137,13 @@ export default function RodillaPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
                 <span>Agendar consulta</span>
               </Link>
-              <a
-                href="https://wa.me/527731754638?text=Hola%2C%20quiero%20agendar%20una%20valoraci%C3%B3n%20por%20dolor%20de%20rodilla."
-                target="_blank"
-                rel="noopener noreferrer"
+              <WhatsAppLink
+                message={WHATSAPP_MESSAGE}
                 className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"
               >
                 <PhoneIcon className="h-4 w-4" />
                 <span>WhatsApp prioritario</span>
-              </a>
+              </WhatsAppLink>
               <Link
                 href="/agendar"
                 className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"

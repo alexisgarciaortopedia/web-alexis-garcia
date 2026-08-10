@@ -6,11 +6,10 @@ import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
+import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
 
 const WHATSAPP_MESSAGE =
   "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
-const PHONE_TEL = "tel:+527731754638";
-const PHONE_DISPLAY = "773 175 4638";
 
 const actionButtonClasses =
   "inline-flex w-full items-center justify-center gap-3 rounded-[20px] border border-white/20 bg-white/6 px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:w-auto sm:min-w-[240px]";
@@ -53,6 +52,7 @@ export default function CitaPage() {
               </a>
               <a
                 href={PHONE_TEL}
+                onClick={trackPhoneCallClick}
                 aria-label="Llamar para gestionar la cita"
                 className={actionButtonClasses}
               >
