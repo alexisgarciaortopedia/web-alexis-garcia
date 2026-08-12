@@ -9,6 +9,7 @@ const PUBLIC_ROUTES = [
   "/ubicaciones",
   "/rodilla",
   "/muevete-seguro",
+  "/privacidad",
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
