@@ -65,7 +65,7 @@ export default function MueveteSeguroPage() {
             {PUERTAS.map((puerta, i) => (
               <ScrollReveal key={puerta.href} delayMs={i * 100}>
                 <Link href={puerta.href} className="group block h-full">
-                  <GlassCard className="flex h-full flex-col justify-between p-8 transition-[transform,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-teal-400/40 hover:shadow-[0_24px_60px_-24px_rgba(45,212,191,0.3)] sm:p-10">
+                  <GlassCard className="flex h-full flex-col justify-between p-8 transition-[border-color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-teal-400/40 sm:p-10">
                     <div>
                       <span className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
                         {puerta.eyebrow}
