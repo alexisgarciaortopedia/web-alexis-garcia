@@ -1,3 +1,4 @@
+import { GlassCard } from "./GlassCard";
 import { ScrollReveal } from "./ScrollReveal";
 import { WhatsAppDemo } from "./WhatsAppDemo";
 
@@ -66,12 +67,7 @@ const BENEFICIOS = [
 
 function WhatsAppIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 32 32"
-      className={className}
-      fill="currentColor"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 32 32" className={className} fill="currentColor" aria-hidden="true">
       <path d="M19.1 17.3c-.2-.1-1.1-.5-1.3-.6-.2-.1-.4-.1-.6.1-.2.2-.7.6-.8.8-.1.1-.3.2-.5.1-.2-.1-.9-.3-1.7-1-.6-.6-1-1.4-1.1-1.6-.1-.2 0-.3.1-.4.1-.1.2-.3.3-.4.1-.1.1-.2.2-.3.1-.1 0-.3 0-.4 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.5.3-.2.2-.7.7-.7 1.7s.7 2 .8 2.1c.1.1 1.5 2.3 3.7 3.3 2.2 1 2.2.7 2.6.7.4-.1 1.1-.4 1.3-.8.2-.4.2-.7.1-.8-.1-.1-.2-.1-.4-.2Z" />
       <path d="M16 3C9.4 3 4 8.4 4 15c0 2 .5 3.9 1.5 5.6L4 29l8.6-1.4c1.5.8 3.2 1.2 4.9 1.2 6.6 0 12-5.4 12-12S22.6 3 16 3Zm0 22.2c-1.6 0-3.1-.4-4.5-1.2l-.7-.4-5 .8.8-4.9-.4-.7c-.8-1.4-1.2-3-1.2-4.5 0-5.1 4.2-9.3 9.3-9.3s9.3 4.2 9.3 9.3-4.2 9.3-9.3 9.3Z" />
     </svg>
@@ -95,31 +91,41 @@ function FlechaRiesgo() {
   );
 }
 
+/** El único botón lleno y brillante de cada pantalla -- nunca compite
+ * con nada más: elevación mínima vía transform (nunca escala) y un
+ * resplandor teal que crece apenas al pasar el cursor. */
+function BotonWhatsApp({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={WHATSAPP_DEMO}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex items-center justify-center gap-2 rounded-full bg-teal-500 px-6 py-3 text-sm font-semibold text-[#050608] shadow-[0_12px_30px_rgba(45,212,191,0.22)] transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:bg-teal-400 hover:shadow-[0_16px_38px_rgba(45,212,191,0.34)] ${className}`}
+    >
+      <WhatsAppIcon />
+      {children}
+    </a>
+  );
+}
+
 export default function CentrosDeportivosPage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#071018_45%,#050608_100%)]" />
-      <div className="pointer-events-none absolute -right-32 top-0 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.14),transparent_70%)] blur-[100px]" />
-      <div className="pointer-events-none absolute -left-32 top-[30%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.12),transparent_70%)] blur-[110px]" />
+      <div className="pointer-events-none absolute -right-32 top-0 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.13),transparent_70%)] blur-[100px]" />
+      <div className="pointer-events-none absolute -left-32 top-[30%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.1),transparent_70%)] blur-[110px]" />
+      <div className="pointer-events-none absolute right-[10%] top-[85%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.09),transparent_70%)] blur-[110px]" />
 
       {/* Nav interna */}
       <header className="relative z-20 border-b border-white/5 bg-[#050608]/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div className="flex flex-col gap-0.5">
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
-              Ortik
-            </span>
-            <span className="text-sm font-semibold text-white">
-              Muévete Seguro para centros deportivos
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Ortik</span>
+            <span className="text-sm font-semibold text-white">Muévete Seguro para centros deportivos</span>
           </div>
           <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#B9C0CC] sm:text-sm">
             {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="transition-colors hover:text-teal-300"
-              >
+              <a key={link.href} href={link.href} className="transition-colors hover:text-teal-300">
                 {link.label}
               </a>
             ))}
@@ -127,7 +133,7 @@ export default function CentrosDeportivosPage() {
               href={WHATSAPP_DEMO}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-teal-500 px-3.5 py-1.5 text-xs font-semibold text-[#050608] transition-colors hover:bg-teal-400"
+              className="inline-flex items-center gap-1.5 rounded-full border border-teal-500/30 px-3.5 py-1.5 text-xs font-medium text-teal-300 transition-colors hover:border-teal-400/50 hover:text-teal-200"
             >
               <WhatsAppIcon className="h-3.5 w-3.5" />
               Agendar demo
@@ -136,37 +142,29 @@ export default function CentrosDeportivosPage() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-5xl px-5 pb-20 pt-10 sm:px-8 sm:pt-14">
+      <main className="relative z-10 mx-auto max-w-5xl px-5 pb-24 pt-14 sm:px-8 sm:pt-20">
         {/* 1. Apertura */}
-        <section className="mb-20 flex flex-col gap-8" aria-labelledby="hero-title">
-          <div className="flex flex-col gap-5">
+        <section className="mb-28 flex flex-col gap-8 sm:mb-32" aria-labelledby="hero-title">
+          <div className="flex flex-col gap-6">
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-teal-500/25 bg-teal-500/10 px-4 py-1.5 text-xs font-medium text-teal-300">
               <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
               Para dueños de centros deportivos
             </div>
             <h1
               id="hero-title"
-              className="font-serif text-[clamp(2rem,5vw,3.25rem)] leading-[1.12] tracking-tight text-white"
+              className="max-w-3xl font-serif text-[clamp(2.25rem,5.5vw,3.75rem)] leading-[1.05] tracking-[-0.02em] text-white"
             >
               No pierdes socios por precio. Los pierdes cuando se lesionan y
               nadie actúa a tiempo.
             </h1>
-            <p className="max-w-2xl text-base leading-relaxed text-[#C5CDD9] sm:text-lg">
+            <p className="max-w-[65ch] text-base leading-relaxed text-[#C5CDD9] sm:text-lg">
               Muévete Seguro es seguimiento con supervisión médica por
               WhatsApp para los socios de tu centro: cuando algo les duele,
               alguien se entera a tiempo y actúa.
             </p>
           </div>
 
-          <a
-            href={WHATSAPP_DEMO}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-teal-500 px-6 py-3 text-sm font-semibold text-[#050608] shadow-[0_12px_30px_rgba(45,212,191,0.25)] transition-colors hover:bg-teal-400"
-          >
-            <WhatsAppIcon />
-            Agendar una demostración por WhatsApp
-          </a>
+          <BotonWhatsApp className="w-fit">Agendar una demostración por WhatsApp</BotonWhatsApp>
 
           <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-[#8C95A3] sm:text-sm">
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[#B9C0CC]">
@@ -184,131 +182,118 @@ export default function CentrosDeportivosPage() {
         </section>
 
         {/* 2. Cómo funciona */}
-        <ScrollReveal>
-          <section id="como-funciona" className="mb-20 scroll-mt-24">
-            <h2 className="mb-6 font-serif text-2xl text-white sm:text-3xl">
+        <section id="como-funciona" className="mb-28 scroll-mt-24 sm:mb-32">
+          <ScrollReveal>
+            <h2 className="mb-8 font-serif text-3xl leading-tight tracking-[-0.01em] text-white sm:text-4xl">
               Cómo funciona
             </h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {PASOS.map((paso) => (
-                <div
-                  key={paso.num}
-                  className="rounded-[20px] border border-white/10 bg-[rgba(16,18,22,0.45)] p-5 backdrop-blur-[20px]"
-                >
-                  <div className="mb-3 flex items-center gap-3">
+          </ScrollReveal>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {PASOS.map((paso, i) => (
+              <ScrollReveal key={paso.num} delayMs={i * 90}>
+                <GlassCard className="h-full p-6">
+                  <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-500/30 to-blue-500/30 text-sm font-bold text-teal-300">
                       {paso.num}
                     </span>
-                    <h3 className="text-sm font-semibold text-white sm:text-base">
-                      {paso.title}
-                    </h3>
+                    <h3 className="text-sm font-semibold text-white sm:text-base">{paso.title}</h3>
                   </div>
-                  <p className="text-sm leading-relaxed text-[#9AA3B2]">
-                    {paso.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-5 rounded-[16px] border border-white/8 bg-white/3 px-4 py-3 text-xs leading-relaxed text-[#8C95A3] sm:text-sm">
+                  <p className="text-sm leading-relaxed text-[#9AA3B2]">{paso.description}</p>
+                </GlassCard>
+              </ScrollReveal>
+            ))}
+          </div>
+          <ScrollReveal delayMs={280}>
+            <p className="mt-6 max-w-[65ch] rounded-[16px] border border-white/8 bg-white/3 px-4 py-3 text-xs leading-relaxed text-[#8C95A3] sm:text-sm">
               Luna no diagnostica, no receta y no autoriza a competir. Eso es
               lo que le da seriedad.
             </p>
-          </section>
-        </ScrollReveal>
+          </ScrollReveal>
+        </section>
 
         {/* 3. La demo */}
-        <ScrollReveal>
-          <section id="demo" className="mb-20 scroll-mt-24">
-            <h2 className="mb-2 font-serif text-2xl text-white sm:text-3xl">
+        <section id="demo" className="relative mb-28 scroll-mt-24 sm:mb-32">
+          <div className="pointer-events-none absolute left-1/2 top-10 -z-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.1),transparent_70%)] blur-[90px]" />
+          <ScrollReveal>
+            <h2 className="mb-3 font-serif text-3xl leading-tight tracking-[-0.01em] text-white sm:text-4xl">
               Así se ve en la vida real
             </h2>
-            <p className="mb-6 max-w-2xl text-sm leading-relaxed text-[#9AA3B2] sm:text-base">
-              Una conversación real, con datos modificados, de cómo Luna
-              responde cuando un socio le escribe.
+            <p className="mb-10 max-w-[65ch] text-sm leading-relaxed text-[#9AA3B2] sm:text-base">
+              Tres conversaciones reales, con datos modificados, de cómo Luna
+              responde según la situación.
             </p>
+          </ScrollReveal>
+          <ScrollReveal delayMs={120}>
             <div className="mx-auto max-w-md">
               <WhatsAppDemo />
             </div>
-          </section>
-        </ScrollReveal>
+          </ScrollReveal>
+        </section>
 
         {/* 4. Respaldo médico */}
         <ScrollReveal>
-          <section
-            id="respaldo"
-            className="mb-20 scroll-mt-24 rounded-[24px] border border-teal-500/25 bg-gradient-to-br from-teal-500/10 to-blue-500/8 p-6 sm:p-10"
-          >
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
-              Respaldo médico
-            </span>
-            <h2 className="mb-4 mt-3 font-serif text-2xl text-white sm:text-4xl">
-              Dr. Alexis Eduardo García de los Santos
-            </h2>
-            <p className="mb-5 text-base text-[#C5CDD9] sm:text-lg">
-              Traumatología y Ortopedia
-            </p>
-            <div className="flex flex-col gap-1.5 text-sm text-[#9AA3B2] sm:text-base">
-              <p>Cédula Profesional 12314318</p>
-              <p>Cédula de Especialidad 15549455</p>
-            </div>
-            <p className="mt-6 max-w-2xl text-sm leading-relaxed text-[#B9C0CC] sm:text-base">
-              Cada señal que Luna detecta pasa frente a un traumatólogo antes
-              de convertirse en una recomendación. Eso es lo que separa esto
-              de una app cualquiera.
-            </p>
+          <section id="respaldo" className="relative mb-28 scroll-mt-24 sm:mb-32">
+            <div className="pointer-events-none absolute -right-16 -top-16 -z-10 h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.14),transparent_70%)] blur-[90px]" />
+            <GlassCard className="border-teal-500/25 bg-gradient-to-br from-teal-500/10 to-blue-500/8 p-8 sm:p-12">
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+                Respaldo médico
+              </span>
+              <h2 className="mb-4 mt-3 font-serif text-3xl leading-[1.08] tracking-[-0.015em] text-white sm:text-5xl">
+                Dr. Alexis Eduardo García de los Santos
+              </h2>
+              <p className="mb-6 text-base text-[#C5CDD9] sm:text-lg">Traumatología y Ortopedia</p>
+              <div className="flex flex-col gap-1.5 text-sm text-[#9AA3B2] sm:text-base">
+                <p>Cédula Profesional 12314318</p>
+                <p>Cédula de Especialidad 15549455</p>
+              </div>
+              <p className="mt-7 max-w-[65ch] text-sm leading-relaxed text-[#B9C0CC] sm:text-base">
+                Cada señal que Luna detecta pasa frente a un traumatólogo
+                antes de convertirse en una recomendación. Eso es lo que
+                separa esto de una app cualquiera.
+              </p>
+            </GlassCard>
           </section>
         </ScrollReveal>
 
         {/* 5. Lo que gana el centro */}
-        <ScrollReveal>
-          <section id="beneficios" className="mb-20 scroll-mt-24">
-            <h2 className="mb-6 font-serif text-2xl text-white sm:text-3xl">
+        <section id="beneficios" className="mb-28 scroll-mt-24 sm:mb-32">
+          <ScrollReveal>
+            <h2 className="mb-8 font-serif text-3xl leading-tight tracking-[-0.01em] text-white sm:text-4xl">
               Lo que gana tu centro
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {BENEFICIOS.map((beneficio) => (
-                <div
-                  key={beneficio.title}
-                  className="rounded-[20px] border border-white/10 bg-[rgba(16,18,22,0.45)] p-5 backdrop-blur-[20px]"
-                >
-                  <h3 className="mb-2 text-sm font-semibold text-white sm:text-base">
-                    {beneficio.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#9AA3B2]">
-                    {beneficio.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-5 rounded-[16px] border border-white/8 bg-white/3 px-4 py-3 text-xs leading-relaxed text-[#8C95A3] sm:text-sm">
+          </ScrollReveal>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {BENEFICIOS.map((beneficio, i) => (
+              <ScrollReveal key={beneficio.title} delayMs={i * 90}>
+                <GlassCard className="h-full p-6">
+                  <h3 className="mb-2 text-sm font-semibold text-white sm:text-base">{beneficio.title}</h3>
+                  <p className="text-sm leading-relaxed text-[#9AA3B2]">{beneficio.description}</p>
+                </GlassCard>
+              </ScrollReveal>
+            ))}
+          </div>
+          <ScrollReveal delayMs={280}>
+            <p className="mt-6 max-w-[65ch] rounded-[16px] border border-white/8 bg-white/3 px-4 py-3 text-xs leading-relaxed text-[#8C95A3] sm:text-sm">
               Tu centro solo reparte códigos de acceso. Del resto -- la
               conversación, el seguimiento, la revisión médica -- se encarga
               el sistema.
             </p>
-          </section>
-        </ScrollReveal>
+          </ScrollReveal>
+        </section>
 
         {/* 6. Cierre */}
         <ScrollReveal>
-          <section
-            id="contacto"
-            className="mb-10 scroll-mt-24 rounded-[24px] border border-white/10 bg-[rgba(16,18,22,0.55)] p-6 text-center backdrop-blur-[24px] sm:p-10"
-          >
-            <h2 className="mb-3 font-serif text-2xl text-white sm:text-3xl">
-              Prueba un mes sin costo para tu centro.
-            </h2>
-            <p className="mx-auto mb-7 max-w-xl text-sm leading-relaxed text-[#B9C0CC] sm:text-base">
-              Sin instalar nada, sin cambiar tu operación.
-            </p>
-            <a
-              href={WHATSAPP_DEMO}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-teal-500 px-6 py-3 text-sm font-semibold text-[#050608] shadow-[0_12px_30px_rgba(45,212,191,0.25)] transition-colors hover:bg-teal-400"
-            >
-              <WhatsAppIcon />
-              Agendar una demostración por WhatsApp
-            </a>
+          <section id="contacto" className="relative mb-10 scroll-mt-24">
+            <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.12),transparent_70%)] blur-[100px]" />
+            <GlassCard className="p-8 text-center sm:p-14">
+              <h2 className="mb-4 font-serif text-3xl leading-tight tracking-[-0.015em] text-white sm:text-4xl">
+                Prueba un mes sin costo para tu centro.
+              </h2>
+              <p className="mx-auto mb-9 max-w-[50ch] text-sm leading-relaxed text-[#B9C0CC] sm:text-base">
+                Sin instalar nada, sin cambiar tu operación.
+              </p>
+              <BotonWhatsApp>Agendar una demostración por WhatsApp</BotonWhatsApp>
+            </GlassCard>
           </section>
         </ScrollReveal>
       </main>

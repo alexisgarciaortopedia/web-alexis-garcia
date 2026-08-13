@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Aparición discreta al hacer scroll -- fade + desplazamiento corto,
- * una sola vez por sección (se desconecta el observer al activarse).
- * Respeta prefers-reduced-motion vía las variantes motion-reduce.
+ * Aparición discreta al hacer scroll -- opacidad + un desplazamiento de
+ * pocos píxeles, una sola vez por elemento (el observer se desconecta al
+ * activarse, nunca se repite al volver a pasar). Curva de aceleración
+ * suave (no lineal), duración corta (dentro de 400-700ms), y respeta
+ * prefers-reduced-motion vía las variantes motion-reduce. Solo anima
+ * transform y opacity -- nunca dispara reflow.
  */
 export function ScrollReveal({
   children,
@@ -38,8 +41,8 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:translate-y-0 ${
-        visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+      className={`transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:translate-y-0 ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
       } ${className}`}
       style={{ transitionDelay: visible ? `${delayMs}ms` : "0ms" }}
     >
