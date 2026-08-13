@@ -9,6 +9,7 @@ const PUBLIC_ROUTES = [
   "/ubicaciones",
   "/rodilla",
   "/muevete-seguro",
+  "/muevete-seguro/atletas",
   "/centros-deportivos",
   "/privacidad",
 ] as const;
