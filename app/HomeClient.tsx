@@ -6,11 +6,15 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
-import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
+import { CertifiedIcon, PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
 import { useSede, type Sede } from "@/lib/sede";
+import {
+  AGGREGATE_REVIEW_COUNT,
+  FALLBACK_RATING,
+} from "@/lib/staticGoogleReviews";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
 const WHATSAPP_MESSAGE =
@@ -89,6 +93,20 @@ export default function HomeClient() {
                 Rodilla, hombro, cadera, columna, fracturas y lesión
                 deportiva. Un plan con objetivos desde la primera consulta.
               </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#BCC5D2] sm:text-sm">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="text-[#E8B44A]" aria-hidden="true">
+                  ★★★★★
+                </span>
+                {FALLBACK_RATING.toFixed(1)} · {AGGREGATE_REVIEW_COUNT} reseñas
+                en Google
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#14304F]/70 px-3 py-1">
+                <CertifiedIcon className="h-3.5 w-3.5 shrink-0 text-[#8FB3DE]" />
+                Certificado · Consejo Mexicano de Ortopedia y Traumatología
+              </span>
             </div>
 
             <div className="flex flex-col gap-3">
