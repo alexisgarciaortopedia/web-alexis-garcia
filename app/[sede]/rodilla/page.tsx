@@ -1,27 +1,53 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { notFound } from "next/navigation";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
+import LocationBlock from "@/components/LocationBlock";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import WhatsAppLink from "@/components/WhatsAppLink";
+import PhoneLink from "@/components/PhoneLink";
 import { InstagramIcon, PhoneIcon } from "@/components/Icons";
+import {
+  CLINIC_LOCATIONS as SEDES,
+  getSedeStaticParams,
+  type ClinicLocationId,
+} from "@/lib/locations";
+import { PHONE_DISPLAY } from "@/lib/phone";
 
-const WHATSAPP_MESSAGE =
-  "Hola, quiero agendar una valoración por dolor de rodilla.";
-
-export const metadata: Metadata = {
-  title: "Dolor de rodilla en Tula | Traumatología y Ortopedia",
-  description:
-    "Valoración de dolor de rodilla en Tula por especialista en Traumatología y Ortopedia. Consulta programada y atención prioritaria.",
-  robots: {
-    index: true,
-    follow: true,
-  },
-  alternates: {
-    canonical: "https://www.alexisgarciaortopedia.com/rodilla",
-  },
+type PageProps = {
+  params: Promise<{ sede: string }>;
 };
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return getSedeStaticParams();
+}
+
+function isValidSede(sede: string): sede is ClinicLocationId {
+  return sede === "pachuca" || sede === "tula";
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { sede: sedeParam } = await params;
+  if (!isValidSede(sedeParam)) return {};
+  const sede = SEDES[sedeParam];
+
+  const title = `Dolor de Rodilla en ${sede.publicLabel} | Traumatología y Ortopedia`;
+  const description = `Valoración de dolor de rodilla en ${sede.publicLabel} por especialista en Traumatología y Ortopedia. Consulta programada y atención prioritaria.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `https://www.alexisgarciaortopedia.com/${sedeParam}/rodilla`,
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 const EVALUATION_STEPS = [
   {
@@ -44,7 +70,12 @@ const EVALUATION_STEPS = [
   },
 ];
 
-export default function RodillaPage() {
+export default async function RodillaSedePage({ params }: PageProps) {
+  const { sede: sedeParam } = await params;
+  if (!isValidSede(sedeParam)) notFound();
+  const sede = SEDES[sedeParam];
+  const whatsappMessage = `Hola, quiero agendar una valoración por dolor de rodilla en ${sede.publicLabel}.`;
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-ink-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#020308_0%,#0A1322_50%,#050608_100%)]" />
@@ -64,7 +95,7 @@ export default function RodillaPage() {
             <div className="flex flex-col gap-8">
               <div className="flex flex-col gap-4">
                 <h1 className="font-serif text-[clamp(3rem,5.2vw,4.6rem)] font-semibold leading-[1.02] tracking-[0.01em] text-white">
-                  Dolor de rodilla en Tula
+                  {sede.rodilla.h1}
                 </h1>
                 <p className="text-sm text-text-secondary sm:text-base">
                   Evaluación por especialista en Traumatología y Ortopedia
@@ -81,24 +112,23 @@ export default function RodillaPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Link
-                  href="https://alexisgarciaortopedia.com/agendar"
-                  className="inline-flex items-center justify-center rounded-full border border-white/20 bg-[linear-gradient(135deg,rgba(255,255,255,0.1),rgba(12,18,28,0.7))] px-6 py-2 text-sm font-semibold text-white shadow-[0_20px_55px_rgba(2,6,12,0.65)] backdrop-blur-[20px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[linear-gradient(135deg,rgba(255,255,255,0.14),rgba(12,18,28,0.75))]"
-                >
-                  Agendar valoración
-                </Link>
                 <WhatsAppLink
-                  message={WHATSAPP_MESSAGE}
-                  className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[rgba(255,255,255,0.04)] px-6 py-2 text-sm font-semibold text-white backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.08)]"
+                  message={whatsappMessage}
+                  className="inline-flex items-center justify-center rounded-full bg-accent-signal px-6 py-2 text-sm font-semibold text-ink-900 shadow-[0_20px_55px_rgba(2,6,12,0.65)] transition-all duration-200 hover:-translate-y-0.5"
                 >
-                  WhatsApp
+                  Escribir por WhatsApp
                 </WhatsAppLink>
+                <PhoneLink className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[rgba(255,255,255,0.04)] px-6 py-2 text-sm font-semibold text-white backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.08)]">
+                  <PhoneIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Llamar {PHONE_DISPLAY}
+                </PhoneLink>
                 <a
                   href="https://instagram.com/dralexisgarcia.ortopedia"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[rgba(255,255,255,0.04)] px-6 py-2 text-sm font-semibold text-white backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.08)]"
                 >
+                  <InstagramIcon className="mr-2 h-4 w-4" aria-hidden="true" />
                   Instagram
                 </a>
               </div>
@@ -125,43 +155,6 @@ export default function RodillaPage() {
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(5,6,8,0.05)_0%,rgba(5,6,8,0.45)_100%)]" />
             </div>
           </div>
-
-          <GlassPanel className="relative overflow-hidden px-6 py-4 shadow-[0_40px_110px_rgba(2,6,12,0.65)]">
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.1),transparent_60%)]" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
-            <div className="relative grid items-center divide-y divide-white/10 text-sm text-text-secondary sm:grid-cols-4 sm:divide-x sm:divide-y-0">
-              <Link
-                href="/agendar"
-                className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
-                <span>Agendar consulta</span>
-              </Link>
-              <WhatsAppLink
-                message={WHATSAPP_MESSAGE}
-                className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"
-              >
-                <PhoneIcon className="h-4 w-4" />
-                <span>WhatsApp prioritario</span>
-              </WhatsAppLink>
-              <Link
-                href="/agendar"
-                className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-white/70" />
-                <span>Consulta en línea</span>
-              </Link>
-              <a
-                href="https://instagram.com/dralexisgarcia.ortopedia"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"
-              >
-                <InstagramIcon className="h-4 w-4" />
-                <span>Instagram</span>
-              </a>
-            </div>
-          </GlassPanel>
         </section>
 
         <section className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
@@ -228,6 +221,8 @@ export default function RodillaPage() {
             ))}
           </div>
         </GlassPanel>
+
+        <LocationBlock sede={sede} />
 
         <section className="text-center">
           <p className="font-serif text-[clamp(1.4rem,3vw,2rem)] text-white">
