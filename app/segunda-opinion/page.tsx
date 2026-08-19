@@ -44,7 +44,7 @@ export default function SegundaOpinionPage() {
             entradilla="¿Ya te dijeron que necesitas cirugía? Revisamos tu diagnóstico contigo. No toda lesión necesita operarse — evaluamos todas las opciones antes."
             reviewCount={AGGREGATE_REVIEW_COUNT}
             reviewLabel="reseñas en Google"
-            micro="Consulta presencial en Pachuca, lunes a viernes · en Tula, sábado y domingo"
+            micro="Consulta presencial todos los días, 9:00 a 19:00 h, en Pachuca y en Tula"
             whatsappMessage={WHATSAPP_MESSAGE}
           />
         </div>
