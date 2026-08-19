@@ -21,7 +21,7 @@ function StarRating({
 
   return (
     <span
-      className={`text-[#F5C26B] ${className}`}
+      className={`text-accent-rating ${className}`}
       aria-label={label}
       title={label}
     >
@@ -154,10 +154,10 @@ export default function ReviewsCarousel() {
         <span id="reviews-heading" className="font-serif text-xl text-white">
           Opiniones de pacientes
         </span>
-        <span className="text-sm text-[#B9C0CC]">
+        <span className="text-sm text-text-secondary">
           Reseñas reales de pacientes atendidos en consulta
         </span>
-        <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-[#B9C0CC]">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-text-secondary">
           <StarRating rating={data.rating} />
           <span>
             {ratingLabel} en Google
@@ -212,7 +212,7 @@ export default function ReviewsCarousel() {
                     </span>
                   )}
                   {activeReview.relativePublishTimeDescription ? (
-                    <p className="text-xs text-[#8C95A3]">
+                    <p className="text-xs text-text-muted">
                       {activeReview.relativePublishTimeDescription}
                     </p>
                   ) : null}
@@ -220,7 +220,7 @@ export default function ReviewsCarousel() {
               </div>
               <StarRating rating={activeReview.rating} className="shrink-0" />
             </div>
-            <p className="text-sm leading-relaxed text-[#B9C0CC]">
+            <p className="text-sm leading-relaxed text-text-secondary">
               {activeReview.text}
             </p>
           </div>
@@ -232,7 +232,7 @@ export default function ReviewsCarousel() {
               type="button"
               onClick={goPrevious}
               aria-label="Reseña anterior"
-              className="absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#050608]/90 p-2 text-white transition-colors hover:bg-white/10 sm:inline-flex"
+              className="absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-ink-900/90 p-2 text-white transition-colors hover:bg-white/10 sm:inline-flex"
             >
               <span aria-hidden="true">‹</span>
             </button>
@@ -240,7 +240,7 @@ export default function ReviewsCarousel() {
               type="button"
               onClick={goNext}
               aria-label="Reseña siguiente"
-              className="absolute right-0 top-1/2 hidden translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-[#050608]/90 p-2 text-white transition-colors hover:bg-white/10 sm:inline-flex"
+              className="absolute right-0 top-1/2 hidden translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-ink-900/90 p-2 text-white transition-colors hover:bg-white/10 sm:inline-flex"
             >
               <span aria-hidden="true">›</span>
             </button>
@@ -290,7 +290,7 @@ export default function ReviewsCarousel() {
 
       <div className="flex flex-col items-center gap-3">
         {data.source === "google" ? (
-          <p className="text-xs text-[#8C95A3]">
+          <p className="text-xs text-text-muted">
             Reseñas proporcionadas por Google
           </p>
         ) : null}

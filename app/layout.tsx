@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Spectral } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -8,11 +8,23 @@ const GOOGLE_ADS_ID = "AW-18142944053";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+// Serif de bajo contraste de trazo en vez de la didona de alto contraste de
+// Playfair, que se lee a clinica de estetica, no a precision clinica.
+//
+// Source Serif 4 era la primera opcion (linaje de documentacion tecnica),
+// pero su archivo pesa 50.9KB solo en 400 -- ya deja el par de fuentes en
+// ~97KB, por encima del presupuesto de 87KB. Literata pesa aun mas
+// (52.7KB). Spectral, la segunda alternativa del documento de diseno,
+// carga los DOS pesos (400 y 600) en 14.0KB + 14.8KB: el par completo
+// queda en ~75.8KB, por debajo del actual. Medido con next build +
+// inspeccion directa de los .woff2 generados, no estimado.
+const sourceSerif = Spectral({
+  variable: "--font-source-serif",
   subsets: ["latin"],
+  weight: ["400", "600"],
 });
 
 const siteTitle =
@@ -62,7 +74,7 @@ export default function RootLayout({
           content="fjzniz8f2fcocaxcc6a9jwqb6sbo7c"
         />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} antialiased`}>
+      <body className={`${inter.variable} ${sourceSerif.variable} antialiased`}>
         {children}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}

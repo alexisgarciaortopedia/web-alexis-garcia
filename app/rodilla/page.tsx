@@ -46,7 +46,7 @@ const EVALUATION_STEPS = [
 
 export default function RodillaPage() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
+    <div className="relative min-h-screen overflow-x-hidden bg-ink-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#020308_0%,#0A1322_50%,#050608_100%)]" />
       <div className="pointer-events-none absolute -right-28 top-6 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(118,146,186,0.25),transparent_70%)] blur-[130px]" />
       <div className="pointer-events-none absolute -left-32 top-[18%] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(58,111,165,0.22),transparent_70%)] blur-[140px]" />
@@ -63,15 +63,15 @@ export default function RodillaPage() {
           <div className="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div className="flex flex-col gap-8">
               <div className="flex flex-col gap-4">
-                <h1 className="font-serif text-[clamp(3rem,5.2vw,4.6rem)] leading-[1.02] tracking-[0.01em] text-white">
+                <h1 className="font-serif text-[clamp(3rem,5.2vw,4.6rem)] font-semibold leading-[1.02] tracking-[0.01em] text-white">
                   Dolor de rodilla en Tula
                 </h1>
-                <p className="text-sm text-[#B9C0CC] sm:text-base">
+                <p className="text-sm text-text-secondary sm:text-base">
                   Evaluación por especialista en Traumatología y Ortopedia
                 </p>
               </div>
 
-              <div className="relative overflow-hidden rounded-[22px] border border-white/15 bg-[rgba(12,16,24,0.68)] px-6 py-5 shadow-[0_35px_110px_rgba(2,6,12,0.65)] backdrop-blur-[30px]">
+              <div className="relative overflow-hidden rounded-md border border-white/15 bg-[rgba(12,16,24,0.68)] px-6 py-5 shadow-[0_35px_110px_rgba(2,6,12,0.65)] backdrop-blur-[30px]">
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.08),transparent_60%)]" />
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_50%)]" />
                 <div className="relative font-serif text-base text-white sm:text-lg">
@@ -103,13 +103,13 @@ export default function RodillaPage() {
                 </a>
               </div>
 
-              <p className="text-xs text-[#8C95A3] sm:text-sm">
+              <p className="text-xs text-text-muted sm:text-sm">
                 Valoración orientada por exploración clínica, análisis funcional
                 y uso selectivo de estudios de imagen.
               </p>
             </div>
 
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[32px] border border-white/20 bg-[rgba(10,14,20,0.65)] shadow-[0_65px_160px_rgba(2,6,12,0.75)]">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md border border-white/20 bg-[rgba(10,14,20,0.65)] shadow-[0_65px_160px_rgba(2,6,12,0.75)]">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
               <Image
                 src="/images/rodilla.jpg"
@@ -129,7 +129,7 @@ export default function RodillaPage() {
           <GlassPanel className="relative overflow-hidden px-6 py-4 shadow-[0_40px_110px_rgba(2,6,12,0.65)]">
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.1),transparent_60%)]" />
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
-            <div className="relative grid items-center divide-y divide-white/10 text-sm text-[#B9C0CC] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+            <div className="relative grid items-center divide-y divide-white/10 text-sm text-text-secondary sm:grid-cols-4 sm:divide-x sm:divide-y-0">
               <Link
                 href="/agendar"
                 className="flex items-center gap-2 px-2 py-2 text-white transition-colors hover:text-white/80 sm:py-0"
@@ -170,7 +170,7 @@ export default function RodillaPage() {
             <h2 className="font-serif text-2xl text-white sm:text-3xl">
               El dolor de rodilla no es un diagnóstico
             </h2>
-            <div className="flex flex-col gap-4 text-sm text-[#B9C0CC] sm:text-base">
+            <div className="flex flex-col gap-4 text-sm text-text-secondary sm:text-base">
               <p>
                 El dolor de rodilla puede relacionarse con sobrecarga, lesión
                 meniscal, lesión ligamentaria, tendinopatías, desgaste articular
@@ -189,7 +189,7 @@ export default function RodillaPage() {
             </div>
           </div>
           <div className="relative">
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[26px] border border-white/15 bg-[rgba(12,16,24,0.6)] shadow-[0_40px_120px_rgba(2,6,12,0.6)]">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md border border-white/15 bg-[rgba(12,16,24,0.6)] shadow-[0_40px_120px_rgba(2,6,12,0.6)]">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_40%_20%,rgba(255,255,255,0.12),transparent_60%)]" />
               <Image
                 src="/images/infiltracion.jpg"
@@ -209,7 +209,7 @@ export default function RodillaPage() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
           <div className="flex flex-col gap-2">
             <span className="font-serif text-xl text-white">Cómo se evalúa</span>
-            <p className="text-sm text-[#B9C0CC] sm:text-base">
+            <p className="text-sm text-text-secondary sm:text-base">
               Exploración clínica, análisis funcional y estudios de imagen solo
               cuando modifican decisiones diagnósticas o terapéuticas.
             </p>
@@ -218,7 +218,7 @@ export default function RodillaPage() {
             {EVALUATION_STEPS.map((step) => (
               <div
                 key={step.title}
-                className="relative overflow-hidden rounded-[20px] border border-white/20 bg-[rgba(14,18,26,0.65)] p-5 text-sm text-[#B9C0CC] shadow-[0_28px_70px_rgba(2,6,12,0.55)] backdrop-blur-[26px] transition-transform duration-200 hover:-translate-y-0.5 sm:text-base"
+                className="relative overflow-hidden rounded-md border border-white/20 bg-[rgba(14,18,26,0.65)] p-5 text-sm text-text-secondary shadow-[0_28px_70px_rgba(2,6,12,0.55)] backdrop-blur-[26px] transition-transform duration-200 hover:-translate-y-0.5 sm:text-base"
               >
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.08),transparent_60%)]" />
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.12),transparent_55%)]" />

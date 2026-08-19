@@ -59,7 +59,7 @@ export default function HomeClient() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
+    <div className="relative min-h-screen overflow-x-hidden bg-ink-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
       <div className="pointer-events-none absolute -right-28 top-16 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(148,156,170,0.18),transparent_70%)] blur-[90px]" />
       <div className="pointer-events-none absolute inset-0 noise-overlay opacity-20" />
@@ -78,15 +78,15 @@ export default function HomeClient() {
               (lg:order-none) y este orden deja de importar. */}
           <div className="order-1 flex flex-col gap-6 lg:order-none">
             <div className="flex flex-col gap-4">
-              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8FB3DE]">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-accent-clinical">
                 {hero.eyebrow}
               </span>
-              <h1 className="font-serif text-[clamp(2.3rem,5vw,4.2rem)] leading-tight tracking-tight text-white">
+              <h1 className="font-serif text-[clamp(2.3rem,5vw,4.2rem)] font-semibold leading-tight tracking-tight text-white">
                 {hero.h1First}
                 <br />
                 {hero.h1Second}
               </h1>
-              <p className="max-w-xl text-sm text-[#B9C0CC] sm:text-base">
+              <p className="max-w-xl text-sm text-text-secondary sm:text-base">
                 <span className="block font-serif text-base text-white sm:text-lg">
                   Diagnóstico claro. Plan preciso. Recuperación con objetivos.
                 </span>
@@ -95,16 +95,16 @@ export default function HomeClient() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#BCC5D2] sm:text-sm">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-text-secondary sm:text-sm">
               <span className="inline-flex items-center gap-1.5">
-                <span className="text-[#E8B44A]" aria-hidden="true">
+                <span className="text-accent-rating" aria-hidden="true">
                   ★★★★★
                 </span>
                 {FALLBACK_RATING.toFixed(1)} · {AGGREGATE_REVIEW_COUNT} reseñas
                 en Google
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#14304F]/70 px-3 py-1">
-                <CertifiedIcon className="h-3.5 w-3.5 shrink-0 text-[#8FB3DE]" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-brand-field/70 px-3 py-1">
+                <CertifiedIcon className="h-3.5 w-3.5 shrink-0 text-accent-clinical" />
                 Certificado · Consejo Mexicano de Ortopedia y Traumatología
               </span>
             </div>
@@ -115,7 +115,7 @@ export default function HomeClient() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={trackWhatsAppClick}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-[#070B12] shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-signal px-6 py-3.5 text-sm font-semibold text-ink-900 shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
               >
                 <WhatsAppIcon className="h-5 w-5" />
                 Escribir por WhatsApp
@@ -128,7 +128,7 @@ export default function HomeClient() {
                 <PhoneIcon className="h-4 w-4" />
                 Llamar {PHONE_DISPLAY}
               </a>
-              <span className="text-center text-xs text-[#8C95A3] sm:text-left">
+              <span className="text-center text-xs text-text-muted sm:text-left">
                 {hero.micro}
               </span>
             </div>
@@ -151,7 +151,7 @@ export default function HomeClient() {
         <ReviewsCarousel />
 
         <GlassPanel className="px-6 py-9 lg:px-10 lg:py-12">
-          <div className="flex flex-col gap-2 text-center text-sm text-[#B9C0CC] md:text-left">
+          <div className="flex flex-col gap-2 text-center text-sm text-text-secondary md:text-left">
             <span className="font-serif text-base text-white">¿Qué atiendo?</span>
             <span>
               Problemas frecuentes que evalúo y trato. Si no ves tu caso, agenda
@@ -299,13 +299,13 @@ export default function HomeClient() {
           </div>
         </GlassPanel>
 
-        <div className="flex flex-col items-center gap-1 text-center text-xs text-[#8C95A3] sm:text-sm">
+        <div className="flex flex-col items-center gap-1 text-center text-xs text-text-muted sm:text-sm">
           <span>
             Médico Cirujano · Universidad Autónoma del Estado de Hidalgo
           </span>
         </div>
 
-        <div className="flex flex-col items-center gap-2 text-center text-xs text-[#8C95A3] sm:text-sm">
+        <div className="flex flex-col items-center gap-2 text-center text-xs text-text-muted sm:text-sm">
           <span>Especialidad en Traumatología y Ortopedia – UNAM</span>
           <span>Hospital Central Norte PEMEX (formación)</span>
           <span>
@@ -316,7 +316,7 @@ export default function HomeClient() {
 
       <footer className="relative z-10 border-t border-white/5 px-8 py-6">
         <nav
-          className="mb-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#8C95A3]"
+          className="mb-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-text-muted"
           aria-label="Enlaces del sitio"
         >
           <a
@@ -342,7 +342,7 @@ export default function HomeClient() {
             WhatsApp
           </a>
         </nav>
-        <p className="text-center text-xs text-[#8C95A3]">
+        <p className="text-center text-xs text-text-muted">
           Responsable: Dr. Alexis Eduardo García de los Santos.
         </p>
       </footer>
