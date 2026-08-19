@@ -8,6 +8,20 @@ const nextConfig: NextConfig = {
     // segun el Accept header del navegador; nunca sirve mas pesado que hoy.
     formats: ["image/avif", "image/webp"],
   },
+  async redirects() {
+    return [
+      {
+        // /rodilla era estatico y siempre decia "Tula", sin importar el
+        // ?ref= -- reemplazado por /[sede]/rodilla. 301 a la variante de
+        // Pachuca (la plaza de conquista) por defecto. Next.js reenvia el
+        // querystring automaticamente, asi que cualquier ?ref= que llegue
+        // aqui sigue de largo intacto.
+        source: "/rodilla",
+        destination: "/pachuca/rodilla",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
