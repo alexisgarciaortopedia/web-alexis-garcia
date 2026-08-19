@@ -12,13 +12,13 @@ const WHATSAPP_MESSAGE =
   "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
 
 const actionButtonClasses =
-  "inline-flex w-full items-center justify-center gap-3 rounded-[20px] border border-white/20 bg-white/6 px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:w-auto sm:min-w-[240px]";
+  "inline-flex w-full items-center justify-center gap-3 rounded-md border border-white/20 bg-white/6 px-6 py-4 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 sm:w-auto sm:min-w-[240px]";
 
 export default function CitaPage() {
   const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
+    <div className="relative min-h-screen overflow-x-hidden bg-ink-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
       <div className="pointer-events-none absolute -right-28 top-16 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(148,156,170,0.18),transparent_70%)] blur-[90px]" />
       <div className="pointer-events-none absolute inset-0 noise-overlay opacity-20" />
@@ -27,10 +27,10 @@ export default function CitaPage() {
 
       <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-col gap-10 px-8 pb-24 pt-10 sm:px-10 lg:pt-14">
         <section className="flex flex-col gap-4 text-center">
-          <h1 className="font-serif text-3xl text-white sm:text-4xl">
+          <h1 className="font-serif text-3xl font-semibold text-white sm:text-4xl">
             Gestión de cita
           </h1>
-          <p className="text-sm text-[#B9C0CC] sm:text-base">
+          <p className="text-sm text-text-secondary sm:text-base">
             Para reprogramar o cancelar una cita, comunícate directamente con
             nuestro equipo.
           </p>
@@ -47,7 +47,7 @@ export default function CitaPage() {
                 aria-label="Contactar por WhatsApp"
                 className={actionButtonClasses}
               >
-                <MessageCircle className="h-5 w-5 text-[#25D366]" aria-hidden="true" />
+                <MessageCircle className="h-5 w-5 text-accent-signal" aria-hidden="true" />
                 WhatsApp
               </a>
               <a
@@ -63,19 +63,19 @@ export default function CitaPage() {
 
             <Link
               href="/agendar"
-              className="text-sm text-[#B9C0CC] transition-colors hover:text-white"
+              className="text-sm text-text-secondary transition-colors hover:text-white"
             >
               Ir a agendar consulta
             </Link>
 
-            <p className="text-center text-xs text-[#8C95A3]">
+            <p className="text-center text-xs text-text-muted">
               La confirmación de cambios queda sujeta a respuesta de nuestro
               equipo.
             </p>
           </div>
         </GlassPanel>
 
-        <p className="text-center text-xs text-[#8C95A3]">
+        <p className="text-center text-xs text-text-muted">
           Teléfono:{" "}
           <a
             href={PHONE_TEL}

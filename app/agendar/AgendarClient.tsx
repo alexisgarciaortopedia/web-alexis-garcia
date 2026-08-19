@@ -20,13 +20,13 @@ const MODALITIES = [
 ];
 
 const cardBaseClasses =
-  "group flex w-full items-center justify-center gap-3 rounded-[22px] border border-white/20 bg-white/6 px-6 py-5 text-center text-sm font-semibold text-white backdrop-blur-[22px] shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
+  "group flex w-full items-center justify-center gap-3 rounded-md border border-white/20 bg-white/6 px-6 py-5 text-center text-sm font-semibold text-white backdrop-blur-[22px] shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30";
 
 export default function AgendarClient() {
   const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#050608] text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-ink-900 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#050608_0%,#0B0F17_50%,#050608_100%)]" />
       <div className="pointer-events-none absolute -right-28 top-16 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,rgba(148,156,170,0.18),transparent_70%)] blur-[90px]" />
       <div className="pointer-events-none absolute inset-0 noise-overlay opacity-20" />
@@ -35,10 +35,10 @@ export default function AgendarClient() {
 
       <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-col gap-10 px-8 pb-24 pt-10 sm:px-10 lg:pt-14">
         <section className="flex flex-col gap-4 text-center">
-          <h1 className="font-serif text-[clamp(2rem,4vw,3rem)] text-white">
+          <h1 className="font-serif text-[clamp(2rem,4vw,3rem)] font-semibold text-white">
             Agenda tu consulta
           </h1>
-          <p className="text-sm text-[#B9C0CC] sm:text-base">
+          <p className="text-sm text-text-secondary sm:text-base">
             Nuestro equipo te ayudará a confirmar la sede, el horario y la
             disponibilidad que mejor se adapten a tus necesidades.
           </p>
@@ -53,7 +53,7 @@ export default function AgendarClient() {
             aria-label="Agendar por WhatsApp"
             className={`${cardBaseClasses} bg-[linear-gradient(180deg,rgba(37,211,102,0.16),rgba(255,255,255,0.06))]`}
           >
-            <MessageCircle className="h-5 w-5 text-[#25D366]" aria-hidden="true" />
+            <MessageCircle className="h-5 w-5 text-accent-signal" aria-hidden="true" />
             Agendar por WhatsApp
           </a>
 
@@ -69,13 +69,13 @@ export default function AgendarClient() {
           </a>
         </section>
 
-        <p className="text-center text-xs text-[#8C95A3] sm:text-sm">
+        <p className="text-center text-xs text-text-muted sm:text-sm">
           La cita queda confirmada únicamente después de recibir respuesta de
           nuestro equipo.
         </p>
 
         <GlassPanel className="px-6 py-6">
-          <div className="flex flex-col gap-4 text-sm text-[#B9C0CC]">
+          <div className="flex flex-col gap-4 text-sm text-text-secondary">
             <p className="font-serif text-base text-white">
               Modalidades disponibles
             </p>
@@ -93,7 +93,7 @@ export default function AgendarClient() {
         <div className="flex justify-center">
           <Link
             href="/ubicaciones"
-            className="text-sm text-[#B9C0CC] transition-colors hover:text-white"
+            className="text-sm text-text-secondary transition-colors hover:text-white"
           >
             Consultar sedes y horarios
           </Link>

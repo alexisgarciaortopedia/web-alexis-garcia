@@ -32,7 +32,7 @@ export default function WhatsAppFloating({
         // este color, es este botón. Texto/ícono en ink-900, no blanco: el
         // contraste de blanco sobre este verde es 1.98:1 (ilegible); ink-900
         // da 9.94:1.
-        "fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-[#070B12] shadow-[0_18px_40px_rgba(0,0,0,0.45)] transition-all duration-200",
+        "fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-accent-signal text-ink-900 shadow-[0_18px_40px_rgba(0,0,0,0.45)] transition-all duration-200",
         visible
           ? "translate-y-0 opacity-100 hover:-translate-y-1"
           : "pointer-events-none translate-y-2 opacity-0",
