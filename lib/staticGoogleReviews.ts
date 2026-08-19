@@ -3,6 +3,13 @@ export const FALLBACK_GOOGLE_MAPS_URI =
 
 export const FALLBACK_RATING = 5.0;
 
+// Suma de las dos fichas de Google Business Profile (15 Pachuca + 23 Tula),
+// verificada a mano el 16 ago 2026. No hay endpoint que combine ambas fichas
+// en un solo número, así que este total no se recalcula solo: cuando el
+// conteo de cualquiera de las dos fichas cambie de forma notable, hay que
+// volver a sumarlas y actualizar esta constante.
+export const AGGREGATE_REVIEW_COUNT = 38;
+
 export type StaticGoogleReview = {
   name: string;
   text: string;
