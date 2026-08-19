@@ -2,18 +2,57 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
+import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
+import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
+import { useSede, type Sede } from "@/lib/sede";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
 const WHATSAPP_MESSAGE =
   "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
 
+const HERO_CONTENT: Record<
+  Sede,
+  { eyebrow: string; h1First: string; h1Second: string; micro: string }
+> = {
+  pachuca: {
+    eyebrow: "ADOY MEDICAL CENTER, PACHUCA · CLÍNICA ZÁRATE, TULA",
+    h1First: "Traumatólogo y Ortopedista",
+    h1Second: "en Pachuca",
+    micro: "Lunes a viernes en Pachuca · sábado y domingo en Tula",
+  },
+  tula: {
+    eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · SÁBADO Y DOMINGO",
+    h1First: "Traumatólogo y Ortopedista",
+    h1Second: "en Tula de Allende",
+    micro: "Sábado y domingo en Tula · lunes a viernes en Pachuca",
+  },
+};
+
 export default function HomeClient() {
   const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
+  const sede = useSede();
+  const hero = HERO_CONTENT[sede];
+
+  const heroRef = useRef<HTMLElement>(null);
+  const [heroPassed, setHeroPassed] = useState(false);
+
+  useEffect(() => {
+    const node = heroRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroPassed(!entry.isIntersecting),
+    );
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050608]">
@@ -24,39 +63,61 @@ export default function HomeClient() {
       <Header />
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-20 px-8 pb-28 pt-10 sm:px-10 lg:pt-14">
-        <section className="relative flex min-h-[600px] w-full flex-col items-center justify-center gap-12 lg:flex-row">
-          <div className="order-2 flex flex-col gap-6 lg:order-none">
-            <div className="flex flex-col gap-5">
+        <section
+          ref={heroRef}
+          className="relative flex min-h-[600px] w-full flex-col items-center justify-center gap-12 lg:flex-row"
+        >
+          {/* En móvil el mensaje va antes que la foto (order-1 vs order-2):
+              con la foto primero, el hero anterior expulsaba el H1, los
+              botones y toda decisión de conversión fuera de la primera
+              pantalla. En escritorio ambas columnas van lado a lado
+              (lg:order-none) y este orden deja de importar. */}
+          <div className="order-1 flex flex-col gap-6 lg:order-none">
+            <div className="flex flex-col gap-4">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8FB3DE]">
+                {hero.eyebrow}
+              </span>
               <h1 className="font-serif text-[clamp(2.3rem,5vw,4.2rem)] leading-tight tracking-tight text-white">
-                Dr. Alexis Eduardo García de los Santos
+                {hero.h1First}
+                <br />
+                {hero.h1Second}
               </h1>
-              <div className="flex flex-col gap-1 text-xs text-[#8C95A3] sm:text-sm">
-                <span>Especialista en Traumatología y Ortopedia</span>
-                <span>
-                  Certificado por el Consejo Mexicano de Ortopedia y
-                  Traumatología
-                </span>
-              </div>
-              <div className="font-serif text-[clamp(1.25rem,2.6vw,2rem)] leading-loose text-white/90">
-                <p>Diagnóstico claro.</p>
-                <p>Plan preciso.</p>
-                <p>Recuperación con objetivos.</p>
-              </div>
               <p className="max-w-xl text-sm text-[#B9C0CC] sm:text-base">
-                Ortopedia y Traumatología con enfoque en diagnóstico preciso y
-                tratamiento basado en evidencia.
+                <span className="block font-serif text-base text-white sm:text-lg">
+                  Diagnóstico claro. Plan preciso. Recuperación con objetivos.
+                </span>
+                Rodilla, hombro, cadera, columna, fracturas y lesión
+                deportiva. Un plan con objetivos desde la primera consulta.
               </p>
-              <Link
-                href="/agendar"
-                className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)] sm:w-fit"
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={trackWhatsAppClick}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-[#070B12] shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
               >
-                Agendar consulta
-              </Link>
+                <WhatsAppIcon className="h-5 w-5" />
+                Escribir por WhatsApp
+              </a>
+              <a
+                href={PHONE_TEL}
+                onClick={trackPhoneCallClick}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
+              >
+                <PhoneIcon className="h-4 w-4" />
+                Llamar {PHONE_DISPLAY}
+              </a>
+              <span className="text-center text-xs text-[#8C95A3] sm:text-left">
+                {hero.micro}
+              </span>
             </div>
           </div>
 
           <div
-            className={`${styles.heroPortrait} ${styles.heroDoctorMask} order-1 min-w-[300px] lg:order-none lg:basis-[55%] lg:min-w-[340px]`}
+            className={`${styles.heroPortrait} ${styles.heroDoctorMask} order-2 min-w-[300px] lg:order-none lg:basis-[55%] lg:min-w-[340px]`}
           >
             <Image
               src="/doctor-hero.webp"
@@ -268,7 +329,7 @@ export default function HomeClient() {
         </p>
       </footer>
 
-      <WhatsAppFloating />
+      <WhatsAppFloating visible={heroPassed} />
     </div>
   );
 }
