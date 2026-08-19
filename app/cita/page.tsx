@@ -77,7 +77,11 @@ export default function CitaPage() {
 
         <p className="text-center text-xs text-[#8C95A3]">
           Teléfono:{" "}
-          <a href={PHONE_TEL} className="transition-colors hover:text-white">
+          <a
+            href={PHONE_TEL}
+            onClick={trackPhoneCallClick}
+            className="transition-colors hover:text-white"
+          >
             {PHONE_DISPLAY}
           </a>
         </p>

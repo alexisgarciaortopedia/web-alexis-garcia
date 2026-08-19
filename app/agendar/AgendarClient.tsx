@@ -103,6 +103,7 @@ export default function AgendarClient() {
           <PhoneIcon className="h-4 w-4 text-white/80" aria-hidden="true" />
           <a
             href={PHONE_TEL}
+            onClick={trackPhoneCallClick}
             className="transition-colors hover:text-white"
             aria-label={`Llamar al ${PHONE_DISPLAY}`}
           >
