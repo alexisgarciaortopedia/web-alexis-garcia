@@ -40,6 +40,36 @@ export type ClinicLocation = {
   };
 };
 
+// Horario unificado, decisión comercial del 19 ago 2026: las dos sedes
+// abren los 7 días, 9:00-19:00 -- el Dr. García se mueve entre Pachuca y
+// Tula según quién agende, ya no hay reparto fijo entre semana/fin de
+// semana. Una sola fuente para las dos sedes, para no repetir el mismo
+// horario dos veces.
+const DAILY_SCHEDULE_DAYS = [0, 1, 2, 3, 4, 5, 6];
+const DAILY_SLOTS_9_TO_19 = [
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
+];
+
 export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
   tula: {
     id: "tula",
@@ -53,19 +83,10 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
       "42803 Tula de Allende, Hidalgo",
       "México",
     ],
-    daysLabel: "Sábado y domingo",
-    scheduleDays: [6, 0],
-    scheduleLabel: "14:00–18:00 h",
-    slots: [
-      "14:00",
-      "14:30",
-      "15:00",
-      "15:30",
-      "16:00",
-      "16:30",
-      "17:00",
-      "17:30",
-    ],
+    daysLabel: "Todos los días",
+    scheduleDays: DAILY_SCHEDULE_DAYS,
+    scheduleLabel: "09:00–19:00 h",
+    slots: DAILY_SLOTS_9_TO_19,
     mapsUrl:
       "https://www.google.com/maps/search/?api=1&query=Z%C3%A1rate+Unidad+de+Especialidades+M%C3%A9dicas+Cto+Revoluci%C3%B3n+19+Tula+de+Allende+Hidalgo",
     mapsEmbedQuery:
@@ -74,21 +95,21 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
     publicLabel: "Tula de Allende",
     reviewCount: 23,
     hub: {
-      eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · SÁBADO Y DOMINGO",
+      eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · TODOS LOS DÍAS",
       h1Second: "en Tula de Allende",
       entradilla:
-        "Rodilla, hombro, cadera, columna, fracturas y lesión deportiva. Consulta presencial en Clínica Zárate, sábado y domingo.",
-      micro: "Respuesta por WhatsApp todos los días · consulta presencial sábado y domingo",
+        "Rodilla, hombro, cadera, columna, fracturas y lesión deportiva. Consulta presencial en Clínica Zárate, todos los días.",
+      micro: "Consulta presencial todos los días, 9:00 a 19:00 h",
     },
     fracturas: {
       eyebrow: "URGENCIAS Y FRACTURAS · TULA DE ALLENDE",
       entradilla:
-        "Respuesta rápida por WhatsApp o llamada directa al consultorio. Manejo completo: inmovilización o cirugía, con seguimiento hasta tu recuperación.",
-      micro: "Respondemos todos los días por WhatsApp · consulta presencial sábado y domingo en Tula",
+        "Escríbenos y el médico responde directamente. Manejo completo: inmovilización o cirugía, con seguimiento hasta tu recuperación.",
+      micro: "Responde el médico directo por WhatsApp · consulta presencial todos los días en Tula",
     },
     rodilla: {
       h1: "Dolor de Rodilla en Tula",
-      locationNote: "Consulta en Tula — Clínica Zárate, sábado y domingo",
+      locationNote: "Consulta en Tula — Clínica Zárate, todos los días, 9:00 a 19:00 h",
     },
   },
   pachuca: {
@@ -102,19 +123,10 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
       "San Antonio",
       "42083 Pachuca de Soto, Hgo.",
     ],
-    daysLabel: "Lunes a viernes",
-    scheduleDays: [1, 2, 3, 4, 5],
-    scheduleLabel: "09:00–12:30 h",
-    slots: [
-      "09:00",
-      "09:30",
-      "10:00",
-      "10:30",
-      "11:00",
-      "11:30",
-      "12:00",
-      "12:30",
-    ],
+    daysLabel: "Todos los días",
+    scheduleDays: DAILY_SCHEDULE_DAYS,
+    scheduleLabel: "09:00–19:00 h",
+    slots: DAILY_SLOTS_9_TO_19,
     mapsUrl:
       "https://www.google.com/maps/search/?api=1&query=Adoy+Medical+Center+Lic.+Hern%C3%A1ndez+y+Fern%C3%A1ndez+105+San+Antonio+42083+Pachuca+de+Soto+Hgo",
     mapsEmbedQuery:
@@ -123,21 +135,21 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
     publicLabel: "Pachuca de Soto",
     reviewCount: 15,
     hub: {
-      eyebrow: "ADOY MEDICAL CENTER, PACHUCA · LUNES A VIERNES",
+      eyebrow: "ADOY MEDICAL CENTER, PACHUCA · TODOS LOS DÍAS",
       h1Second: "en Pachuca de Soto",
       entradilla:
-        "Rodilla, hombro, cadera, columna, fracturas y lesión deportiva. Consulta presencial en Adoy Medical Center, de lunes a viernes.",
-      micro: "Respuesta por WhatsApp todos los días · consulta presencial lunes a viernes",
+        "Rodilla, hombro, cadera, columna, fracturas y lesión deportiva. Consulta presencial en Adoy Medical Center, todos los días.",
+      micro: "Consulta presencial todos los días, 9:00 a 19:00 h",
     },
     fracturas: {
       eyebrow: "URGENCIAS Y FRACTURAS · PACHUCA",
       entradilla:
         "Escríbenos y el médico responde directamente. Manejo completo: inmovilización o cirugía, con seguimiento hasta tu recuperación.",
-      micro: "Responde el médico directo por WhatsApp · consulta presencial lunes a viernes en Pachuca",
+      micro: "Responde el médico directo por WhatsApp · consulta presencial todos los días en Pachuca",
     },
     rodilla: {
       h1: "Dolor de Rodilla en Pachuca",
-      locationNote: "Consulta en Pachuca — Adoy Medical Center, lunes a viernes",
+      locationNote: "Consulta en Pachuca — Adoy Medical Center, todos los días, 9:00 a 19:00 h",
     },
   },
 };

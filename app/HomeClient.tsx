@@ -28,13 +28,13 @@ const HERO_CONTENT: Record<
     eyebrow: "ADOY MEDICAL CENTER, PACHUCA · CLÍNICA ZÁRATE, TULA",
     h1First: "Traumatólogo y Ortopedista",
     h1Second: "en Pachuca",
-    micro: "Lunes a viernes en Pachuca · sábado y domingo en Tula",
+    micro: "Consulta presencial todos los días, 9:00 a 19:00 h, en Pachuca y en Tula",
   },
   tula: {
-    eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · SÁBADO Y DOMINGO",
+    eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · TODOS LOS DÍAS",
     h1First: "Traumatólogo y Ortopedista",
     h1Second: "en Tula de Allende",
-    micro: "Sábado y domingo en Tula · lunes a viernes en Pachuca",
+    micro: "Consulta presencial todos los días, 9:00 a 19:00 h, en Tula y en Pachuca",
   },
 };
 
