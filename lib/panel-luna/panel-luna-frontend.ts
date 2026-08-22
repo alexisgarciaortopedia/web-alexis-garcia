@@ -1,4 +1,29 @@
 /**
+ * ORIGEN: portado literal desde muevete-seguro (src/panel-luna-frontend.ts)
+ * -- ese repo es la fuente canónica de este shell (tests automatizados
+ * viven ahí, con Deno test; este archivo no tiene su propia suite de
+ * tests en este repo). Mismo criterio que el panel viejo, ver
+ * lib/panel/panel-frontend.ts.
+ *
+ * Servido desde este sitio (dominio propio de Alexis) en vez de
+ * *.supabase.co por el mismo motivo que el panel viejo: Supabase
+ * reescribe cualquier respuesta text/html a text/plain en su dominio
+ * por defecto -- Next.js/Vercel sí respeta el Content-Type real.
+ *
+ * CUALQUIER cambio de comportamiento del panel-luna exige DOS pasos, no
+ * uno -- si falta cualquiera de los dos, el cambio NO se ve en
+ * producción, aunque el otro paso sí se haya hecho:
+ *   1. Desplegar la función en Supabase, desde muevete-seguro:
+ *      npx supabase functions deploy panel-luna --project-ref oztpeidhbxzucakadruv --use-api
+ *   2. Volver a portar ESTE archivo, literal, desde
+ *      muevete-seguro/src/panel-luna-frontend.ts.
+ * Es justo lo que pasó el 2026-08-21/22: se hizo el paso 1 y no el 2 --
+ * "Enviar al atleta" quedó desplegado en Supabase pero invisible en
+ * alexisgarciaortopedia.com/panel-luna hasta este commit, que hace el
+ * paso 2.
+ */
+
+/**
  * Shell del panel nuevo -- HTML + CSS + JS vanilla en un solo archivo,
  * sin framework, servido directo por la Edge Function (igual criterio
  * que el panel viejo: el HTML es público, sin datos; todo dato real pasa
@@ -160,7 +185,14 @@ async function api(path, options = {}) {
     },
   });
   if (res.status === 401) throw new Error("unauthorized");
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "error");
+  if (!res.ok) {
+    const cuerpo = await res.json().catch(() => ({}));
+    const error = new Error(cuerpo.error || "error");
+    // Aditivo -- ningún caller existente lo leía antes de esta fase
+    // (envío de reportes, único que distingue motivo en el cliente).
+    error.motivo = cuerpo.motivo;
+    throw error;
+  }
   return res.status === 204 ? null : res.json();
 }
 
@@ -992,6 +1024,7 @@ function vistaRevisionReporte(phoneHash, reporte) {
       </div>
       <div class="meta">\${(reporte.periodo_inicio || "").slice(0, 10)} → \${(reporte.periodo_fin || "").slice(0, 10)}</div>
       \${aprobado ? \`<div class="meta">Aprobado: \${hace(reporte.aprobado_at)}</div>\` : ""}
+      \${reporte.enviado_at ? \`<div class="meta">Enviado al atleta: \${hace(reporte.enviado_at)}</div>\` : ""}
     </div>
   \`));
 
@@ -1013,6 +1046,8 @@ function vistaRevisionReporte(phoneHash, reporte) {
       \${!aprobado && !esAdmin ? \`<div class="meta" style="margin-top:6px">Solo Alexis puede aprobar y firmar este reporte.</div>\` : ""}
       <div id="msg-revision"></div>
       \${aprobado && esAdmin ? \`<button class="accion primario" id="descargar-pdf" style="margin-top:10px">Descargar PDF (solo la carta)</button>\` : ""}
+      \${aprobado && esAdmin && !reporte.enviado_at ? \`<button class="accion primario" id="enviar-atleta" style="margin-top:10px">Enviar al atleta</button>\` : ""}
+      \${aprobado && esAdmin && reporte.enviado_at ? \`<div class="meta" style="margin-top:10px">Ya se envió -- \${hace(reporte.enviado_at)}.</div>\` : ""}
     </div>
   \`);
   form.querySelector("#nota-doctor").value = reporte.nota_doctor || "";
@@ -1083,6 +1118,36 @@ function vistaRevisionReporte(phoneHash, reporte) {
         boton.disabled = false;
       }
     };
+
+    const botonEnviar = form.querySelector("#enviar-atleta");
+    if (botonEnviar) {
+      botonEnviar.onclick = async () => {
+        if (!confirm("¿Enviar este reporte al atleta por WhatsApp? No se puede deshacer.")) return;
+        botonEnviar.disabled = true;
+        msg.textContent = "Enviando...";
+        msg.className = "";
+        try {
+          await api(\`api/reportes/\${reporte.id}/enviar\`, { method: "POST" });
+          irARevisionReporte(phoneHash, reporte.id);
+        } catch (e) {
+          botonEnviar.disabled = false;
+          const motivo = e?.motivo;
+          if (motivo === "ya_enviado") {
+            msg.textContent = "Ya se había enviado -- recargando...";
+            irARevisionReporte(phoneHash, reporte.id);
+          } else if (motivo === "registro_fallido") {
+            msg.textContent = "El reporte SÍ se mandó al atleta, pero no se pudo dejar constancia en el sistema -- avísale a Alexis.";
+            msg.className = "msg-error";
+          } else if (motivo === "sin_telefono") {
+            msg.textContent = "Este atleta no tiene teléfono guardado -- no se puede enviar.";
+            msg.className = "msg-error";
+          } else {
+            msg.textContent = "No se pudo enviar: " + (e.message || motivo || "error desconocido");
+            msg.className = "msg-error";
+          }
+        }
+      };
+    }
   }
 
   cont.appendChild(form);
