@@ -4,10 +4,10 @@ Actualizado: 2026-08-26.
 
 ## Conversión de teléfono
 
-- `main` contiene la etiqueta correcta, pero el handler previo solo llamaba a `gtag` y dejaba navegar inmediatamente a `tel:`.
-- La acción de Ads había reportado cero datos después de una prueba real según el estado maestro reconciliado del 26-08-2026.
-- Rama `audit/privada-mision-1`: handler corregido con `preventDefault`, `event_callback`, `event_timeout: 1000` y fallback de 1 segundo con protección contra navegación doble.
-- Falta deploy autorizado y prueba real; después esperar procesamiento de Ads y revisar la acción por fecha/hora. No declarar recepción del hit antes de verla en Ads.
+- PR #14 fue mergeado a `main` el 2026-08-26 (merge `1a5e5d9e4ca39459bbdbbed3c471b911366f74d3`). Vercel terminó el despliegue correctamente.
+- Producción contiene el handler de `lib/phone.ts`: `preventDefault`, `event_callback`, `event_timeout: 1000`, fallback de 1 segundo y protección contra navegación doble.
+- Prueba controlada: 2026-08-26 13:20:37 America/Mexico_City. El botón principal emitió un `fetch` a `www.googleadservices.com/pagead/conversion/18142944053/` con `label=_EqkCPn2q-ccELW2nctD`, `en=conversion` y `event_timeout=1000`; después mantuvo el destino `tel:+527731754638`.
+- Google Ads puede tardar hasta 48 horas en reflejar recepción/estado. La evidencia de red está cerrada; la contabilización atribuida sigue su latencia normal.
 
 ## Google Ads
 
@@ -17,10 +17,10 @@ Actualizado: 2026-08-26.
 - Últimos 30 días (27 jul–25 ago): 9,946 impresiones, 612 clics, 4,443.41 MXN, 33 conversiones y 134.65 MXN/conv. Desglose: WhatsApp 27, `Clic de llamada` 5 y `Llamadas desde anuncios` 1.
 - Grupos: `Ad group 1` habilitado y con gasto; `Procedimientos-PAC` habilitado sin gasto hoy; `PAC-URG` y `PAC-2OP` en pausa y sin gasto hoy.
 - Solo aparece una campaña no retirada. Existe un borrador `Search-2-Tula`; un borrador no publica ni gasta.
-- `Clic a teléfono - sitio web`: habilitada, **Esperando conversiones**, principal, incluida en objetivos de cuenta y 0 conversiones. No es secundaria actualmente.
+- `Clic a teléfono - sitio web`: habilitada y guardada como **Acción secundaria** el 2026-08-26 tras verificar el hit. Ads confirma que no se usa para optimizar pujas y solo aparece en `Todas las conversiones`. La interfaz aún mostraba **Esperando conversiones** por latencia de procesamiento.
 - `WhatsApp - clic`: activa, principal e incluida en objetivos de cuenta. `Clicks to call` alojada en Google es principal pero no está incluida en objetivos de cuenta.
 - Enhanced Conversions sigue sin activarse; Ads muestra una recomendación para activarlas, que debe ignorarse por decisión cerrada.
-- No se realizó ningún cambio en Ads.
+- No se modificaron campañas, presupuesto, pujas, grupos, keywords, WhatsApp ni otras conversiones. `PAC-URG` y `PAC-2OP` permanecen pausados.
 
 ## Monitoreo
 
@@ -28,8 +28,10 @@ Actualizado: 2026-08-26.
 - Ads Facturación muestra fondos disponibles por 4,979.25 MXN y saldo promocional restante de 686.23 MXN. El saldo 1,165.76 del Sheet es incorrecto.
 - Causa del saldo incorrecto: `getSaldoDisponible_()` resta `amount_served` a `approved_spending_limit` de `account_budget`; ese presupuesto de cuenta no representa los fondos de prepago disponibles.
 - Promoción verificada: crédito concedido 4,000 MXN, **Activo**, ya financiando campañas; 3,313.77 MXN gastados (82.84 %) y caducidad del crédito 2 oct 2026. La alerta B8 que exige primera conversión antes del 1 sept es falsa y se basa solo en una fecha hardcodeada.
-- Script `Sistema de Monitoreo` ID `12037766`: habilitado cada hora, última ejecución 26 ago 12:36, terminó sin cambios. El código mantiene `LAST_30_DAYS` y el guard de hoja nula.
-- Riesgo operativo: `reporteDiario()` puede pausar keywords automáticamente mediante A1 a las 08:00. Esto contradice la regla vigente de no cambiar campañas sin autorización y debe retirarse o pasar a modo recomendación, pero no se modificó.
+- Script vivo `Sistema de Monitoreo` ID `12037766`: A1 quedó en recomendaciones manuales; no existe ninguna llamada `.pause()` ni ruta que cambie keywords.
+- B8 y sus constantes hardcodeadas fueron retiradas. No se sustituyeron por inferencias.
+- `getSaldoDisponible_()` devuelve `null`, ya no consulta `account_budget`; el reporte dice `Saldo: no verificado — revisar Facturación`. `diasDeSaldo` queda `null` cuando el saldo no está verificado.
+- Gasto, clics, impresiones, conversiones y CPA conservan sus consultas. La vista previa terminó `Hecho (0:02)` y mostró `Sin cambios`, sin tocar campañas.
 - Existe `Monitoreo - Reporte 08h` ID `12143656`, habilitado, sin frecuencia y sin ejecución visible; no gasta por sí mismo, pero sigue siendo un duplicado huérfano.
 
 ## Fase 0
