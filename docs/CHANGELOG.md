@@ -9,3 +9,4 @@
 - Creada documentación persistente y reglas multiagente.
 - Añadido runbook post-deploy para evidencia de red y verificación posterior en Google Ads.
 - Google Ads y Apps Script vivos quedaron sin lectura por falta de sesión autenticada; ningún cambio externo realizado.
+- Continuación: auditados Ads, facturación, promociones, conversiones y ambos scripts con la cuenta correcta. Confirmados B8 falso, saldo derivado incorrecto y riesgo de pausa automática A1. Ningún cambio externo realizado.

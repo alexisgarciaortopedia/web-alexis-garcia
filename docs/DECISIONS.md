@@ -15,3 +15,4 @@
 - Publicar el fix de teléfono solo con autorización de deploy/producción.
 - En Google Ads, cambiar `Clic a teléfono - sitio web` a secundaria únicamente tras autorización expresa y después de confirmar recepción de un hit.
 - No actuar sobre crédito/saldo hasta reconciliar cada cifra con Facturación/Promociones de Ads.
+- Preparar la retirada de B8, el saldo aproximado y la pausa automática A1; no editar el script vivo sin autorización explícita.
