@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Flujos retirados: se conservan solo como referencia y no se compilan.
+    "app/_archived/**",
   ]),
 ]);
 

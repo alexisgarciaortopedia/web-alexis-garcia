@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-26 — Misión 3: atribución Ads / Maps por WhatsApp
+
+- Añadida detección session-only de `gclid`, `gbraid` y `wbraid`, con clasificación `GADS-PAC` y prioridad sobre `ref=`.
+- Añadido soporte validado para `GMAPS-PAC`, fallback `WEB` e ID anónimo por pestaña `WA-XXXXXX`.
+- El mensaje de WhatsApp ahora termina `Ref: <origen> | ID: <ID>`; los click IDs no se exponen en el mensaje ni se envían a analytics por esta lógica.
+- Verificada persistencia al navegar, sesiones nuevas con IDs distintos y compatibilidad en las rutas críticas.
+- Verificado el request de conversión WhatsApp existente `AW-18142944053/CAIPCPry49ocELW2nctD`; `lib/phone.ts` no fue modificado.
+- Corregidos tres enlaces internos para cumplir `@next/next/no-html-link-for-pages` e ignorados en lint los flujos retirados `app/_archived/**`, que no forman parte del build.
+- `npm run lint` y `npm run build` completados correctamente. Sin merge, deploy ni cambios de producción.
+
 ## 2026-08-26 — Cierre ejecutivo Misión 1
 
 - Mergeado PR #14 y verificado despliegue Vercel exitoso en producción.

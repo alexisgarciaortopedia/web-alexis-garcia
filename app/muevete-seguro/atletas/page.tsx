@@ -1,4 +1,5 @@
 import { ArrowDown } from "lucide-react";
+import Link from "next/link";
 import { GlassCard } from "../../centros-deportivos/GlassCard";
 import { ScrollReveal } from "../../centros-deportivos/ScrollReveal";
 import { WhatsAppDemo } from "../../centros-deportivos/WhatsAppDemo";
@@ -231,9 +232,9 @@ export default function MueveteSeguroPage() {
             Responsable: Dr. Alexis Eduardo García de los Santos.
           </p>
           <p className="mt-3 text-center text-xs text-[#4B5563]">
-            <a href="/privacidad" className="underline decoration-white/20 underline-offset-2 transition-colors hover:text-[#8C95A3]">
+            <Link href="/privacidad" className="underline decoration-white/20 underline-offset-2 transition-colors hover:text-[#8C95A3]">
               Aviso de privacidad
-            </a>
+            </Link>
           </p>
           <p className="mt-3 text-center text-xs text-[#4B5563]">
             © {new Date().getFullYear()} Muévete Seguro by Ortik
