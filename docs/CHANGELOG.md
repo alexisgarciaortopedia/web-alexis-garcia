@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-26 — Misión 2: Fase 0 operativa
+
+- Auditadas las seis pestañas del Sheet vivo y su privacidad.
+- Convertidos IDs de pacientes y movimientos de fórmulas dependientes de fila a valores permanentes, conservando registros y relaciones existentes.
+- Añadido `Doctoralia`; normalizado `Google Maps / orgánico`; validación de origen estricta con los once valores autorizados.
+- Corregido valor acumulado por paciente para sumar exclusivamente movimientos `Cobrado`.
+- Añadidos pendientes de contacto sin cita y no-show/cancelación al resumen.
+- Añadidas alertas visuales para duplicados, cobros sin importe y próxima acción sin fecha; protegidas con advertencia las columnas técnicas y el respaldo.
+- Simplificadas las instrucciones de `INICIO` para captura cotidiana de Brayan.
+- Ejecutada y retirada una prueba ficticia completa; fórmulas, desplegables, vínculos, sede, cobro y resumen conciliaron sin dejar datos de prueba.
+- Confirmado que el Sheet no es público y que Ads permanece manual, sin atribución inventada ni conexión al Panel.
+
 ## 2026-08-26 — Cierre ejecutivo Misión 1
 
 - Mergeado PR #14 y verificado despliegue Vercel exitoso en producción.

@@ -36,5 +36,11 @@ Actualizado: 2026-08-26.
 
 ## Fase 0
 
-- Sheet operativo verificado con pestañas `INICIO`, `PACIENTES`, `MOVIMIENTOS`, `RESUMEN`, respaldo y catálogos.
-- `RESUMEN` mantiene gasto Ads manual en 0 y advierte que el Panel requiere validación contra la interfaz real.
+- Sheet vivo `PRIVADA — Registro de pacientes desde 24-08-2026` auditado y corregido el 2026-08-26. Pestañas: `INICIO`, `PACIENTES`, `MOVIMIENTOS`, `RESUMEN`, `RESPALDO 23-26 AGO` y `CATALOGOS`.
+- IDs de pacientes y movimientos ya no dependen de `ROW()`: son valores literales permanentes. Se conservaron `P-000001`–`P-000009`, `E-000001`–`E-000009` y todos sus vínculos; existen IDs reservados únicos hasta `P-000599` y `E-001499`.
+- `Doctoralia` y `Google Maps / orgánico` están en el catálogo y en la validación estricta de origen. La atribución mantiene `Confirmado`, `Probable`, `No atribuible` y `Pendiente`.
+- `RESUMEN` identifica contacto sin cita, no-show/cancelación, estudios, seguimiento, procedimiento, cirugía y acciones vencidas. El gasto Ads sigue manual y sin conexión al Panel.
+- Ingresos total, Pachuca, Tula y valor acumulado por paciente cuentan únicamente movimientos con estado `Cobrado`; propuesto o tarifa no se suman.
+- IDs, columnas calculadas y respaldo tienen advertencia de protección. Duplicados de nombre/teléfono, cobros sin importe y próximas acciones sin fecha quedan resaltados.
+- Prueba temporal completa ejecutada y retirada: relación paciente–movimiento, Doctoralia, cobro, sede, valor acumulado y resumen conciliaron; después los totales regresaron a cero y no quedó dato ficticio.
+- Privacidad verificada: solo propietario `alexisgarciaortopedia@gmail.com` y editor `ga407578@uaeh.edu.mx`; no hay permisos `anyone` ni de dominio.

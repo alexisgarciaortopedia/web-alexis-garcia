@@ -1,9 +1,9 @@
 # Siguiente paso único
 
-Misión 1 cerrada técnicamente. Solo queda observación por latencia externa:
+Usar Fase 0 diariamente y validar el hábito operativo antes de construir más software:
 
-1. Revisar después del plazo de procesamiento de Google Ads (la interfaz indica hasta 48 horas) que `Clic a teléfono - sitio web` deje de mostrar `Esperando conversiones` o registre actividad diagnóstica.
-2. No repetir clics buscando una conversión atribuida: la prueba técnica sin `gclid` puede validar el hit sin sumar una conversión publicitaria atribuida.
-3. Mantener el saldo en `no verificado — revisar Facturación` hasta que exista una fuente fiable de fondos prepago en Ads Scripts.
-
-Procedimiento detallado: `docs/PHONE_CONVERSION_RUNBOOK.md`.
+1. Brayan busca primero por nombre o teléfono; paciente nuevo va en la primera fila vacía de `PACIENTES`.
+2. Cada contacto, cita, atención, cancelación, estudio, procedimiento o seguimiento crea una fila nueva en `MOVIMIENTOS`.
+3. Solo marcar `Cobrado` y capturar importe cuando el dinero se recibió realmente; si queda pendiente, registrar próxima acción y fecha.
+4. Revisar cada día `RESUMEN` → `PENDIENTES` y corregir las celdas resaltadas, sin borrar ni reutilizar filas.
+5. Mantener gasto Ads manual durante la validación; no iniciar PWA ni integración automática todavía.
