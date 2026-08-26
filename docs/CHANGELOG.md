@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-26 — Cierre ejecutivo Misión 1
+
+- Mergeado PR #14 y verificado despliegue Vercel exitoso en producción.
+- Verificado en recursos de red el hit telefónico `AW-18142944053/_EqkCPn2q-ccELW2nctD` a las 13:20:37 (America/Mexico_City), con `event_timeout=1000` y destino `tel:` preservado.
+- Cambiada únicamente `Clic a teléfono - sitio web` de principal a secundaria; Google Ads confirma que no optimiza pujas con ella.
+- Editado el script vivo `Sistema de Monitoreo`: A1 solo recomienda, B8 eliminada, `account_budget` retirado y saldo marcado no verificado.
+- Vista previa segura completada en 2 segundos con `Sin cambios`; no se modificaron campañas ni keywords.
+- `PAC-URG` y `PAC-2OP` permanecen pausados; no se tocaron presupuesto, pujas, grupos, keywords, WhatsApp ni otras conversiones.
+
 ## 2026-08-26 — Misión 1 (rama `audit/privada-mision-1`)
 
 - Auditada la medición telefónica y localizado el riesgo de cancelación por navegación inmediata a `tel:`.
