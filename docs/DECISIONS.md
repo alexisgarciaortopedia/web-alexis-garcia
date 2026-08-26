@@ -12,6 +12,7 @@
 
 ## Operativas
 
+- La atribución de WhatsApp usa prioridad `click ID de Ads → ref explícito válido → WEB`; el click ID permanece solo en la sesión y el mensaje expone únicamente origen e ID anónimo `WA-XXXXXX`.
 - A1 del monitor solo detecta y recomienda; ningún script puede pausar keywords automáticamente.
 - B8 queda eliminada porque el crédito promocional verificado está activo; no se reemplaza por inferencias.
 - Ads Scripts no se considera fuente fiable del saldo prepago: se muestra `no verificado — revisar Facturación`.

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Header from "@/components/Header";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 
@@ -73,12 +74,12 @@ export default function SobreMiPage() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <a
+              <Link
                 href="/agendar"
                 className="inline-flex w-full items-center justify-center rounded-full bg-brand-field px-6 py-2 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 sm:w-fit"
               >
                 Agendar evaluación
-              </a>
+              </Link>
               <span className="text-xs text-text-muted">Respuesta inmediata.</span>
             </div>
           </div>
