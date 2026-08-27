@@ -4,7 +4,7 @@ Actualizado: 2026-08-26.
 
 ## Atribución WhatsApp Ads / Maps (Misión 3)
 
-- Implementado en la rama `feature/privada-attribution-ads-maps`; todavía no está desplegado ni modifica producción.
+- PR #16 mergeado a `main` el 2026-08-26 mediante el commit `759f0fc927d71a95ef476cc7737912a5be0c9b01`. Vercel reportó `SUCCESS` y producción sirve la atribución nueva.
 - `gclid`, `gbraid` o `wbraid` clasifican la sesión como `GADS-PAC` y tienen prioridad sobre cualquier `ref=`. El click ID se conserva solo en `sessionStorage` y no aparece en el mensaje de WhatsApp.
 - `?ref=GMAPS-PAC` se conserva durante la navegación; sin parámetros se usa `WEB`. Los `ref` explícitos se normalizan y validan antes de aceptarlos.
 - Cada pestaña genera un ID anónimo `WA-XXXXXX`, sin PII, estable durante esa sesión. El mensaje termina `Ref: <origen> | ID: <ID>`.
@@ -12,6 +12,8 @@ Actualizado: 2026-08-26.
 - Un clic controlado emitió el request de conversión `AW-18142944053/CAIPCPry49ocELW2nctD`. `lib/phone.ts` permanece idéntico a `main` y conserva `AW-18142944053/_EqkCPn2q-ccELW2nctD`.
 - `npm run lint` y `npm run build` pasan. Para desbloquear lint se ignoraron flujos retirados bajo `app/_archived/**` y se sustituyeron tres anchors internos por `next/link`; no cambian atribución ni producción.
 - URL etiquetada verificada para Google Business Profile Pachuca: `https://www.alexisgarciaortopedia.com/pachuca?ref=GMAPS-PAC`.
+- Verificación post-deploy en producción: Maps conservó `GMAPS-PAC / WA-623BT9` al navegar a `/agendar`; Ads simulado conservó `GADS-PAC / WA-JREND2` al navegar a `/que-atiendo`; Ads ganó sobre Maps con `GADS-PAC / WA-66C97S`; Web directa produjo `WEB / WA-AXLTA7`.
+- Los cuatro IDs de pestañas nuevas fueron distintos. Ninguno de los mensajes incluyó los `gclid` de prueba. Los enlaces WhatsApp siguen apuntando a `wa.me` en pestaña nueva y el teléfono conserva `tel:+527731754638`; no se abrió WhatsApp ni se inició llamada.
 
 ## Conversión de teléfono
 

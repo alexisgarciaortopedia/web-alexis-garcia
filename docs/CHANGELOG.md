@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-26 — Misión 3: verificación post-deploy
+
+- PR #16 mergeado a `main` en `759f0fc927d71a95ef476cc7737912a5be0c9b01`; Vercel reportó `SUCCESS`.
+- Producción verificada en Maps, Ads simulado, prioridad Ads sobre Maps y Web directa; origen e ID persistieron durante navegación y cada pestaña recibió un ID diferente.
+- Confirmado que los `gclid` de prueba no aparecen en el mensaje final de WhatsApp.
+- Confirmados enlaces `wa.me` válidos y destino telefónico `tel:+527731754638` sin abrir WhatsApp, enviar mensajes ni iniciar llamadas.
+- Queda pendiente únicamente la acción manual de etiquetar el enlace del sitio web en Google Business Profile de Pachuca.
+
 ## 2026-08-26 — Misión 3: atribución Ads / Maps por WhatsApp
 
 - Añadida detección session-only de `gclid`, `gbraid` y `wbraid`, con clasificación `GADS-PAC` y prioridad sobre `ref=`.
