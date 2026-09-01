@@ -408,8 +408,11 @@ async function irAOrganizaciones() {
   vista = { nombre: "organizaciones" };
   render(el(\`<div class="vacio">Cargando...</div>\`));
   try {
-    const { organizaciones } = await api("api/organizaciones");
-    render(vistaOrganizaciones(organizaciones));
+    const [{ organizaciones }, { regiones }] = await Promise.all([
+      api("api/organizaciones"),
+      api("api/regiones"),
+    ]);
+    render(vistaOrganizaciones(organizaciones, regiones));
   } catch {
     render(el(\`<div class="vacio">No se pudieron cargar las organizaciones.</div>\`));
   }
@@ -420,7 +423,27 @@ function metaOrganizacion(o) {
   return \`\${o.tipo} · \${o.plan} · \${limite}\`;
 }
 
-function vistaOrganizaciones(organizaciones) {
+/** "Sin región" es un estado tan real como cualquier región -- nunca se
+ * pinta como si faltara un dato. */
+function nombreRegion(regionId, regiones) {
+  if (!regionId) return "Sin región";
+  return regiones.find((r) => r.id === regionId)?.nombre ?? "Sin región";
+}
+
+/** Options del selector de región, con "Sin región (fuera de zona
+ * conocida)" siempre presente como PRIMERA opción -- nunca un <select>
+ * que arranca vacío por default: elegirla es una decisión consciente,
+ * no un olvido (ver comentario de Organizacion.regionId, src/panel-
+ * organizaciones.ts). seleccionadoId null selecciona esa opción. */
+function opcionesRegion(regiones, seleccionadoId) {
+  const opciones = [\`<option value="" \${!seleccionadoId ? "selected" : ""}>Sin región (fuera de zona conocida)</option>\`];
+  for (const r of regiones) {
+    opciones.push(\`<option value="\${r.id}" \${r.id === seleccionadoId ? "selected" : ""}>\${r.nombre}</option>\`);
+  }
+  return opciones.join("");
+}
+
+function vistaOrganizaciones(organizaciones, regiones) {
   const cont = el(\`<div></div>\`);
 
   const formCard = el(\`
@@ -434,6 +457,8 @@ function vistaOrganizaciones(organizaciones) {
       <input id="nueva-org-plan" placeholder="estandar, premium...">
       <label>Límite de miembros (opcional)</label>
       <input id="nueva-org-limite" type="number" min="1" placeholder="sin límite">
+      <label>Región</label>
+      <select id="nueva-org-region">\${opcionesRegion(regiones, null)}</select>
       <button class="accion primario" id="crear-org" style="margin-top:12px;width:100%">Crear organización</button>
       <div id="crear-org-msg"></div>
     </div>
@@ -443,6 +468,7 @@ function vistaOrganizaciones(organizaciones) {
     const tipo = formCard.querySelector("#nueva-org-tipo").value.trim();
     const plan = formCard.querySelector("#nueva-org-plan").value.trim();
     const limiteRaw = formCard.querySelector("#nueva-org-limite").value.trim();
+    const regionId = formCard.querySelector("#nueva-org-region").value || null;
     const msg = formCard.querySelector("#crear-org-msg");
     msg.textContent = "";
     if (!nombre || !tipo || !plan) {
@@ -454,7 +480,7 @@ function vistaOrganizaciones(organizaciones) {
     try {
       await api("api/organizaciones", {
         method: "POST",
-        body: JSON.stringify({ nombre, tipo, plan, limiteMiembros: limiteRaw ? Number(limiteRaw) : null }),
+        body: JSON.stringify({ nombre, tipo, plan, limiteMiembros: limiteRaw ? Number(limiteRaw) : null, regionId }),
       });
       irAOrganizaciones();
     } catch {
@@ -476,7 +502,7 @@ function vistaOrganizaciones(organizaciones) {
           <div class="nombre">\${o.nombre}</div>
           <span class="badge \${o.estado === "activa" ? "verde" : "rojo"}">\${o.estado.toUpperCase()}</span>
         </div>
-        <div class="meta">\${metaOrganizacion(o)}</div>
+        <div class="meta">\${metaOrganizacion(o)} · \${nombreRegion(o.regionId, regiones)}</div>
         <div class="meta">\${o.atletasActivos} atletas activos · \${o.codigosDisponibles} códigos disponibles · \${o.codigosUsados} usados</div>
       </div>
     \`);
@@ -489,14 +515,17 @@ function vistaOrganizaciones(organizaciones) {
 async function irADetalleOrganizacion(id) {
   render(el(\`<div class="vacio">Cargando...</div>\`));
   try {
-    const detalle = await api(\`api/organizaciones/\${id}\`);
-    render(vistaDetalleOrganizacion(detalle));
+    const [detalle, { regiones }] = await Promise.all([
+      api(\`api/organizaciones/\${id}\`),
+      api("api/regiones"),
+    ]);
+    render(vistaDetalleOrganizacion(detalle, regiones));
   } catch {
     render(el(\`<div class="vacio">No se pudo cargar la organización.</div>\`));
   }
 }
 
-function vistaDetalleOrganizacion(detalle) {
+function vistaDetalleOrganizacion(detalle, regiones) {
   const o = detalle.organizacion;
   const codigos = detalle.codigos;
   const cont = el(\`<div></div>\`);
@@ -529,6 +558,35 @@ function vistaDetalleOrganizacion(detalle) {
     }
   };
   cont.appendChild(infoCard);
+
+  const regionCard = el(\`
+    <div class="card">
+      <div class="nombre" style="margin-bottom:6px">Región</div>
+      <select id="org-region">\${opcionesRegion(regiones, o.regionId)}</select>
+      <button class="accion" id="guardar-region" style="margin-top:8px;width:100%">Guardar región</button>
+      <div id="region-msg"></div>
+    </div>
+  \`);
+  regionCard.querySelector("#guardar-region").onclick = async (ev) => {
+    const regionId = regionCard.querySelector("#org-region").value || null;
+    const msg = regionCard.querySelector("#region-msg");
+    msg.textContent = "";
+    ev.target.disabled = true;
+    try {
+      await api(\`api/organizaciones/\${o.id}/region\`, {
+        method: "PATCH",
+        body: JSON.stringify({ regionId }),
+      });
+      msg.textContent = "Guardada.";
+      msg.className = "meta";
+    } catch {
+      msg.textContent = "No se pudo guardar la región.";
+      msg.className = "msg-error";
+    } finally {
+      ev.target.disabled = false;
+    }
+  };
+  cont.appendChild(regionCard);
 
   const loteCard = el(\`
     <div class="card">
