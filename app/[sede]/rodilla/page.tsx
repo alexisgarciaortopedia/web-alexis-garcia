@@ -37,11 +37,11 @@ export async function generateMetadata({
   if (!isValidSede(sedeParam)) return {};
   const sede = SEDES[sedeParam];
 
-  const title = `Dolor de Rodilla en ${sede.publicLabel} | Traumatología y Ortopedia`;
+  const title = `Dolor de Rodilla en ${sede.shortLabel} | Dr. Alexis García`;
   const description = `Valoración de dolor de rodilla en ${sede.publicLabel} por especialista en Traumatología y Ortopedia. Consulta programada y atención prioritaria.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: `https://www.alexisgarciaortopedia.com/${sedeParam}/rodilla`,

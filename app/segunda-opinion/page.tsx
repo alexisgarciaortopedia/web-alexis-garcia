@@ -12,7 +12,7 @@ const WHATSAPP_MESSAGE =
   "Hola, ya tengo un diagnóstico y quiero una segunda opinión antes de decidir.";
 
 export const metadata: Metadata = {
-  title: "Segunda Opinión Ortopédica | Dr. Alexis García",
+  title: { absolute: "Segunda Opinión Ortopédica | Dr. Alexis García" },
   description:
     "¿Ya te dijeron que necesitas cirugía? Revisamos tu diagnóstico contigo. No toda lesión necesita operarse -- evaluamos todas las opciones antes.",
   alternates: {

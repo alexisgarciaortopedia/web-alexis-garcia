@@ -10,6 +10,7 @@
 - `app/sitemap.ts`: `lastModified` hoisteado a una sola constante por build. La lista de URLs no cambió.
 - Confirmado que el dominio canónico es `www`: `alexisgarciaortopedia.com` responde 307 a `www`. No se tocó nada por este motivo — la propiedad de Search Console es de dominio (`sc-domain`) y cubre ambas variantes.
 - `/agendar` y `/cita` sin tocar: siguen `noindex, nofollow`, fuera del sitemap y sin el footer compartido.
+- Corregido el `<title>` triplicado de las 6 páginas de sede y de `/segunda-opinion`: el título propio ya cerraba con la marca y la plantilla del layout raíz le sumaba otra vez el nombre completo. Ahora usan `title.absolute`. Añadido `shortLabel` en `lib/locations.ts` ("Pachuca", "Tula") porque `publicLabel` gastaba caracteres sin ganar búsquedas. Los 7 títulos quedan entre 45 y 59 caracteres. `/agendar` tiene el mismo defecto pero se dejó intacta: es `noindex` y es ruta del flujo de citas.
 - `npm run lint` y `npm run build` correctos (los 12 errores de lint restantes vienen de `.worktrees/ads-intent/`, un worktree suelto sin trackear, ajeno a este cambio). Sin merge, deploy ni cambios de producción.
 
 ## 2026-08-26 — Misión 3: atribución Ads / Maps por WhatsApp

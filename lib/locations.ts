@@ -15,6 +15,12 @@ export type ClinicLocation = {
   active: boolean;
   publicLabel: string;
   /**
+   * Nombre corto de la ciudad, el que la gente teclea en Google
+   * ("traumatólogo en Pachuca", no "en Pachuca de Soto"). Se usa en los
+   * <title>, donde publicLabel gasta caracteres sin ganar búsquedas.
+   */
+  shortLabel: string;
+  /**
    * Conteo manual de la ficha de Google Business Profile de esta sede,
    * verificado a mano el 16 ago 2026 (15 Pachuca + 23 Tula = los 38
    * combinados que usa AGGREGATE_REVIEW_COUNT en staticGoogleReviews.ts).
@@ -93,6 +99,7 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
       "Z%C3%A1rate+Unidad+de+Especialidades+M%C3%A9dicas+Cto+Revoluci%C3%B3n+19+Tula+de+Allende+Hidalgo",
     active: true,
     publicLabel: "Tula de Allende",
+    shortLabel: "Tula",
     reviewCount: 23,
     hub: {
       eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · TODOS LOS DÍAS",
@@ -133,6 +140,7 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
       "Adoy+Medical+Center+Lic.+Hern%C3%A1ndez+y+Fern%C3%A1ndez+105+San+Antonio+42083+Pachuca+de+Soto+Hgo",
     active: true,
     publicLabel: "Pachuca de Soto",
+    shortLabel: "Pachuca",
     reviewCount: 15,
     hub: {
       eyebrow: "ADOY MEDICAL CENTER, PACHUCA · TODOS LOS DÍAS",

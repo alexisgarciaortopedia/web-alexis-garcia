@@ -33,11 +33,11 @@ export async function generateMetadata({
   if (!isValidSede(sedeParam)) return {};
   const sede = SEDES[sedeParam];
 
-  const title = `Fractura o Lesión Reciente en ${sede.publicLabel} | Dr. Alexis García`;
+  const title = `Fractura o Lesión Reciente en ${sede.shortLabel} | Dr. Alexis García`;
   const description = `¿Fractura, esguince o lesión deportiva reciente en ${sede.publicLabel}? Escríbenos y el médico responde directamente. Valoración clara y manejo completo.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: `https://www.alexisgarciaortopedia.com/${sedeParam}/fracturas`,

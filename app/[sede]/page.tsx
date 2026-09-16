@@ -38,11 +38,11 @@ export async function generateMetadata({
   if (!isValidSede(sedeParam)) return {};
   const sede = SEDES[sedeParam];
 
-  const title = `Traumatólogo y Ortopedista en ${sede.publicLabel} | Dr. Alexis García`;
+  const title = `Traumatólogo y Ortopedista en ${sede.shortLabel} | Dr. Alexis García`;
   const description = `Consulta de Traumatología y Ortopedia en ${sede.publicLabel} con el Dr. Alexis García. Rodilla, hombro, cadera, columna, fracturas y lesión deportiva. ${sede.daysLabel}, ${sede.scheduleLabel}.`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: `https://www.alexisgarciaortopedia.com/${sedeParam}`,
