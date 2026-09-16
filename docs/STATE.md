@@ -1,6 +1,15 @@
 # Estado actual
 
-Actualizado: 2026-08-26.
+Actualizado: 2026-09-16.
+
+## Indexación del sitio (2026-09-16)
+
+- Implementado en la rama `fix/seo-indexacion-enlaces`; todavía no está desplegado ni modifica producción.
+- Dominio canónico verificado: `www.alexisgarciaortopedia.com`. La variante sin `www` responde 307 hacia ella (dominio primario de Vercel). Las URLs de Ads y la ficha de Maps de Pachuca ya apuntan a `www`; no se cambió nada de esto.
+- La propiedad de Search Console es de dominio (`sc-domain`), así que cubre `www` y no-`www`. El `Sitemap:` de robots.txt se mantiene en `www`.
+- Sitemap: 15 URLs, sin cambios respecto a producción. Las 15 verificadas 200 y `index, follow` en el sitio en vivo antes de tocar nada.
+- Causa raíz del bajo descubrimiento: 7 páginas huérfanas (`/pachuca`, `/tula`, las cuatro guías por sede, `/segunda-opinion`) con cero enlaces internos entrantes, más `/muevete-seguro` y `/centros-deportivos` como islote sin enlace desde el sitio principal. Tras el cambio, cada una de las 15 rutas recibe entre 13 y 17 enlaces internos, medido sobre el HTML generado por `next build`.
+- `/agendar` y `/cita` permanecen `noindex, nofollow`, fuera del sitemap y sin el footer compartido — verificado en el build.
 
 ## Atribución WhatsApp Ads / Maps (Misión 3)
 

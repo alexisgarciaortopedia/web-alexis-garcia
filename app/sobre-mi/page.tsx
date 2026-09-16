@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 
 export default function SobreMiPage() {
@@ -97,6 +98,8 @@ export default function SobreMiPage() {
           </div>
         </section>
       </main>
+
+      <SiteFooter />
 
       <WhatsAppFloating />
     </div>

@@ -1,6 +1,7 @@
 import { GlassCard } from "./GlassCard";
 import { ScrollReveal } from "./ScrollReveal";
 import { WhatsAppDemo } from "./WhatsAppDemo";
+import { SiteFooterNav } from "@/components/SiteFooter";
 
 const WHATSAPP_NUMBER = "527731754638";
 
@@ -301,6 +302,8 @@ export default function CentrosDeportivosPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/5 bg-[#050608]/90 px-5 py-8 sm:px-8">
         <div className="mx-auto max-w-5xl">
+          <SiteFooterNav />
+          <div className="my-8 border-t border-white/5" />
           <p className="text-center text-xs leading-relaxed text-[#6B7280] sm:text-sm">
             Muévete Seguro by Ortik es una iniciativa médico-deportiva
             vinculada a la práctica profesional del Dr. Alexis García.

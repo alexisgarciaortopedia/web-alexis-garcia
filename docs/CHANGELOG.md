@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-16 — Indexación: enlaces internos, robots y canonical
+
+- Diagnóstico: las 15 URLs públicas ya estaban en el sitemap, todas 200 y todas `index, follow`. El problema no era el sitemap sino el enlazado interno: `/pachuca`, `/tula`, sus cuatro guías y `/segunda-opinion` no recibían un solo enlace desde ninguna página — existían únicamente en el sitemap.
+- Añadido `components/SiteFooter.tsx` con las 15 rutas públicas agrupadas. Montado en las 13 páginas del sitio principal; en las cuatro de Muévete Seguro by Ortik se monta solo la rejilla (`SiteFooterNav`) encima de su footer de marca, para no perder el deslinde médico.
+- Añadidos enlaces en cuerpo (no solo footer): home → `/pachuca` y `/tula`; `/ubicaciones` → cada sede con sus dos guías; `/pachuca` y `/tula` → sus guías de fracturas y rodilla.
+- `app/robots.ts`: añadidos `Disallow` para `/panel`, `/panel-luna` y `/control`, que hasta hoy solo se defendían con el header `X-Robots-Tag` (Google lo lee después de rastrear). Se mantienen `/agendar`, `/cita` y `/api/`.
+- `app/layout.tsx`: añadido `alternates.canonical` por defecto, para que una ruta nueva no nazca sin canonical. Verificado que los 17 canonicals generados siguen siendo correctos y con `www`.
+- `app/sitemap.ts`: `lastModified` hoisteado a una sola constante por build. La lista de URLs no cambió.
+- Confirmado que el dominio canónico es `www`: `alexisgarciaortopedia.com` responde 307 a `www`. No se tocó nada por este motivo — la propiedad de Search Console es de dominio (`sc-domain`) y cubre ambas variantes.
+- `/agendar` y `/cita` sin tocar: siguen `noindex, nofollow`, fuera del sitemap y sin el footer compartido.
+- `npm run lint` y `npm run build` correctos (los 12 errores de lint restantes vienen de `.worktrees/ads-intent/`, un worktree suelto sin trackear, ajeno a este cambio). Sin merge, deploy ni cambios de producción.
+
 ## 2026-08-26 — Misión 3: atribución Ads / Maps por WhatsApp
 
 - Añadida detección session-only de `gclid`, `gbraid` y `wbraid`, con clasificación `GADS-PAC` y prioridad sobre `ref=`.

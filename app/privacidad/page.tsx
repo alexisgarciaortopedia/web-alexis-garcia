@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { SiteFooterNav } from "@/components/SiteFooter";
 
 const CONTACT_EMAIL = "alexisgarciaortopedia@gmail.com";
 const CONTACT_PHONE_DISPLAY = "773 175 4638";
@@ -492,6 +493,8 @@ export default function PrivacidadPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/5 bg-[#050608]/90 px-5 py-8 sm:px-8">
         <div className="mx-auto max-w-3xl">
+          <SiteFooterNav />
+          <div className="my-8 border-t border-white/5" />
           <p className="text-center text-xs leading-relaxed text-[#6B7280] sm:text-sm">
             Muévete Seguro by Ortik es una iniciativa médico-deportiva vinculada a la práctica
             profesional del Dr. Alexis García.

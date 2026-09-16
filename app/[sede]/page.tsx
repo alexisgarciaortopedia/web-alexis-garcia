@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import FloatingWhatsAppAfterHero from "@/components/FloatingWhatsAppAfterHero";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
 import LandingHero from "@/components/LandingHero";
 import LocationBlock from "@/components/LocationBlock";
+import SiteFooter from "@/components/SiteFooter";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import PhoneLink from "@/components/PhoneLink";
 import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
@@ -98,6 +100,42 @@ export default async function SedeHubPage({ params }: PageProps) {
           </ul>
         </GlassPanel>
 
+        <GlassPanel className="flex flex-col gap-5 px-6 py-7 sm:px-8">
+          <div className="flex flex-col gap-2">
+            <h2 className="font-serif text-xl text-white sm:text-2xl">
+              Guías de consulta en {sede.publicLabel}
+            </h2>
+            <p className="text-sm text-text-secondary sm:text-base">
+              Los dos motivos con los que más llega la gente a esta sede,
+              explicados antes de que agendes.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Link
+              href={`/${sedeParam}/fracturas`}
+              className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10"
+            >
+              <span className="font-serif text-base text-white">
+                Fracturas en {sede.publicLabel}
+              </span>
+              <span className="text-sm text-text-secondary">
+                Qué hacer en las primeras horas y cuándo se opera.
+              </span>
+            </Link>
+            <Link
+              href={`/${sedeParam}/rodilla`}
+              className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10"
+            >
+              <span className="font-serif text-base text-white">
+                Dolor de rodilla en {sede.publicLabel}
+              </span>
+              <span className="text-sm text-text-secondary">
+                Menisco, ligamentos y artrosis: cómo se estudia cada uno.
+              </span>
+            </Link>
+          </div>
+        </GlassPanel>
+
         <LocationBlock sede={sede} />
 
         <section className="flex flex-col items-center gap-5 text-center">
@@ -119,6 +157,8 @@ export default async function SedeHubPage({ params }: PageProps) {
           </div>
         </section>
       </main>
+
+      <SiteFooter />
 
       <FloatingWhatsAppAfterHero heroId="hero" />
     </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import FloatingWhatsAppAfterHero from "@/components/FloatingWhatsAppAfterHero";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import LandingHero from "@/components/LandingHero";
 import LocationBlock from "@/components/LocationBlock";
 import { CLINIC_LOCATIONS as SEDES } from "@/lib/locations";
@@ -68,6 +69,8 @@ export default function SegundaOpinionPage() {
           <LocationBlock sede={SEDES.tula} />
         </div>
       </main>
+
+      <SiteFooter />
 
       <FloatingWhatsAppAfterHero heroId="hero" />
     </div>

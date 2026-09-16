@@ -39,6 +39,14 @@ export const metadata: Metadata = {
     template: "%s | Dr. Alexis Eduardo García de los Santos",
   },
   description: siteDescription,
+  // Canonical por defecto, relativo a metadataBase. Cada página pública
+  // ya declara el suyo absoluto; esto es la red de seguridad para que una
+  // ruta nueva no nazca sin canonical -- y para que el canónico sea
+  // siempre la variante con www, la que sirve Vercel como dominio
+  // primario (alexisgarciaortopedia.com redirige aquí).
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: siteTitle,
     description: siteDescription,

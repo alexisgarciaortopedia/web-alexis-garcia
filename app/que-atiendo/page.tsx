@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 
 type Condition = {
@@ -432,6 +433,8 @@ export default function QueAtiendoPage() {
           })}
         </section>
       </main>
+
+      <SiteFooter />
 
       <WhatsAppFloating />
     </div>

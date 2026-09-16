@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import FloatingWhatsAppAfterHero from "@/components/FloatingWhatsAppAfterHero";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import LandingHero from "@/components/LandingHero";
 import LocationBlock from "@/components/LocationBlock";
 import {
@@ -95,6 +96,8 @@ export default async function FracturasPage({ params }: PageProps) {
 
         <LocationBlock sede={sede} />
       </main>
+
+      <SiteFooter />
 
       <FloatingWhatsAppAfterHero heroId="hero" />
     </div>

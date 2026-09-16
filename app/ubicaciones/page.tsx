@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import { CLINIC_LOCATIONS, getMapsEmbedUrl } from "@/lib/locations";
 
@@ -50,6 +51,30 @@ export default function UbicacionesPage() {
                 Confirmación de cita vía WhatsApp.
               </p>
               <p className="text-text-muted">Solo con cita.</p>
+              <p>
+                Más sobre la consulta en esta sede en{" "}
+                <Link
+                  href="/tula"
+                  className="text-white underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-white"
+                >
+                  traumatólogo y ortopedista en Tula
+                </Link>
+                , con sus guías de{" "}
+                <Link
+                  href="/tula/fracturas"
+                  className="text-white underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-white"
+                >
+                  fracturas
+                </Link>{" "}
+                y{" "}
+                <Link
+                  href="/tula/rodilla"
+                  className="text-white underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-white"
+                >
+                  dolor de rodilla
+                </Link>
+                .
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -107,6 +132,30 @@ export default function UbicacionesPage() {
                 Confirmación de cita vía WhatsApp.
               </p>
               <p className="text-text-muted">Solo con cita.</p>
+              <p>
+                Más sobre la consulta en esta sede en{" "}
+                <Link
+                  href="/pachuca"
+                  className="text-white underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-white"
+                >
+                  traumatólogo y ortopedista en Pachuca
+                </Link>
+                , con sus guías de{" "}
+                <Link
+                  href="/pachuca/fracturas"
+                  className="text-white underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-white"
+                >
+                  fracturas
+                </Link>{" "}
+                y{" "}
+                <Link
+                  href="/pachuca/rodilla"
+                  className="text-white underline decoration-white/30 underline-offset-2 transition-colors hover:decoration-white"
+                >
+                  dolor de rodilla
+                </Link>
+                .
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -141,6 +190,8 @@ export default function UbicacionesPage() {
           </article>
         </section>
       </main>
+
+      <SiteFooter />
 
       <WhatsAppFloating />
     </div>

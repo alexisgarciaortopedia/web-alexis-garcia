@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import { CertifiedIcon, PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
+import SiteFooter from "@/components/SiteFooter";
 import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
 import { useSede, type Sede } from "@/lib/sede";
 import {
@@ -149,6 +150,42 @@ export default function HomeClient() {
         </section>
 
         <ReviewsCarousel />
+
+        <GlassPanel className="flex flex-col gap-6 px-6 py-9 lg:px-10 lg:py-12">
+          <div className="flex flex-col gap-2 text-center text-sm text-text-secondary md:text-left">
+            <span className="font-serif text-base text-white">
+              ¿Dónde consulto?
+            </span>
+            <span>
+              Dos consultorios en Hidalgo, los siete días. Cada uno tiene su
+              propia página con dirección, horario y las guías de la sede.
+            </span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Link
+              href="/pachuca"
+              className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10"
+            >
+              <span className="font-serif text-base text-white">
+                Traumatólogo en Pachuca
+              </span>
+              <span className="text-sm text-text-secondary">
+                Adoy Medical Center · consulta, fracturas y dolor de rodilla
+              </span>
+            </Link>
+            <Link
+              href="/tula"
+              className="flex flex-col gap-1 rounded-md border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:bg-white/10"
+            >
+              <span className="font-serif text-base text-white">
+                Traumatólogo en Tula de Allende
+              </span>
+              <span className="text-sm text-text-secondary">
+                Clínica Zárate · consulta, fracturas y dolor de rodilla
+              </span>
+            </Link>
+          </div>
+        </GlassPanel>
 
         <GlassPanel className="px-6 py-9 lg:px-10 lg:py-12">
           <div className="flex flex-col gap-2 text-center text-sm text-text-secondary md:text-left">
@@ -314,38 +351,7 @@ export default function HomeClient() {
         </div>
       </main>
 
-      <footer className="relative z-10 border-t border-white/5 px-8 py-6">
-        <nav
-          className="mb-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-text-muted"
-          aria-label="Enlaces del sitio"
-        >
-          <a
-            href="https://instagram.com/dralexisgarcia.ortopedia"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="transition-colors hover:text-white"
-          >
-            Instagram
-          </a>
-          <Link href="/ubicaciones" className="transition-colors hover:text-white">
-            Ubicaciones
-          </Link>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={trackWhatsAppClick}
-            aria-label="WhatsApp"
-            className="transition-colors hover:text-white"
-          >
-            WhatsApp
-          </a>
-        </nav>
-        <p className="text-center text-xs text-text-muted">
-          Responsable: Dr. Alexis Eduardo García de los Santos.
-        </p>
-      </footer>
+      <SiteFooter />
 
       <WhatsAppFloating visible={heroPassed} />
     </div>

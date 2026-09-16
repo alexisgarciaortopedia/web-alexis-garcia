@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import GlassPanel from "@/components/GlassPanel";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import LocationBlock from "@/components/LocationBlock";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import WhatsAppLink from "@/components/WhatsAppLink";
@@ -233,6 +234,8 @@ export default async function RodillaSedePage({ params }: PageProps) {
           </p>
         </section>
       </main>
+
+      <SiteFooter />
 
       <WhatsAppFloating />
     </div>
