@@ -20,14 +20,6 @@ export type ClinicLocation = {
    * <title>, donde publicLabel gasta caracteres sin ganar búsquedas.
    */
   shortLabel: string;
-  /**
-   * Conteo manual de la ficha de Google Business Profile de esta sede,
-   * verificado a mano el 16 ago 2026 (15 Pachuca + 23 Tula = los 38
-   * combinados que usa AGGREGATE_REVIEW_COUNT en staticGoogleReviews.ts).
-   * No hay endpoint que lo traiga por sede -- actualizar a mano si cambia
-   * de forma notable.
-   */
-  reviewCount: number;
   /** Copy de las landings de oleada -- ver privada/13-direccion-visual.md. */
   hub: {
     eyebrow: string;
@@ -100,7 +92,6 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
     active: true,
     publicLabel: "Tula de Allende",
     shortLabel: "Tula",
-    reviewCount: 23,
     hub: {
       eyebrow: "CLÍNICA ZÁRATE, TULA DE ALLENDE · TODOS LOS DÍAS",
       h1Second: "en Tula de Allende",
@@ -141,7 +132,6 @@ export const CLINIC_LOCATIONS: Record<ClinicLocationId, ClinicLocation> = {
     active: true,
     publicLabel: "Pachuca de Soto",
     shortLabel: "Pachuca",
-    reviewCount: 15,
     hub: {
       eyebrow: "ADOY MEDICAL CENTER, PACHUCA · TODOS LOS DÍAS",
       h1Second: "en Pachuca de Soto",

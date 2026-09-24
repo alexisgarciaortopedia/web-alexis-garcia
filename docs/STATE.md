@@ -1,6 +1,13 @@
 # Estado actual
 
-Actualizado: 2026-09-16.
+Actualizado: 2026-09-23.
+
+## Prueba social de Google Maps (2026-09-23)
+
+- Fichas profesionales verificadas directamente en Google Maps: Pachuca 5.0 / 24 reseñas (CID `13899597655234583047`, dirección Lic. Hernández y Fernández 105); Tula 5.0 / 23 reseñas (CID `16310803683419924396`, dirección Cto. Revolución 19). Tula conserva el conteo anterior porque eso muestra hoy su ficha.
+- Integración y despliegue autorizados el 23 sep 2026 para `fix/google-reviews-social-proof`. `lib/practiceReviews.ts` contiene las dos fichas; el total 47 se calcula, y `GoogleRating` se usa en home, sedes, fracturas, rodilla, segunda opinión y carrusel.
+- El `AggregateRating` combinado de `Physician` se retiró: era una suma de dos perfiles propios y Google no admite snippets de reseñas autogestionadas para negocios locales. El resto del schema Physician permanece.
+- Los conteos son manuales, sin consulta de Maps en cada request. Revisar las dos fichas antes de futuras actualizaciones.
 
 ## Indexación del sitio (2026-09-16)
 

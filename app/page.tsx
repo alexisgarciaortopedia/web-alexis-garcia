@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import HomeClient from "./HomeClient";
-import {
-  AGGREGATE_REVIEW_COUNT,
-  FALLBACK_GOOGLE_MAPS_URI,
-  FALLBACK_RATING,
-} from "@/lib/staticGoogleReviews";
+import { practiceReviews } from "@/lib/practiceReviews";
 
 export const metadata: Metadata = {
   title: "Dr. Alexis Eduardo García de los Santos | Traumatología y Ortopedia",
@@ -30,14 +26,10 @@ const physicianStructuredData = {
       image: "https://www.alexisgarciaortopedia.com/doctor-hero.webp",
       medicalSpecialty: "Traumatología y Ortopedia",
       telephone: "+527731754638",
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: FALLBACK_RATING,
-        reviewCount: AGGREGATE_REVIEW_COUNT,
-      },
       sameAs: [
         "https://instagram.com/dralexisgarcia.ortopedia",
-        FALLBACK_GOOGLE_MAPS_URI,
+        practiceReviews.pachuca.googleMapsUrl,
+        practiceReviews.tula.googleMapsUrl,
       ],
       workLocation: [
         {

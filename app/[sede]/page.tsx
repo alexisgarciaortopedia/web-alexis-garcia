@@ -78,8 +78,7 @@ export default async function SedeHubPage({ params }: PageProps) {
             h1First="Traumatólogo y Ortopedista"
             h1Second={sede.hub.h1Second}
             entradilla={sede.hub.entradilla}
-            reviewCount={sede.reviewCount}
-            reviewLabel={`reseñas en ${sede.publicLabel.split(" ")[0]}`}
+            reviewLocation={sedeParam}
             micro={sede.hub.micro}
             whatsappMessage={whatsappMessage}
           />

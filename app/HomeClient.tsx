@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import GlassPanel from "@/components/GlassPanel";
+import GoogleRating from "@/components/GoogleRating";
 import Header from "@/components/Header";
 import { CertifiedIcon, PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
@@ -12,10 +13,6 @@ import ReviewsCarousel from "@/components/ReviewsCarousel";
 import SiteFooter from "@/components/SiteFooter";
 import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
 import { useSede, type Sede } from "@/lib/sede";
-import {
-  AGGREGATE_REVIEW_COUNT,
-  FALLBACK_RATING,
-} from "@/lib/staticGoogleReviews";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
 const WHATSAPP_MESSAGE =
@@ -97,13 +94,7 @@ export default function HomeClient() {
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-text-secondary sm:text-sm">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="text-accent-rating" aria-hidden="true">
-                  ★★★★★
-                </span>
-                {FALLBACK_RATING.toFixed(1)} · {AGGREGATE_REVIEW_COUNT} reseñas
-                en Google
-              </span>
+              <GoogleRating location="global" />
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-brand-field/70 px-3 py-1">
                 <CertifiedIcon className="h-3.5 w-3.5 shrink-0 text-accent-clinical" />
                 Certificado · Consejo Mexicano de Ortopedia y Traumatología

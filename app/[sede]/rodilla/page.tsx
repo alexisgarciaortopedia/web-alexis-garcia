@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import GlassPanel from "@/components/GlassPanel";
+import GoogleRating from "@/components/GoogleRating";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import LocationBlock from "@/components/LocationBlock";
@@ -101,6 +102,10 @@ export default async function RodillaSedePage({ params }: PageProps) {
                 <p className="text-sm text-text-secondary sm:text-base">
                   Evaluación por especialista en Traumatología y Ortopedia
                 </p>
+                <GoogleRating
+                  location={sedeParam}
+                  className="text-xs text-text-secondary sm:text-sm"
+                />
               </div>
 
               <div className="relative overflow-hidden rounded-md border border-white/15 bg-[rgba(12,16,24,0.68)] px-6 py-5 shadow-[0_35px_110px_rgba(2,6,12,0.65)] backdrop-blur-[30px]">

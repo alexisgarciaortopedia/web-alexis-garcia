@@ -73,8 +73,7 @@ export default async function FracturasPage({ params }: PageProps) {
             h1First="¿Fractura o Lesión Reciente?"
             h1Second={`Traumatólogo en ${sede.publicLabel.split(" ")[0]}`}
             entradilla={sede.fracturas.entradilla}
-            reviewCount={sede.reviewCount}
-            reviewLabel={`reseñas en ${sede.publicLabel.split(" ")[0]}`}
+            reviewLocation={sedeParam}
             micro={sede.fracturas.micro}
             whatsappMessage={whatsappMessage}
           />

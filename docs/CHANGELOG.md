@@ -42,3 +42,9 @@
 - Añadido runbook post-deploy para evidencia de red y verificación posterior en Google Ads.
 - Google Ads y Apps Script vivos quedaron sin lectura por falta de sesión autenticada; ningún cambio externo realizado.
 - Continuación: auditados Ads, facturación, promociones, conversiones y ambos scripts con la cuenta correcta. Confirmados B8 falso, saldo derivado incorrecto y riesgo de pausa automática A1. Ningún cambio externo realizado.
+
+# 2026-09-23 — Prueba social de Google Reviews
+
+- Verificadas las fichas profesionales en Maps: Pachuca 5.0 / 24 reseñas, Tula 5.0 / 23 reseñas. Total derivado: 47.
+- Centralizados calificación, conteo y enlace de cada sede; componente compartido en home y landings.
+- Retirado `AggregateRating` autogestionado de `Physician`, conservando el resto del JSON-LD.
