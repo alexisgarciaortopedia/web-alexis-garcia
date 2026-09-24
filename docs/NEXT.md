@@ -1,5 +1,10 @@
 # Siguientes pasos
 
+## Prueba social de Google Maps
+
+1. Tras el despliegue autorizado, comprobar las cifras y enlaces en home y todas las landings.
+2. Cuando cambien las reseñas, verificar ambas fichas de Google Maps y actualizar únicamente `lib/practiceReviews.ts`.
+
 ## Indexación — requiere autorización de Alexis
 
 1. Revisar y autorizar el merge del PR de `fix/seo-indexacion-enlaces`; después autorizar despliegue. No se hizo merge ni deploy.

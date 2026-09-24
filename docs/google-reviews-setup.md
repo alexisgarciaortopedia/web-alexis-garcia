@@ -2,6 +2,10 @@
 
 Esta guía describe cómo activar la integración con **Places API (New)** para mostrar reseñas reales del perfil profesional del Dr. Alexis Eduardo García de los Santos en la home del sitio.
 
+Los conteos y calificaciones públicos de las dos sedes se mantienen manualmente en `lib/practiceReviews.ts`; el total se calcula allí. La API descrita abajo solo alimenta el contenido del carrusel y no determina las cifras visibles de prueba social.
+
+Perfiles verificados el 23 sep 2026: [Pachuca](https://www.google.com/maps?cid=13899597655234583047) (5.0, 24 reseñas) y [Tula](https://www.google.com/maps?cid=16310803683419924396) (5.0, 23 reseñas).
+
 Hasta que las variables estén configuradas, el sitio muestra automáticamente las reseñas estáticas actuales como fallback, sin errores visibles para el visitante.
 
 ## Ficha profesional confirmada
@@ -17,7 +21,7 @@ Perfil público del médico en Google (no confundir con clínicas ni con Doctora
 - El **kgmid** identifica la ficha en Google Search, pero **no** es el Place ID de Places API (New).
 - `GOOGLE_PLACES_PLACE_ID` debe configurarse **únicamente** cuando exista confirmación inequívoca del Place ID real (por ejemplo, vía Text Search con API key habilitada o Place ID Finder).
 - El fallback seguirá funcionando aunque todavía no exista Place ID en Vercel.
-- El botón **Ver todas las reseñas en Google** ya abre la ficha profesional confirmada mediante la URL anterior.
+- Los enlaces de prueba social abren la ficha profesional de la sede correspondiente.
 
 Cuando se confirme el Place ID inequívoco, configúralo así (sin subir valores reales al repositorio):
 

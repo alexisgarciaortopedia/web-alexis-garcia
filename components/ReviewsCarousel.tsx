@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import GlassPanel from "@/components/GlassPanel";
+import GoogleRating from "@/components/GoogleRating";
 import {
   buildFallbackReviewsResponse,
   type ReviewsApiResponse,
@@ -144,26 +145,19 @@ export default function ReviewsCarousel() {
     return null;
   }
 
-  const ratingLabel = data.rating.toFixed(1);
-  const showGoogleTotal =
-    data.source === "google" && typeof data.totalReviews === "number";
-
   return (
     <section className="flex flex-col gap-8" aria-labelledby="reviews-heading">
       <div className="flex flex-col items-center gap-2 text-center">
         <span id="reviews-heading" className="font-serif text-xl text-white">
-          Opiniones de pacientes
+          Reseñas en Google
         </span>
         <span className="text-sm text-text-secondary">
-          Reseñas reales de pacientes atendidos en consulta
+          Opiniones públicas sobre la consulta
         </span>
-        <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-text-secondary">
-          <StarRating rating={data.rating} />
-          <span>
-            {ratingLabel} en Google
-            {showGoogleTotal ? ` · ${data.totalReviews} opiniones` : ""}
-          </span>
-        </div>
+        <GoogleRating
+          location="global"
+          className="justify-center text-xs text-text-secondary"
+        />
       </div>
 
       <div
@@ -171,7 +165,7 @@ export default function ReviewsCarousel() {
         className="relative mx-auto w-full max-w-3xl outline-none"
         role="region"
         aria-roledescription="carrusel"
-        aria-label="Opiniones de pacientes"
+        aria-label="Reseñas sobre la consulta"
         tabIndex={0}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -294,15 +288,6 @@ export default function ReviewsCarousel() {
             Reseñas proporcionadas por Google
           </p>
         ) : null}
-
-        <a
-          href={data.googleMapsUri}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
-        >
-          Ver todas las reseñas en Google
-        </a>
       </div>
     </section>
   );

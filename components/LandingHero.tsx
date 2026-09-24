@@ -2,14 +2,15 @@ import { CertifiedIcon, PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import PhoneLink from "@/components/PhoneLink";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { PHONE_DISPLAY } from "@/lib/phone";
+import GoogleRating from "@/components/GoogleRating";
+import type { ReviewLocation } from "@/lib/practiceReviews";
 
 type LandingHeroProps = {
   eyebrow: string;
   h1First: string;
   h1Second: string;
   entradilla: string;
-  reviewCount: number;
-  reviewLabel: string;
+  reviewLocation: ReviewLocation | "global";
   micro: string;
   whatsappMessage: string;
 };
@@ -25,8 +26,7 @@ export default function LandingHero({
   h1First,
   h1Second,
   entradilla,
-  reviewCount,
-  reviewLabel,
+  reviewLocation,
   micro,
   whatsappMessage,
 }: LandingHeroProps) {
@@ -50,12 +50,7 @@ export default function LandingHero({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-text-secondary sm:text-sm">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="text-accent-rating" aria-hidden="true">
-            ★★★★★
-          </span>
-          5.0 · {reviewCount} {reviewLabel}
-        </span>
+        <GoogleRating location={reviewLocation} />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-brand-field/70 px-3 py-1">
           <CertifiedIcon className="h-3.5 w-3.5 shrink-0 text-accent-clinical" />
           Certificado · Consejo Mexicano de Ortopedia y Traumatología

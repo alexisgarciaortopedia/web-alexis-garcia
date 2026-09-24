@@ -6,7 +6,6 @@ import SiteFooter from "@/components/SiteFooter";
 import LandingHero from "@/components/LandingHero";
 import LocationBlock from "@/components/LocationBlock";
 import { CLINIC_LOCATIONS as SEDES } from "@/lib/locations";
-import { AGGREGATE_REVIEW_COUNT } from "@/lib/staticGoogleReviews";
 
 const WHATSAPP_MESSAGE =
   "Hola, ya tengo un diagnóstico y quiero una segunda opinión antes de decidir.";
@@ -43,8 +42,7 @@ export default function SegundaOpinionPage() {
             h1First="¿Ya Tienes un Diagnóstico?"
             h1Second="Confirma Antes de Operarte"
             entradilla="¿Ya te dijeron que necesitas cirugía? Revisamos tu diagnóstico contigo. No toda lesión necesita operarse — evaluamos todas las opciones antes."
-            reviewCount={AGGREGATE_REVIEW_COUNT}
-            reviewLabel="reseñas en Google"
+            reviewLocation="global"
             micro="Consulta presencial todos los días, 9:00 a 19:00 h, en Pachuca y en Tula"
             whatsappMessage={WHATSAPP_MESSAGE}
           />

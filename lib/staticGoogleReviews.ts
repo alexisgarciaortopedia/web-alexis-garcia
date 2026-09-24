@@ -1,14 +1,4 @@
-export const FALLBACK_GOOGLE_MAPS_URI =
-  "https://www.google.com/search?kgmid=%2Fg%2F11z1x56bs6&q=Dr.%20Alexis%20Garc%C3%ADa%20de%20los%20Santos%20%7C%20Traumatolog%C3%ADa%20y%20Ortopedia";
-
-export const FALLBACK_RATING = 5.0;
-
-// Suma de las dos fichas de Google Business Profile (15 Pachuca + 23 Tula),
-// verificada a mano el 16 ago 2026. No hay endpoint que combine ambas fichas
-// en un solo número, así que este total no se recalcula solo: cuando el
-// conteo de cualquiera de las dos fichas cambie de forma notable, hay que
-// volver a sumarlas y actualizar esta constante.
-export const AGGREGATE_REVIEW_COUNT = 38;
+import { practiceReviews } from "./practiceReviews";
 
 export type StaticGoogleReview = {
   name: string;
@@ -64,14 +54,14 @@ export type ReviewsApiResponse = {
 export function buildFallbackReviewsResponse(): ReviewsApiResponse {
   return {
     source: "fallback",
-    rating: FALLBACK_RATING,
+    rating: practiceReviews.tula.rating,
     totalReviews: null,
     reviews: STATIC_GOOGLE_REVIEWS.map((review) => ({
       authorName: review.name,
       rating: 5,
       text: review.text,
     })),
-    googleMapsUri: FALLBACK_GOOGLE_MAPS_URI,
+    googleMapsUri: practiceReviews.tula.googleMapsUrl,
     updatedAt: null,
   };
 }

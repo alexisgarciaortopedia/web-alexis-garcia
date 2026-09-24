@@ -53,6 +53,10 @@ const FIELD_MASK = [
 const MAX_VISIBLE_REVIEWS = 5;
 
 function normalizeReview(review: GoogleReview): NormalizedReview | null {
+  if (typeof review.rating !== "number") {
+    return null;
+  }
+
   const text =
     review.text?.text?.trim() ||
     review.originalText?.text?.trim() ||
@@ -63,9 +67,9 @@ function normalizeReview(review: GoogleReview): NormalizedReview | null {
   }
 
   return {
-    authorName: review.authorAttribution?.displayName?.trim() || "Paciente",
+    authorName: review.authorAttribution?.displayName?.trim() || "Usuario de Google",
     authorPhotoUrl: review.authorAttribution?.photoUri,
-    rating: typeof review.rating === "number" ? review.rating : 5,
+    rating: review.rating,
     text,
     relativePublishTimeDescription: review.relativePublishTimeDescription,
     publishTime: review.publishTime,
