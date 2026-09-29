@@ -90,4 +90,4 @@ Actualizado: 2026-09-29.
 - Lint, TypeScript y compilación de producción local pasan. GA4 preparado pero pendiente del identificador real; no se afirma medición activa.
 - Producción conserva los contactos publicados. Alcance y pendientes en PREMIUM_REVIEW.md.
 
-- Vercel confirmó éxito del preview `f292e36a`; pruebas de contactos y atribución pasan. Revisión visual bloqueada por inicio de sesión en Vercel; GA4 real sigue pendiente.
+- Vercel confirmó éxito del preview `f292e36a`; pruebas de contactos y atribución pasan. Acceso Vercel resuelto y revisión visual en escritorio/celular completada. Ambos videos reproducen y el flujo Tula → agenda conserva contacto. PR #19 en borrador; GA4 real sigue pendiente.

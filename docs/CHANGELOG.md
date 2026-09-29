@@ -72,4 +72,4 @@
 - Preparada instrumentación web GA4 con exclusión de pruebas, diferenciando contacto, solicitud de programa y video. Activación pendiente de ID real.
 - Lint, TypeScript y build local de 35 rutas aprobados. Sin cambios a producción ni configuración de campañas Ads.
 
-- Vercel confirmó éxito del preview `f292e36a`; pruebas de contactos y atribución pasan. Revisión visual bloqueada por inicio de sesión en Vercel; GA4 real sigue pendiente.
+- Vercel confirmó éxito del preview `f292e36a`; pruebas de contactos y atribución pasan. Acceso Vercel resuelto y revisión visual en escritorio/celular completada. Ambos videos reproducen y el flujo Tula → agenda conserva contacto. PR #19 en borrador; GA4 real sigue pendiente.

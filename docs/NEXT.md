@@ -39,4 +39,4 @@ Procedimiento telefónico: `docs/PHONE_CONVERSION_RUNBOOK.md`.
 - Conectar y validar GA4 real; verificar etiquetas Ads/Maps Pachuca y Maps Tula para el corte del 1 octubre.
 - Ver PREMIUM_REVIEW.md para límites de medición, materiales y pruebas.
 
-- Abrir acceso autorizado a Vercel para completar QA visual del preview; despliegue f292e36a ya terminó correctamente.
+- Revisar propuesta en PR #19 y preview (con visor /design-review). Acceso Vercel resuelto y pruebas visuales/funcionales completadas. Esperar aprobación de Alexis antes de producción.

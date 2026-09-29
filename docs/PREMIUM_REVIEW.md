@@ -31,11 +31,14 @@ Fecha: 28 septiembre 2026 (México). Rama: feature/premium-conversion-preview.
 - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt npx next build --webpack (35 rutas compiladas).
 
 ## Despliegue de revisión
-- Vercel confirmó Deployment has completed para f292e36af84cb415a2a33bf983584de182dac34f.
-- La revisión visual del preview requiere iniciar sesión en Vercel; todavía no se afirma QA visual de escritorio/móvil ni reproducción en navegador.
+- Vercel confirmó Deployment has completed para f292e36af84cb415a2a33bf983584de182dac34f y 0465afb6f6a7df8769ba845d4775bad54b3af983.
+- PR #19 en borrador, sin fusión. Visor /design-review solo en entorno preview/desarrollo, no disponible en producción.
+- Preview: https://web-alexis-garcia-git-fe-1ee11f-alexisgarciaortopedias-projects.vercel.app/
+- En la sesión de Analytics abierta aparece la bienvenida inicial; no hay una propiedad seleccionada/configurada para activar estas métricas.
+- Acceso a Vercel verificado. Revisión visual de portada en escritorio y 390 px; agenda, navegación y solicitud del programa verificadas a 360 px mediante el visor responsive del propio preview. Ambos videos alcanzan readyState 4 sin error; quirófano completó 20 s y Adoy reprodujo con duración 44 s. Tula → agenda conserva la sede. No equivale a una prueba en dispositivos físicos.
 
 ## Antes de producción
-- Revisar la vista desplegada en escritorio y móvil, reproducción de videos y navegación por sede.
+- Alexis revisa y aprueba la propuesta navegable antes de publicar.
 - Confirmar la autorización de publicación de personas reconocibles en los videos.
 - Conectar la propiedad GA4 real, comprobar eventos y exclusión de pruebas; verificar enlaces etiquetados en ambas fichas Maps.
 - Confirmar tarifa actual si se desea mostrarla y alcance del seguimiento.
