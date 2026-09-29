@@ -1,5 +1,7 @@
 "use client";
 
+import { isPublicMeasurementEnabled } from "@/lib/webAnalytics";
+
 import type { MouseEvent } from "react";
 
 const CONVERSION_SEND_TO = "AW-18142944053/_EqkCPn2q-ccELW2nctD";
@@ -12,6 +14,7 @@ const CONVERSION_SEND_TO = "AW-18142944053/_EqkCPn2q-ccELW2nctD";
  * única señal telefónica que la puja puede aprovechar.
  */
 export function trackPhoneCallClick(event: MouseEvent<HTMLAnchorElement>) {
+  if (!isPublicMeasurementEnabled()) return;
   const w = window as typeof window & {
     gtag?: (...args: unknown[]) => void;
   };
