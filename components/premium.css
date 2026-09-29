@@ -6,3 +6,14 @@
 @media(prefers-reduced-motion:reduce){.premium *, .premium *:before,.premium *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .p-consult-portrait>img{object-fit:cover;object-position:center 20%}.p-consult-portrait:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,#071311e8)}
+
+@media (min-width:701px) and (max-width:900px){
+  .p-hero{grid-template-columns:1.1fr 1fr;gap:24px;min-height:590px}
+  .p-hero h1{font-size:clamp(44px,6vw,54px)}
+  .p-hero-visual{margin-left:0;min-height:500px}
+  .p-hero-description{max-width:100%}
+  .p-portrait-note{left:0;padding:12px;bottom:19%}
+  .p-portrait-note strong{font-size:12px}
+  .p-portrait-note div>span{font-size:7px}
+  .p-hero-watch{left:0;gap:7px;font-size:8px;bottom:8%}
+}
