@@ -101,3 +101,13 @@ Actualizado: 2026-09-29.
 - Quirófano y Adoy sirven video/mp4 HTTP 200. Quirófano llegó al final 0:20/0:20 en navegador público; Tula → agenda conservó el número 7731754638 y el ID anónimo de sesión. Pachuca conserva 7717588383.
 - GA4 continúa pendiente de propiedad real y validación de recepción; no se afirma conteo activo de visitas. No se modificaron campañas Ads, presupuestos ni pujas.
 - Video de consulta con personas identificables continúa excluido hasta confirmar autorización de publicación web.
+
+## Ajustes de identidad y consulta — 28 septiembre 2026, 23:11 México
+
+- Alexis confirmó autorización de publicación web del video de consulta con pacientes y ordenó publicar los ajustes sin otra confirmación.
+- Monograma del favicon extraído con transparencia mediante edición de imagen; reemplaza el AG tipográfico. Presentación blanca por CSS para contraste en fondo oscuro; nombre conservado.
+- Instagram usa su icono SVG; enlace Inicio explícito en cabeceras premium e histórica.
+- Video consulta de 25 segundos y portada incorporados; carga únicamente al pulsar reproducir.
+- Lint, compilación Next.js con TypeScript y verificación de contactos/atribución/carga diferida pasan.
+- GA4 sigue pendiente; campañas y presupuestos sin cambios.
+- Publicación `68bc7d1d2efe943295584bb91d79770d7108a674`: Vercel confirmó éxito; navegador público reprodujo consulta y los tres recursos nuevos responden HTTP 200.

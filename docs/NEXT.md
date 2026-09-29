@@ -37,5 +37,5 @@ Procedimiento telefónico: `docs/PHONE_CONVERSION_RUNBOOK.md`.
 ## Rediseño premium publicado
 - Completado: autorización expresa, merge del PR #19, build Vercel exitoso y verificación de las cinco rutas en el dominio público.
 - Conectar y validar GA4 real; verificar etiquetas Ads/Maps Pachuca y Maps Tula para el corte del 1 octubre.
-- Confirmar autorización web de pacientes reconocibles antes de incorporar video de consulta.
+- Autorización del video de consulta confirmada por Alexis el 28 septiembre a las 23:11; video incorporado en la actualización.
 - Ver PREMIUM_REVIEW.md para alcance y pruebas; la aprobación y publicación ya están cerradas.
