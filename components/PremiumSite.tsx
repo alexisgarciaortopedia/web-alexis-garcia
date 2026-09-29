@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ArrowRight, ChevronDown, MapPin, Menu, Phone, Play, ShieldCheck, X, Activity } from "lucide-react";
+import { Instagram, ArrowUpRight, ArrowRight, ChevronDown, MapPin, Menu, Phone, Play, ShieldCheck, X, Activity } from "lucide-react";
 import { CLINIC_CONTACTS } from "@/lib/contacts";
 import { CLINIC_LOCATIONS } from "@/lib/locations";
 import { practiceReviews, totalReviews, combinedRating } from "@/lib/practiceReviews";
@@ -31,8 +31,9 @@ export function PremiumHeader({ sede }: { sede?: Sede }) {
   const currentSede = useSede();
   const active = sede ?? currentSede;
   return <header className="p-header">
-    <Link href="/" className="p-brand" aria-label="Dr. Alexis García, inicio"><span className="p-monogram">AG<span>✳</span></span><span>Dr. Alexis García<small>TRAUMATOLOGÍA Y ORTOPEDIA</small></span></Link>
+    <Link href="/" className="p-brand" aria-label="Dr. Alexis García, inicio"><Image src="/media/ag-transparent.png" alt="" width={64} height={64} className="p-brand-logo" priority/><span>Dr. Alexis García<small>TRAUMATOLOGÍA Y ORTOPEDIA</small></span></Link>
     <nav className={`p-nav ${open ? "is-open" : ""}`} aria-label="Navegación principal">
+      <Link onClick={() => setOpen(false)} href="/">Inicio</Link>
       <Link onClick={() => setOpen(false)} href="/#consulta">La consulta</Link>
       <Link onClick={() => setOpen(false)} href="/#tratamientos">Qué atiendo</Link>
       <Link onClick={() => setOpen(false)} href="/#sedes">Consultorios</Link>
@@ -47,7 +48,7 @@ export function PremiumFooter() {
   return <footer className="p-footer p-wrap">
     <div className="p-footer-top"><div><Link href="/" className="p-footer-brand">Dr. Alexis García<span>Traumatología y Ortopedia</span></Link><p>Tu movimiento merece atención.</p></div>
       <div><span className="p-label">CONSULTORIOS</span><Link href="/pachuca">Pachuca · Adoy Medical Center</Link><Link href="/tula">Tula · Clínica Zárate</Link><Link href="/ubicaciones">Ubicaciones y horarios</Link></div>
-      <div><span className="p-label">CONOCE MÁS</span><Link href="/sobre-mi">Sobre el doctor</Link><Link href="/segunda-opinion">Segunda opinión</Link><Link href="/muevete-seguro">Muévete Seguro</Link><a href="https://instagram.com/dralexisgarcia.ortopedia" target="_blank" rel="noopener noreferrer">Instagram ↗</a></div>
+      <div><span className="p-label">CONOCE MÁS</span><Link href="/sobre-mi">Sobre el doctor</Link><Link href="/segunda-opinion">Segunda opinión</Link><Link href="/muevete-seguro">Muévete Seguro</Link><a href="https://instagram.com/dralexisgarcia.ortopedia" target="_blank" rel="noopener noreferrer" className="p-social-link"><Instagram size={18} aria-hidden="true"/> Instagram</a></div>
     </div>
     <div className="p-footer-phones">{(["pachuca","tula"] as const).map(s => <a key={s} href={CLINIC_CONTACTS[s].tel} onClick={trackPhoneCallClick} data-placement="footer"><span>{CLINIC_CONTACTS[s].label}</span>{CLINIC_CONTACTS[s].display}<ArrowUpRight size={17}/></a>)}</div>
     <div className="p-footer-bottom"><span>© {new Date().getFullYear()} Dr. Alexis Eduardo García de los Santos.</span><Link href="/privacidad">Aviso de privacidad</Link><span>Hidalgo, México</span></div>
@@ -119,7 +120,7 @@ export default function PremiumSite({ sede }: { sede?: Sede }) {
           <div className="p-steps">{[["Entender qué te pasa","Valoración clínica y revisión de los estudios que ya tengas."],["Explicarte tus opciones","Un diagnóstico comprensible y alternativas según tu caso."],["Definir el siguiente paso","Indicaciones claras y un plan de tratamiento y seguimiento."]].map(([title,text],i) => <div key={title}><span>0{i+1}</span><div><h3>{title}</h3><p>{text}</p></div></div>)}</div>
           <AppointmentButton sede={active} placement="consultation">Quiero una valoración <span className="p-sr-only">en {contact.label}</span></AppointmentButton>
         </div>
-        <div className="p-consult-film"><div className="p-video-card p-consult-portrait"><Image src="/images/sobre-mi.jpg" alt="Dr. Alexis García, atención en consulta" fill sizes="(max-width:700px) 90vw,40vw"/><div className="p-video-caption"><small>DR. ALEXIS GARCÍA</small><strong>Tu historia.<br/>Toda mi atención.</strong></div></div><p>Atención real. Explicaciones claras. Un espacio para tus dudas.</p></div>
+        <div className="p-consult-film"><VideoCard name="consulta" title="Conoce mi consulta." label="TU HISTORIA. TODA MI ATENCIÓN."/><p>Atención real. Explicaciones claras. Un espacio para tus dudas.</p></div>
       </section>
       <section className="p-conditions" id="tratamientos"><div className="p-wrap p-section">
         <div className="p-section-heading"><div><Eyebrow number="02">QUÉ ATIENDO</Eyebrow><h2>¿Qué te está<br/><em>limitando hoy?</em></h2></div><p>Empieza por lo que sientes.<br/>En consulta valoramos la causa.</p></div>

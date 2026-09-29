@@ -17,3 +17,6 @@
   .p-portrait-note div>span{font-size:7px}
   .p-hero-watch{left:0;gap:7px;font-size:8px;bottom:8%}
 }
+
+/* Identidad original: transparencia real y acabado claro para contraste sobre el fondo oscuro. */
+.p-brand-logo{width:64px;height:64px;object-fit:contain;flex-shrink:0;filter:brightness(0) invert(1);opacity:.95}.p-social-link{display:inline-flex;align-items:center;gap:9px}.p-nav{gap:18px}@media(max-width:700px){.p-brand-logo{width:48px;height:48px}.p-brand{gap:10px}}

@@ -18,6 +18,7 @@ export default function Header() {
             Dr. Alexis Eduardo García
           </Link>
           <nav className="flex w-full flex-wrap items-center gap-4 text-sm text-text-secondary md:w-auto md:flex-nowrap md:justify-center">
+            <Link href="/" className="transition-colors hover:text-white">Inicio</Link>
             <Link href="/sobre-mi" className="transition-colors hover:text-white">
               Sobre mí
             </Link>
