@@ -34,9 +34,8 @@
 
 Procedimiento telefónico: `docs/PHONE_CONVERSION_RUNBOOK.md`.
 
-## Rediseño premium (versión de revisión)
-- Revisar diseño desplegado y videos en móvil/escritorio antes de aprobar sustitución de producción.
+## Rediseño premium publicado
+- Completado: autorización expresa, merge del PR #19, build Vercel exitoso y verificación de las cinco rutas en el dominio público.
 - Conectar y validar GA4 real; verificar etiquetas Ads/Maps Pachuca y Maps Tula para el corte del 1 octubre.
-- Ver PREMIUM_REVIEW.md para límites de medición, materiales y pruebas.
-
-- Revisar propuesta en PR #19 y preview (con visor /design-review). Acceso Vercel resuelto y pruebas visuales/funcionales completadas. Esperar aprobación de Alexis antes de producción.
+- Confirmar autorización web de pacientes reconocibles antes de incorporar video de consulta.
+- Ver PREMIUM_REVIEW.md para alcance y pruebas; la aprobación y publicación ya están cerradas.

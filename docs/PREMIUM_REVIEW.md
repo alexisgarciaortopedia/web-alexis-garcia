@@ -1,4 +1,4 @@
-# Rediseño premium — versión de revisión
+# Rediseño premium — revisión y publicación
 
 Fecha: 28 septiembre 2026 (México). Rama: feature/premium-conversion-preview.
 
@@ -38,8 +38,18 @@ Fecha: 28 septiembre 2026 (México). Rama: feature/premium-conversion-preview.
 - Acceso a Vercel verificado. Revisión visual de portada en escritorio y 390 px; agenda, navegación y solicitud del programa verificadas a 360 px mediante el visor responsive del propio preview. Ambos videos alcanzan readyState 4 sin error; quirófano completó 20 s y Adoy reprodujo con duración 44 s. Tula → agenda conserva la sede. No equivale a una prueba en dispositivos físicos.
 
 ## Antes de producción
-- Alexis revisa y aprueba la propuesta navegable antes de publicar.
+- Completado: Alexis aprobó y autorizó la publicación el 28 de septiembre de 2026, 22:51–22:52.
 - Confirmar la autorización de publicación de personas reconocibles en los videos.
 - Conectar la propiedad GA4 real, comprobar eventos y exclusión de pruebas; verificar enlaces etiquetados en ambas fichas Maps.
 - Confirmar tarifa actual si se desea mostrarla y alcance del seguimiento.
-- El dominio público no se modifica hasta aprobar esta revisión. No se alteran presupuesto, pujas ni objetivos Ads.
+- Dominio público actualizado tras autorización expresa. No se alteraron presupuesto, pujas ni objetivos Ads.
+
+## Publicación premium — 28 septiembre 2026, America/Mexico_City
+
+- Alexis autorizó expresamente hacer pública la versión revisada a las 22:51–22:52.
+- PR #19 integrado en main: `b327db6ada39c7454ad17d55265cdf3a23f1d93f`. Vercel confirmó `Deployment has completed` en producción.
+- Sitio público: https://www.alexisgarciaortopedia.com/
+- Home, Pachuca, Tula, agenda y Muévete Seguro responden HTTP 200 con el diseño nuevo y ambos teléfonos. `/design-review` devuelve 404 en producción, como se diseñó.
+- Quirófano y Adoy sirven video/mp4 HTTP 200. Quirófano llegó al final 0:20/0:20 en navegador público; Tula → agenda conservó el número 7731754638 y el ID anónimo de sesión. Pachuca conserva 7717588383.
+- GA4 continúa pendiente de propiedad real y validación de recepción; no se afirma conteo activo de visitas. No se modificaron campañas Ads, presupuestos ni pujas.
+- Video de consulta con personas identificables continúa excluido hasta confirmar autorización de publicación web.

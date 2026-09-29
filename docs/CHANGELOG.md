@@ -73,3 +73,13 @@
 - Lint, TypeScript y build local de 35 rutas aprobados. Sin cambios a producción ni configuración de campañas Ads.
 
 - Vercel confirmó éxito del preview `f292e36a`; pruebas de contactos y atribución pasan. Acceso Vercel resuelto y revisión visual en escritorio/celular completada. Ambos videos reproducen y el flujo Tula → agenda conserva contacto. PR #19 en borrador; GA4 real sigue pendiente.
+
+## Publicación premium — 28 septiembre 2026, America/Mexico_City
+
+- Alexis autorizó expresamente hacer pública la versión revisada a las 22:51–22:52.
+- PR #19 integrado en main: `b327db6ada39c7454ad17d55265cdf3a23f1d93f`. Vercel confirmó `Deployment has completed` en producción.
+- Sitio público: https://www.alexisgarciaortopedia.com/
+- Home, Pachuca, Tula, agenda y Muévete Seguro responden HTTP 200 con el diseño nuevo y ambos teléfonos. `/design-review` devuelve 404 en producción, como se diseñó.
+- Quirófano y Adoy sirven video/mp4 HTTP 200. Quirófano llegó al final 0:20/0:20 en navegador público; Tula → agenda conservó el número 7731754638 y el ID anónimo de sesión. Pachuca conserva 7717588383.
+- GA4 continúa pendiente de propiedad real y validación de recepción; no se afirma conteo activo de visitas. No se modificaron campañas Ads, presupuestos ni pujas.
+- Video de consulta con personas identificables continúa excluido hasta confirmar autorización de publicación web.
