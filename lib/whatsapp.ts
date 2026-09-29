@@ -1,5 +1,7 @@
 "use client";
 
+import { isPublicMeasurementEnabled } from "@/lib/webAnalytics";
+
 import { useSyncExternalStore } from "react";
 
 import { CLINIC_CONTACTS } from "@/lib/contacts";
@@ -156,6 +158,7 @@ export function useWhatsAppUrl(message: string, sede?: Sede) {
 
 /** Dispara la conversión "WhatsApp – clic" de Google Ads antes de navegar. */
 export function trackWhatsAppClick() {
+  if (!isPublicMeasurementEnabled()) return;
   const w = window as typeof window & {
     gtag?: (...args: unknown[]) => void;
   };

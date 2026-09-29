@@ -33,3 +33,10 @@
 - Mantener el saldo en `no verificado — revisar Facturación` hasta que exista una fuente fiable de fondos prepago en Ads Scripts.
 
 Procedimiento telefónico: `docs/PHONE_CONVERSION_RUNBOOK.md`.
+
+## Rediseño premium (versión de revisión)
+- Revisar diseño desplegado y videos en móvil/escritorio antes de aprobar sustitución de producción.
+- Conectar y validar GA4 real; verificar etiquetas Ads/Maps Pachuca y Maps Tula para el corte del 1 octubre.
+- Ver PREMIUM_REVIEW.md para límites de medición, materiales y pruebas.
+
+- Revisar propuesta en PR #19 y preview (con visor /design-review). Acceso Vercel resuelto y pruebas visuales/funcionales completadas. Esperar aprobación de Alexis antes de producción.

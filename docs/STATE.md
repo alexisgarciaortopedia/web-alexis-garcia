@@ -83,3 +83,11 @@ Actualizado: 2026-09-29.
 - Verificadas en navegador las 12 rutas públicas afectadas, con ambos teléfonos y destinos correctos por sede. También se verificó navegación interna Tula → Pachuca y cambio del WhatsApp flotante; ID anónimo conservado.
 - Evidencia visual de agenda publicada: ambos contactos separados con botones de llamada y WhatsApp.
 - Único pendiente externo: revisión de Google Ads del nuevo recurso de llamada; Maps aceptó los cambios.
+
+## Rediseño premium — revisión del 28 septiembre 2026
+
+- Nueva rama feature/premium-conversion-preview: portada, sedes, agenda y solicitud Muévete Seguro implementadas con videos reales optimizados.
+- Lint, TypeScript y compilación de producción local pasan. GA4 preparado pero pendiente del identificador real; no se afirma medición activa.
+- Producción conserva los contactos publicados. Alcance y pendientes en PREMIUM_REVIEW.md.
+
+- Vercel confirmó éxito del preview `f292e36a`; pruebas de contactos y atribución pasan. Acceso Vercel resuelto y revisión visual en escritorio/celular completada. Ambos videos reproducen y el flujo Tula → agenda conserva contacto. PR #19 en borrador; GA4 real sigue pendiente.
