@@ -118,7 +118,7 @@ export default function PremiumSite({ sede }: { sede?: Sede }) {
           <div className="p-steps">{[["Entender qué te pasa","Valoración clínica y revisión de los estudios que ya tengas."],["Explicarte tus opciones","Un diagnóstico comprensible y alternativas según tu caso."],["Definir el siguiente paso","Indicaciones claras y un plan de tratamiento y seguimiento."]].map(([title,text],i) => <div key={title}><span>0{i+1}</span><div><h3>{title}</h3><p>{text}</p></div></div>)}</div>
           <AppointmentButton sede={active} placement="consultation">Quiero una valoración <span className="p-sr-only">en {contact.label}</span></AppointmentButton>
         </div>
-        <div className="p-consult-film"><VideoCard name="consulta" title="Así es una consulta conmigo." label="UNA MIRADA A LA ATENCIÓN"/><p>Atención real. Explicaciones claras. Un espacio para tus dudas.</p></div>
+        <div className="p-consult-film"><div className="p-video-card p-consult-portrait"><Image src="/images/sobre-mi.jpg" alt="Dr. Alexis García, atención en consulta" fill sizes="(max-width:700px) 90vw,40vw"/><div className="p-video-caption"><small>DR. ALEXIS GARCÍA</small><strong>Tu historia.<br/>Toda mi atención.</strong></div></div><p>Atención real. Explicaciones claras. Un espacio para tus dudas.</p></div>
       </section>
       <section className="p-conditions" id="tratamientos"><div className="p-wrap p-section">
         <div className="p-section-heading"><div><Eyebrow number="02">QUÉ ATIENDO</Eyebrow><h2>¿Qué te está<br/><em>limitando hoy?</em></h2></div><p>Empieza por lo que sientes.<br/>En consulta valoramos la causa.</p></div>
