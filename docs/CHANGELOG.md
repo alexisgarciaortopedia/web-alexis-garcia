@@ -57,3 +57,12 @@
 - Web: contactos centralizados en `lib/contacts.ts`; ambos números visibles en encabezado, footer, agenda, gestión de cita, ubicaciones y privacidad. Llamadas, WhatsApp y flotante de cada ruta dirigen a su sede; home conserva selección por ref. JSON-LD incluye ambos contactos.
 - Conservados IDs y lógica de conversión, atribución por ref/click ID e ID anónimo de WhatsApp. Muévete Seguro mantiene su canal operativo existente.
 - Lint, TypeScript y build de producción local (webpack con certificados del sistema) verificados. HTML generado comprobado en 12 rutas: ambos teléfonos y destinos de cada sede correctos. Turbopack local limitado por Google Fonts; build Vercel y publicación pendientes al preparar esta rama.
+
+### Cierre verificado — 28 septiembre 2026, hora de México
+
+- PR #18 integrado en main, commit `783b06f5f606b06f6327b0666a99836504b97406`.
+- Vercel confirmó éxito del preview completo `f97bc2b` (2/2 checks) y del despliegue de producción `783b06f`.
+- Los primeros previews fallaron por cargas parciales desde navegador; todos los archivos dependientes quedaron incluidos antes del merge. No se publicó un build fallido.
+- Verificadas en navegador las 12 rutas públicas afectadas, con ambos teléfonos y destinos correctos por sede. También se verificó navegación interna Tula → Pachuca y cambio del WhatsApp flotante; ID anónimo conservado.
+- Evidencia visual de agenda publicada: ambos contactos separados con botones de llamada y WhatsApp.
+- Único pendiente externo: revisión de Google Ads del nuevo recurso de llamada; Maps aceptó los cambios.

@@ -74,3 +74,12 @@ Actualizado: 2026-09-29.
 
 - Sheet operativo verificado con pestañas `INICIO`, `PACIENTES`, `MOVIMIENTOS`, `RESUMEN`, respaldo y catálogos.
 - `RESUMEN` mantiene gasto Ads manual en 0 y advierte que el Panel requiere validación contra la interfaz real.
+
+### Cierre verificado — 28 septiembre 2026, hora de México
+
+- PR #18 integrado en main, commit `783b06f5f606b06f6327b0666a99836504b97406`.
+- Vercel confirmó éxito del preview completo `f97bc2b` (2/2 checks) y del despliegue de producción `783b06f`.
+- Los primeros previews fallaron por cargas parciales desde navegador; todos los archivos dependientes quedaron incluidos antes del merge. No se publicó un build fallido.
+- Verificadas en navegador las 12 rutas públicas afectadas, con ambos teléfonos y destinos correctos por sede. También se verificó navegación interna Tula → Pachuca y cambio del WhatsApp flotante; ID anónimo conservado.
+- Evidencia visual de agenda publicada: ambos contactos separados con botones de llamada y WhatsApp.
+- Único pendiente externo: revisión de Google Ads del nuevo recurso de llamada; Maps aceptó los cambios.

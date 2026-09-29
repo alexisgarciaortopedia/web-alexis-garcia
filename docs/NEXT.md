@@ -2,7 +2,7 @@
 
 ## Contactos por sede — actualización autorizada
 
-1. Comprobar build/despliegue de `fix/contactos-pachuca-tula` y enlaces publicados de ambas sedes.
+1. Completado: PR #18 integrado, build Vercel de producción correcto y 12 rutas verificadas en el sitio público.
 2. Comprobar aprobación de Google del nuevo recurso de llamada 7717588383 de Search-1; al guardar estaba pendiente de revisión.
 3. Las secciones históricas siguientes conservan su estado de cierre original; no representan una nueva restricción sobre esta actualización autorizada.
 
