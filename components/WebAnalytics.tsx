@@ -23,7 +23,9 @@ export default function WebAnalytics() {
   if (!/^G-[A-Z0-9]+$/.test(GA4_ID)) return null;
   return <Script id="ga4-configuration" strategy="afterInteractive" onReady={() => {
     if (!isPublicMeasurementEnabled()) return;
-    const w = window as typeof window & { gtag?: (...args: unknown[]) => void };
-    w.gtag?.("config", GA4_ID, { allow_google_signals: false, allow_ad_personalization_signals: false });
+    const w = window as typeof window & { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void };
+    w.dataLayer ??= [];
+    w.gtag ??= (...args: unknown[]) => { w.dataLayer!.push(args); };
+    w.gtag("config", GA4_ID, { allow_google_signals: false, allow_ad_personalization_signals: false });
   }}>{`/* GA4 configuration: ${GA4_ID} */`}</Script>;
 }
