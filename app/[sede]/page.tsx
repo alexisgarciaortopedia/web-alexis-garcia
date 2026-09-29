@@ -15,7 +15,7 @@ import {
   getSedeStaticParams,
   type ClinicLocationId,
 } from "@/lib/locations";
-import { PHONE_DISPLAY } from "@/lib/phone";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 
 type PageProps = {
   params: Promise<{ sede: string }>;
@@ -143,15 +143,16 @@ export default async function SedeHubPage({ params }: PageProps) {
           </h2>
           <div className="flex w-full max-w-sm flex-col gap-3">
             <WhatsAppLink
+              sede={sedeParam}
               message={whatsappMessage}
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-signal px-6 py-3.5 text-sm font-semibold text-ink-900 shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
             >
               <WhatsAppIcon className="h-5 w-5" />
               Escribir por WhatsApp
             </WhatsAppLink>
-            <PhoneLink className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10">
+            <PhoneLink sede={sedeParam} className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10">
               <PhoneIcon className="h-4 w-4" />
-              Llamar {PHONE_DISPLAY}
+              Llamar {CLINIC_CONTACTS[sedeParam].display}
             </PhoneLink>
           </div>
         </section>
