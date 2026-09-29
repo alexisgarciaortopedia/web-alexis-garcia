@@ -11,7 +11,8 @@ import { CertifiedIcon, PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
 import SiteFooter from "@/components/SiteFooter";
-import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
+import { trackPhoneCallClick } from "@/lib/phone";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 import { useSede, type Sede } from "@/lib/sede";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
@@ -37,8 +38,9 @@ const HERO_CONTENT: Record<
 };
 
 export default function HomeClient() {
-  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
   const sede = useSede();
+  const contact = CLINIC_CONTACTS[sede];
+  const whatsappUrl = useWhatsAppUrl(`${WHATSAPP_MESSAGE} Sede: ${contact.label}.`, sede);
   const hero = HERO_CONTENT[sede];
 
   const heroRef = useRef<HTMLElement>(null);
@@ -110,15 +112,15 @@ export default function HomeClient() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-signal px-6 py-3.5 text-sm font-semibold text-ink-900 shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
               >
                 <WhatsAppIcon className="h-5 w-5" />
-                Escribir por WhatsApp
+                WhatsApp {contact.label}
               </a>
               <a
-                href={PHONE_TEL}
+                href={contact.tel}
                 onClick={trackPhoneCallClick}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
               >
                 <PhoneIcon className="h-4 w-4" />
-                Llamar {PHONE_DISPLAY}
+                Llamar {contact.display}
               </a>
               <span className="text-center text-xs text-text-muted sm:text-left">
                 {hero.micro}

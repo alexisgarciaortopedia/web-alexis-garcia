@@ -15,7 +15,7 @@ import {
   getSedeStaticParams,
   type ClinicLocationId,
 } from "@/lib/locations";
-import { PHONE_DISPLAY } from "@/lib/phone";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 
 type PageProps = {
   params: Promise<{ sede: string }>;
@@ -119,14 +119,15 @@ export default async function RodillaSedePage({ params }: PageProps) {
 
               <div className="flex flex-wrap gap-3">
                 <WhatsAppLink
+                  sede={sedeParam}
                   message={whatsappMessage}
                   className="inline-flex items-center justify-center rounded-full bg-accent-signal px-6 py-2 text-sm font-semibold text-ink-900 shadow-[0_20px_55px_rgba(2,6,12,0.65)] transition-all duration-200 hover:-translate-y-0.5"
                 >
                   Escribir por WhatsApp
                 </WhatsAppLink>
-                <PhoneLink className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[rgba(255,255,255,0.04)] px-6 py-2 text-sm font-semibold text-white backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.08)]">
+                <PhoneLink sede={sedeParam} className="inline-flex items-center justify-center rounded-full border border-white/15 bg-[rgba(255,255,255,0.04)] px-6 py-2 text-sm font-semibold text-white backdrop-blur-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(255,255,255,0.08)]">
                   <PhoneIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Llamar {PHONE_DISPLAY}
+                  Llamar {CLINIC_CONTACTS[sedeParam].display}
                 </PhoneLink>
                 <a
                   href="https://instagram.com/dralexisgarcia.ortopedia"

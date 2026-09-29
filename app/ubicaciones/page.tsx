@@ -1,4 +1,7 @@
 import Link from "next/link";
+import PhoneLink from "@/components/PhoneLink";
+import WhatsAppLink from "@/components/WhatsAppLink";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import WhatsAppFloating from "@/components/WhatsAppFloating";
@@ -87,6 +90,8 @@ export default function UbicacionesPage() {
               >
                 Agendar cita en Tula
               </Link>
+              <PhoneLink sede="tula" className="w-full text-sm text-white">Llamar: {CLINIC_CONTACTS.tula.display}</PhoneLink>
+              <WhatsAppLink sede="tula" message="Hola, me gustaría agendar en Tula." className="w-full text-sm text-accent-signal">WhatsApp Tula</WhatsAppLink>
               <a
                 href={tula.mapsUrl}
                 target="_blank"
@@ -168,6 +173,8 @@ export default function UbicacionesPage() {
               >
                 Agendar cita en Pachuca
               </Link>
+              <PhoneLink sede="pachuca" className="w-full text-sm text-white">Llamar: {CLINIC_CONTACTS.pachuca.display}</PhoneLink>
+              <WhatsAppLink sede="pachuca" message="Hola, me gustaría agendar en Pachuca." className="w-full text-sm text-accent-signal">WhatsApp Pachuca</WhatsAppLink>
               <a
                 href={pachuca.mapsUrl}
                 target="_blank"

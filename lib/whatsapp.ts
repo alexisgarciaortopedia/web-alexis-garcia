@@ -2,7 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
-const PHONE = "527731754638";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
+import { useSede, type Sede } from "@/lib/sede";
 const DEFAULT_REF = "WEB";
 const REF_STORAGE_KEY = "ag_ref";
 const CONTACT_ID_STORAGE_KEY = "ag_wa_contact_id";
@@ -20,10 +21,10 @@ type StoredAdsClick = {
   value: string;
 };
 
-function buildWhatsAppUrl(message: string, snapshot: string) {
+function buildWhatsAppUrl(message: string, snapshot: string, sede: Sede) {
   const [ref, contactId] = snapshot.split("|");
   const fullMessage = `${message}\nRef: ${ref} | ID: ${contactId}`;
-  return `https://wa.me/${PHONE}?text=${encodeURIComponent(fullMessage)}`;
+  return `https://wa.me/${CLINIC_CONTACTS[sede].whatsapp}?text=${encodeURIComponent(fullMessage)}`;
 }
 
 // El parámetro ?ref= no cambia sin una navegación completa, así que no hace
@@ -143,13 +144,14 @@ function getClientSnapshot() {
  * Builds a wa.me link con origen e ID anónimo de contacto. Los click IDs de
  * Ads se conservan solo en sessionStorage y nunca se exponen en el mensaje.
  */
-export function useWhatsAppUrl(message: string) {
+export function useWhatsAppUrl(message: string, sede?: Sede) {
+  const routeSede = useSede();
   const snapshot = useSyncExternalStore(
     subscribe,
     getClientSnapshot,
     getServerSnapshot,
   );
-  return buildWhatsAppUrl(message, snapshot);
+  return buildWhatsAppUrl(message, snapshot, sede ?? routeSede);
 }
 
 /** Dispara la conversión "WhatsApp – clic" de Google Ads antes de navegar. */

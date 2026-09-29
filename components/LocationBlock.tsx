@@ -1,3 +1,6 @@
+import PhoneLink from "@/components/PhoneLink";
+import WhatsAppLink from "@/components/WhatsAppLink";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 import GlassPanel from "@/components/GlassPanel";
 import type { ClinicLocation } from "@/lib/locations";
 
@@ -30,6 +33,8 @@ export default function LocationBlock({ sede }: LocationBlockProps) {
           {sede.scheduleLabel}
         </span>
       </div>
+      <PhoneLink sede={sede.id} className="text-sm text-white">Llamar a {sede.shortLabel}: {CLINIC_CONTACTS[sede.id].display}</PhoneLink>
+      <WhatsAppLink sede={sede.id} message={`Hola, me gustaría agendar en ${sede.shortLabel}.`} className="text-sm text-accent-signal">WhatsApp {sede.shortLabel}</WhatsAppLink>
       <a
         href={sede.mapsUrl}
         target="_blank"

@@ -2,10 +2,6 @@
 
 import type { MouseEvent } from "react";
 
-/** Número único de contacto, en los dos formatos que usa la interfaz. */
-export const PHONE_TEL = "tel:+527731754638";
-export const PHONE_DISPLAY = "773 175 4638";
-
 const CONVERSION_SEND_TO = "AW-18142944053/_EqkCPn2q-ccELW2nctD";
 
 /**

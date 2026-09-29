@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CLINIC_CONTACTS, CONTACT_SEDES } from "@/lib/contacts";
 import HomeClient from "./HomeClient";
 import { practiceReviews } from "@/lib/practiceReviews";
 
@@ -25,7 +26,8 @@ const physicianStructuredData = {
       url: "https://www.alexisgarciaortopedia.com",
       image: "https://www.alexisgarciaortopedia.com/doctor-hero.webp",
       medicalSpecialty: "Traumatología y Ortopedia",
-      telephone: "+527731754638",
+      telephone: CONTACT_SEDES.map((sede) => CLINIC_CONTACTS[sede].e164),
+      contactPoint: CONTACT_SEDES.map((sede) => ({ "@type": "ContactPoint", telephone: CLINIC_CONTACTS[sede].e164, contactType: "appointments", areaServed: CLINIC_CONTACTS[sede].label, availableLanguage: "Spanish" })),
       sameAs: [
         "https://instagram.com/dralexisgarcia.ortopedia",
         practiceReviews.pachuca.googleMapsUrl,
@@ -35,6 +37,7 @@ const physicianStructuredData = {
         {
           "@type": "Place",
           name: "Zárate Unidad de Especialidades Médicas",
+          telephone: CLINIC_CONTACTS.tula.e164,
           address: {
             "@type": "PostalAddress",
             streetAddress: "Cto. Revolución 19, Col. Iturbe",
@@ -61,6 +64,7 @@ const physicianStructuredData = {
         {
           "@type": "Place",
           name: "Adoy Medical Center",
+          telephone: CLINIC_CONTACTS.pachuca.e164,
           address: {
             "@type": "PostalAddress",
             streetAddress: "Lic. Hernández y Fernández 105, San Antonio",

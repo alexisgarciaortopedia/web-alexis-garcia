@@ -48,3 +48,12 @@
 - Verificadas las fichas profesionales en Maps: Pachuca 5.0 / 24 reseñas, Tula 5.0 / 23 reseñas. Total derivado: 47.
 - Centralizados calificación, conteo y enlace de cada sede; componente compartido en home y landings.
 - Retirado `AggregateRating` autogestionado de `Physician`, conservando el resto del JSON-LD.
+
+## Contactos por sede (2026-09-29)
+
+- Alexis autorizó actualizar Ads, Maps y el sitio publicado; proporcionó Pachuca **771 758 8383**. Tula conserva **773 175 4638**.
+- Maps: Pachuca principal 7717588383, adicional 7731754638, WhatsApp `https://wa.me/527717588383`; Tula principal 7731754638, adicional 7717588383, WhatsApp propio conservado. Cambios guardados y aceptados en ambas fichas.
+- Google Ads 954-489-8007: recurso de llamada 7717588383 añadido a nivel campaña Search-1 (Pachuca); pendiente de revisión de Google al verificar. Recurso de cuenta Tula conservado. Sin cambios de presupuesto, pujas ni objetivos.
+- Web: contactos centralizados en `lib/contacts.ts`; ambos números visibles en encabezado, footer, agenda, gestión de cita, ubicaciones y privacidad. Llamadas, WhatsApp y flotante de cada ruta dirigen a su sede; home conserva selección por ref. JSON-LD incluye ambos contactos.
+- Conservados IDs y lógica de conversión, atribución por ref/click ID e ID anónimo de WhatsApp. Muévete Seguro mantiene su canal operativo existente.
+- Lint, TypeScript y build de producción local (webpack con certificados del sistema) verificados. HTML generado comprobado en 12 rutas: ambos teléfonos y destinos de cada sede correctos. Turbopack local limitado por Google Fonts; build Vercel y publicación pendientes al preparar esta rama.

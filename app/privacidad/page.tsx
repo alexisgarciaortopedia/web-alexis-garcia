@@ -3,9 +3,8 @@ import Link from "next/link";
 import { SiteFooterNav } from "@/components/SiteFooter";
 
 const CONTACT_EMAIL = "alexisgarciaortopedia@gmail.com";
-const CONTACT_PHONE_DISPLAY = "773 175 4638";
-const CONTACT_PHONE_TEL = "+527731754638";
-const LAST_UPDATED = "11 de agosto de 2026";
+import { CLINIC_CONTACTS, CONTACT_SEDES } from "@/lib/contacts";
+const LAST_UPDATED = "28 de septiembre de 2026";
 
 type IndiceItem = {
   id: string;
@@ -179,10 +178,11 @@ export default function PrivacidadPage() {
             </a>
           </p>
           <p>
-            Teléfono:{" "}
-            <a href={`tel:${CONTACT_PHONE_TEL}`} className="text-teal-400 transition-colors hover:text-teal-300">
-              {CONTACT_PHONE_DISPLAY}
-            </a>
+            Teléfonos: {CONTACT_SEDES.map((sede) => (
+              <a key={sede} href={CLINIC_CONTACTS[sede].tel} className="block text-teal-400 transition-colors hover:text-teal-300">
+                {CLINIC_CONTACTS[sede].label}: {CLINIC_CONTACTS[sede].display}
+              </a>
+            ))}
           </p>
         </Seccion>
 
