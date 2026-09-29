@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 
 export type Sede = "pachuca" | "tula";
 
@@ -28,13 +29,10 @@ function getClientSnapshot(): Sede {
   return detectSedeFromRef(ref);
 }
 
-/**
- * Determina qué sede mostrar en el hero a partir del ?ref= de la campaña
- * que trajo al paciente (p. ej. GADS-TUL-URG => Tula). Mismo patrón de
- * hidratación en dos pasos que useWhatsAppUrl: el servidor siempre entrega
- * la variante de Pachuca, y el cliente la corrige tras montar si el ref
- * indica Tula.
- */
+/** La sede de la ruta tiene prioridad; el home conserva la selección por ref. */
 export function useSede(): Sede {
-  return useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const pathname = usePathname();
+  const refSede = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const routeSede = pathname.split("/")[1];
+  return routeSede === "tula" || routeSede === "pachuca" ? routeSede : refSede;
 }
