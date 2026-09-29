@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ArrowRight, ChevronDown, MapPin, Menu, Phone, Play, ShieldCheck, X, Activity } from "lucide-react";
 import { CLINIC_CONTACTS } from "@/lib/contacts";
 import { CLINIC_LOCATIONS } from "@/lib/locations";
-import { practiceReviews } from "@/lib/practiceReviews";
+import { practiceReviews, totalReviews, combinedRating } from "@/lib/practiceReviews";
 import { STATIC_GOOGLE_REVIEWS } from "@/lib/staticGoogleReviews";
 import { useSede, type Sede } from "@/lib/sede";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
@@ -74,7 +74,8 @@ export function VideoCard({ name, title, label, compact = false }: { name: "cons
 
 function Rating({ sede }: { sede?: Sede }) {
   const reviews = sede ? practiceReviews[sede] : null;
-  return <div className="p-rating"><span className="p-stars" aria-label="5 de 5 estrellas">★★★★★</span><strong>5.0</strong><span>{reviews ? `${reviews.count} reseñas en Google` : "47 reseñas entre ambas sedes"}</span><a href={(reviews ?? practiceReviews.pachuca).googleMapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Ver reseñas en Google"><ArrowUpRight size={15}/></a></div>;
+  const rating = reviews?.rating ?? combinedRating;
+  return <div className="p-rating"><span className="p-stars" aria-label={`${rating} de 5 estrellas`}>★★★★★</span><strong>{rating.toFixed(1)}</strong><span>{reviews ? `${reviews.count} reseñas en Google` : `${totalReviews} reseñas entre ambas sedes`}</span><a href={(reviews ?? practiceReviews.pachuca).googleMapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Ver reseñas en Google"><ArrowUpRight size={15}/></a></div>;
 }
 
 const conditions = [
