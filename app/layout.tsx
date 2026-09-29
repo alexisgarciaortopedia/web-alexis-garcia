@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Spectral } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import WebAnalytics from "@/components/WebAnalytics";
 
 const GOOGLE_ADS_ID = "AW-18142944053";
 
@@ -93,9 +94,13 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GOOGLE_ADS_ID}');
+            const productionHost = ['www.alexisgarciaortopedia.com', 'alexisgarciaortopedia.com'].includes(location.hostname);
+            let testVisit = new URLSearchParams(location.search).get('medicion') === 'prueba';
+            try { if (testVisit) sessionStorage.setItem('ag_measurement_test', '1'); testVisit = testVisit || sessionStorage.getItem('ag_measurement_test') === '1'; } catch {}
+            if (productionHost && !testVisit) gtag('config', '${GOOGLE_ADS_ID}');
           `}
         </Script>
+        <WebAnalytics />
       </body>
     </html>
   );
