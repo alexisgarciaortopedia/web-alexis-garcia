@@ -1,5 +1,7 @@
 "use client";
 
+import { useSede } from "@/lib/sede";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 import { WhatsAppIcon } from "@/components/Icons";
 import { trackWhatsAppClick, useWhatsAppUrl } from "@/lib/whatsapp";
 
@@ -19,7 +21,8 @@ type WhatsAppFloatingProps = {
 export default function WhatsAppFloating({
   visible = true,
 }: WhatsAppFloatingProps) {
-  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE);
+  const sede = useSede();
+  const whatsappUrl = useWhatsAppUrl(WHATSAPP_MESSAGE, sede);
 
   return (
     <a
@@ -37,7 +40,7 @@ export default function WhatsAppFloating({
           ? "translate-y-0 opacity-100 hover:-translate-y-1"
           : "pointer-events-none translate-y-2 opacity-0",
       ].join(" ")}
-      aria-label="WhatsApp"
+      aria-label={`WhatsApp ${CLINIC_CONTACTS[sede].label}`}
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
     >

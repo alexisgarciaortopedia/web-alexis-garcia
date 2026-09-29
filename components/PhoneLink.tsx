@@ -1,8 +1,12 @@
 "use client";
 
-import { PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
+import { trackPhoneCallClick } from "@/lib/phone";
+
+import { CLINIC_CONTACTS } from "@/lib/contacts";
+import { useSede, type Sede } from "@/lib/sede";
 
 type PhoneLinkProps = {
+  sede?: Sede;
   className?: string;
   "aria-label"?: string;
   children: React.ReactNode;
@@ -15,13 +19,15 @@ type PhoneLinkProps = {
  * pueden llevar un onClick directo en su propio JSX.
  */
 export default function PhoneLink({
+  sede,
   className,
   children,
   ...rest
 }: PhoneLinkProps) {
+  const routeSede = useSede();
   return (
     <a
-      href={PHONE_TEL}
+      href={CLINIC_CONTACTS[sede ?? routeSede].tel}
       onClick={trackPhoneCallClick}
       className={className}
       {...rest}

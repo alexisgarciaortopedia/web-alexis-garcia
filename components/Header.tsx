@@ -3,7 +3,9 @@
 import Link from "next/link";
 import GlassPanel from "./GlassPanel";
 import { InstagramIcon, PhoneIcon } from "./Icons";
-import { PHONE_DISPLAY, PHONE_TEL, trackPhoneCallClick } from "@/lib/phone";
+import { trackPhoneCallClick } from "@/lib/phone";
+
+import { CLINIC_CONTACTS, CONTACT_SEDES } from "@/lib/contacts";
 
 const INSTAGRAM_URL = "https://instagram.com/dralexisgarcia.ortopedia";
 
@@ -28,14 +30,19 @@ export default function Header() {
           </nav>
           <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-3 md:w-auto md:justify-end max-[900px]:w-full max-[900px]:flex-wrap max-[900px]:justify-between">
             <div className="flex min-w-0 items-center gap-3 text-sm text-white/70">
-              <a
-                href={PHONE_TEL}
-                onClick={trackPhoneCallClick}
-                className="flex min-w-0 items-center gap-2 transition-colors hover:text-white max-[900px]:truncate"
-              >
-                <PhoneIcon className="h-4 w-4 text-white/80" />
-                <span>{PHONE_DISPLAY}</span>
-              </a>
+              <div className="flex flex-col gap-1">
+                {CONTACT_SEDES.map((sede) => (
+                <a
+                  key={sede}
+                  href={CLINIC_CONTACTS[sede].tel}
+                  onClick={trackPhoneCallClick}
+                  className="flex min-w-0 items-center gap-2 transition-colors hover:text-white max-[900px]:truncate"
+                >
+                  <PhoneIcon className="h-4 w-4 text-white/80" />
+                  <span className="whitespace-nowrap">{CLINIC_CONTACTS[sede].label}: {CLINIC_CONTACTS[sede].display}</span>
+                </a>
+                ))}
+              </div>
               <a
                 href={INSTAGRAM_URL}
                 target="_blank"

@@ -1,8 +1,5 @@
 import Link from "next/link";
-import WhatsAppLink from "@/components/WhatsAppLink";
-
-const WHATSAPP_MESSAGE =
-  "Hola, vengo de la página del Dr. Alexis García. Me gustaría agendar una consulta.";
+import ContactOptions from "@/components/ContactOptions";
 
 /**
  * Enlaces del sitio, agrupados por sección.
@@ -93,6 +90,7 @@ export default function SiteFooter() {
   return (
     <footer className="relative z-10 border-t border-white/5 px-8 py-10">
       <SiteFooterNav />
+      <div className="mx-auto mt-8 max-w-3xl"><ContactOptions /></div>
 
       <div className="mx-auto mt-8 flex w-full max-w-5xl flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/5 pt-6 text-xs text-text-muted">
         <a
@@ -103,12 +101,6 @@ export default function SiteFooter() {
         >
           Instagram
         </a>
-        <WhatsAppLink
-          message={WHATSAPP_MESSAGE}
-          className="transition-colors hover:text-white"
-        >
-          WhatsApp
-        </WhatsAppLink>
         <Link
           href="/privacidad"
           className="transition-colors hover:text-white"

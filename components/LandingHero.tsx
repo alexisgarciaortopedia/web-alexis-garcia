@@ -1,7 +1,7 @@
 import { CertifiedIcon, PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 import PhoneLink from "@/components/PhoneLink";
 import WhatsAppLink from "@/components/WhatsAppLink";
-import { PHONE_DISPLAY } from "@/lib/phone";
+import { CLINIC_CONTACTS } from "@/lib/contacts";
 import GoogleRating from "@/components/GoogleRating";
 import type { ReviewLocation } from "@/lib/practiceReviews";
 
@@ -30,6 +30,7 @@ export default function LandingHero({
   micro,
   whatsappMessage,
 }: LandingHeroProps) {
+  const sede = reviewLocation === "tula" ? "tula" : "pachuca";
   return (
     <section className="flex flex-col gap-6 pt-4">
       <div className="flex flex-col gap-4">
@@ -59,15 +60,16 @@ export default function LandingHero({
 
       <div className="flex max-w-md flex-col gap-3">
         <WhatsAppLink
+          sede={sede}
           message={whatsappMessage}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-signal px-6 py-3.5 text-sm font-semibold text-ink-900 shadow-[0_12px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
         >
           <WhatsAppIcon className="h-5 w-5" />
-          Escribir por WhatsApp
+          WhatsApp {CLINIC_CONTACTS[sede].label}
         </WhatsAppLink>
-        <PhoneLink className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10">
+        <PhoneLink sede={sede} className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-white/10">
           <PhoneIcon className="h-4 w-4" />
-          Llamar {PHONE_DISPLAY}
+          Llamar {CLINIC_CONTACTS[sede].display}
         </PhoneLink>
         <span className="text-center text-xs text-text-muted sm:text-left">
           {micro}
