@@ -97,3 +97,7 @@
 
 - Google Maps: Pachuca 4.9 / 32 y Tula 5.0 / 28, verificadas en sus fichas profesionales. La web mostraba 5.0 / 24 y 5.0 / 23. El total derivado pasa de 47 a 60.
 - Actualización limitada a `lib/practiceReviews.ts`; las cifras históricas en documentación anterior permanecen fechadas.
+
+## 2026-11-27 — Enlace de Facebook
+
+- Añadido el perfil facilitado por Alexis en el pie premium, el pie de páginas interiores y el `sameAs` de la portada.

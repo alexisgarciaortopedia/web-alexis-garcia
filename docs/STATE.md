@@ -1,5 +1,9 @@
 # Estado actual
 
+## Facebook del consultorio — 27 nov 2026
+
+- El perfil indicado por Alexis (`61596619014601`) abre como “Dr. Alexis García | Pachuca”. El enlace se añadió a los dos pies del sitio y al `sameAs` del médico en la portada; no se modificó Facebook.
+
 ## Reseñas de Google Maps — 27 nov 2026
 
 - Verificadas las fichas profesionales por CID: Pachuca 4.9 / 32 reseñas; Tula 5.0 / 28 reseñas. El sitio publicado todavía muestra 24 + 23 = 47; faltan 13 frente a las 60 actuales.

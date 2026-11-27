@@ -1,5 +1,9 @@
 # Siguientes pasos
 
+## Facebook
+
+Si Alexis cambia el perfil oficial, actualizar el enlace en los dos pies del sitio y en el `sameAs` de la portada.
+
 ## Cifras de reseñas — 27 nov 2026
 
 1. Publicar la rama `fix/reviews-2026-11-27` cuando se compruebe el pipeline de Vercel y su costo.

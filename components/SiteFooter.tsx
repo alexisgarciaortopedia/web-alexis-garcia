@@ -101,6 +101,14 @@ export default function SiteFooter() {
         >
           Instagram
         </a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61596619014601"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors hover:text-white"
+        >
+          Facebook
+        </a>
         <Link
           href="/privacidad"
           className="transition-colors hover:text-white"
