@@ -93,3 +93,7 @@
 - Lint, compilación Next.js con TypeScript y verificación de contactos/atribución/carga diferida pasan.
 - GA4 sigue pendiente; campañas y presupuestos sin cambios.
 - Publicación `68bc7d1d2efe943295584bb91d79770d7108a674`: Vercel confirmó éxito; navegador público reprodujo consulta y los tres recursos nuevos responden HTTP 200.
+## 2026-11-27 — Cifras de reseñas por sede
+
+- Google Maps: Pachuca 4.9 / 32 y Tula 5.0 / 28, verificadas en sus fichas profesionales. La web mostraba 5.0 / 24 y 5.0 / 23. El total derivado pasa de 47 a 60.
+- Actualización limitada a `lib/practiceReviews.ts`; las cifras históricas en documentación anterior permanecen fechadas.

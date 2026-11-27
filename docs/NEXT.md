@@ -1,5 +1,10 @@
 # Siguientes pasos
 
+## Cifras de reseñas — 27 nov 2026
+
+1. Publicar la rama `fix/reviews-2026-11-27` cuando se compruebe el pipeline de Vercel y su costo.
+2. Verificar en producción 32 reseñas / 4.9 Pachuca, 28 / 5.0 Tula y 60 en total.
+
 ## Contactos por sede — actualización autorizada
 
 1. Completado: PR #18 integrado, build Vercel de producción correcto y 12 rutas verificadas en el sitio público.

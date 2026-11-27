@@ -1,6 +1,11 @@
 # Estado actual
 
-Actualizado: 2026-09-29.
+## Reseñas de Google Maps — 27 nov 2026
+
+- Verificadas las fichas profesionales por CID: Pachuca 4.9 / 32 reseñas; Tula 5.0 / 28 reseñas. El sitio publicado todavía muestra 24 + 23 = 47; faltan 13 frente a las 60 actuales.
+- `lib/practiceReviews.ts` actualizado en la rama `fix/reviews-2026-11-27`; el total y la calificación combinada se derivan de ambas fichas. Estado de publicación: pendiente de verificar.
+
+Actualizado: 2026-11-27. El resto del documento conserva cortes históricos.
 
 ## Contactos por sede (2026-09-29)
 
