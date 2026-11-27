@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Instagram, ArrowUpRight, ArrowRight, ChevronDown, MapPin, Menu, Phone, Play, ShieldCheck, X, Activity } from "lucide-react";
+import { Instagram, Facebook, ArrowUpRight, ArrowRight, ChevronDown, MapPin, Menu, Phone, Play, ShieldCheck, X, Activity } from "lucide-react";
 import { CLINIC_CONTACTS } from "@/lib/contacts";
 import { CLINIC_LOCATIONS } from "@/lib/locations";
 import { practiceReviews, totalReviews, combinedRating } from "@/lib/practiceReviews";
@@ -48,7 +48,7 @@ export function PremiumFooter() {
   return <footer className="p-footer p-wrap">
     <div className="p-footer-top"><div><Link href="/" className="p-footer-brand">Dr. Alexis García<span>Traumatología y Ortopedia</span></Link><p>Tu movimiento merece atención.</p></div>
       <div><span className="p-label">CONSULTORIOS</span><Link href="/pachuca">Pachuca · Adoy Medical Center</Link><Link href="/tula">Tula · Clínica Zárate</Link><Link href="/ubicaciones">Ubicaciones y horarios</Link></div>
-      <div><span className="p-label">CONOCE MÁS</span><Link href="/sobre-mi">Sobre el doctor</Link><Link href="/segunda-opinion">Segunda opinión</Link><Link href="/muevete-seguro">Muévete Seguro</Link><a href="https://instagram.com/dralexisgarcia.ortopedia" target="_blank" rel="noopener noreferrer" className="p-social-link"><Instagram size={18} aria-hidden="true"/> Instagram</a></div>
+      <div><span className="p-label">CONOCE MÁS</span><Link href="/sobre-mi">Sobre el doctor</Link><Link href="/segunda-opinion">Segunda opinión</Link><Link href="/muevete-seguro">Muévete Seguro</Link><a href="https://instagram.com/dralexisgarcia.ortopedia" target="_blank" rel="noopener noreferrer" className="p-social-link"><Instagram size={18} aria-hidden="true"/> Instagram</a><a href="https://www.facebook.com/profile.php?id=61596619014601" target="_blank" rel="noopener noreferrer" className="p-social-link"><Facebook size={18} aria-hidden="true"/> Facebook</a></div>
     </div>
     <div className="p-footer-phones">{(["pachuca","tula"] as const).map(s => <a key={s} href={CLINIC_CONTACTS[s].tel} onClick={trackPhoneCallClick} data-placement="footer"><span>{CLINIC_CONTACTS[s].label}</span>{CLINIC_CONTACTS[s].display}<ArrowUpRight size={17}/></a>)}</div>
     <div className="p-footer-bottom"><span>© {new Date().getFullYear()} Dr. Alexis Eduardo García de los Santos.</span><Link href="/privacidad">Aviso de privacidad</Link><span>Hidalgo, México</span></div>

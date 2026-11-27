@@ -30,6 +30,7 @@ const physicianStructuredData = {
       contactPoint: CONTACT_SEDES.map((sede) => ({ "@type": "ContactPoint", telephone: CLINIC_CONTACTS[sede].e164, contactType: "appointments", areaServed: CLINIC_CONTACTS[sede].label, availableLanguage: "Spanish" })),
       sameAs: [
         "https://instagram.com/dralexisgarcia.ortopedia",
+        "https://www.facebook.com/profile.php?id=61596619014601",
         practiceReviews.pachuca.googleMapsUrl,
         practiceReviews.tula.googleMapsUrl,
       ],
